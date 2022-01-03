@@ -1,7 +1,7 @@
 locals {
   service_secrets = concat(var.service_secrets, [])
-  global_secrets = concat(var.global_secrets, [])
-  environment  = merge(var.environment, {})
+  global_secrets  = concat(var.global_secrets, [])
+  environment     = merge(var.environment, {})
 }
 
 variable "env" {
@@ -147,7 +147,7 @@ variable "target_group_arn" {
 }
 
 variable "sidecar_container_definitions" {
-  type        = list
+  type        = list(any)
   description = "ECS Sidecar container definitions, e.g. Datadog agent"
   default     = []
 }
@@ -155,7 +155,7 @@ variable "sidecar_container_definitions" {
 variable "iam_role_policy_statement" {
   type        = list(any)
   description = "ECS Service IAM Role policy statement"
-  default = []
+  default     = []
 }
 
 variable "ecs_launch_type" {
