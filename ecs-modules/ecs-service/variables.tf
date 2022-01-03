@@ -147,7 +147,7 @@ variable "target_group_arn" {
 }
 
 variable "sidecar_container_definitions" {
-  type        = list(any)
+  type        = any
   description = "ECS Sidecar container definitions, e.g. Datadog agent"
   default     = []
 }
