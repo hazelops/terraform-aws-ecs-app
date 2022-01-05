@@ -1,5 +1,5 @@
 module "alb" {
-  count   = var.service_type == "web" ? 1 : 0
+  count = var.app_type == "web" ? 1 : 0
 
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 5.0"
@@ -26,8 +26,8 @@ module "alb" {
         protocol           = "HTTPS"
         certificate_arn    = var.tls_cert_arn
         target_group_index = 0
-      } 
-    ])
+      }
+  ])
 
   target_groups = concat([
     {
@@ -72,8 +72,8 @@ module "ecr" {
 }
 
 module "efs" {
-  source    = "cloudposse/efs/aws"
-  version   = "~> 0.31"
+  source  = "cloudposse/efs/aws"
+  version = "~> 0.31"
 
   enabled         = var.efs_enabled
   namespace       = var.namespace
@@ -84,7 +84,7 @@ module "efs" {
   security_groups = var.security_groups
 
   # This is a workaround for 2-zone legacy setups
-  subnets   = length(regexall("legacy", var.env)) > 0 ? [
+  subnets = length(regexall("legacy", var.env)) > 0 ? [
     var.private_subnets[0],
     var.private_subnets[1]
   ] : var.private_subnets
@@ -94,29 +94,29 @@ module "efs" {
 module "service" {
   source = "./ecs-modules/ecs-service"
 
-  env                      = var.env
-  name                     = var.name
-  namespace                = var.namespace
-  ecs_cluster_name         = local.ecs_cluster_name
-  ecs_service_name         = local.ecs_service_name
+  env              = var.env
+  name             = var.name
+  namespace        = var.namespace
+  ecs_cluster_name = local.ecs_cluster_name
+  ecs_service_name = local.ecs_service_name
 
-  ecs_platform_version     = var.ecs_launch_type == "FARGATE" ? var.ecs_platform_version : null
-  ecs_launch_type          = var.ecs_launch_type
-  ec2_service_group        = var.ec2_service_group
-  docker_container_port    = var.docker_container_port
-  ecs_network_mode         = var.ecs_network_mode
-  ecs_volumes_from         = var.ecs_volumes_from
-  cpu                      = var.cpu
-  memory                   = var.memory
-  volumes                  = local.volumes
-  subnets                  = var.private_subnets
-  security_groups          = var.security_groups
+  ecs_platform_version  = var.ecs_launch_type == "FARGATE" ? var.ecs_platform_version : null
+  ecs_launch_type       = var.ecs_launch_type
+  ec2_service_group     = var.ec2_service_group
+  docker_container_port = var.docker_container_port
+  ecs_network_mode      = var.ecs_network_mode
+  ecs_volumes_from      = var.ecs_volumes_from
+  cpu                   = var.cpu
+  memory                = var.memory
+  volumes               = local.volumes
+  subnets               = var.private_subnets
+  security_groups       = var.security_groups
 
-  web_proxy_enabled        = var.web_proxy_enabled
-  ecs_exec_enabled         = var.ecs_exec_enabled
-  
+  web_proxy_enabled = var.web_proxy_enabled
+  ecs_exec_enabled  = var.ecs_exec_enabled
+
   # length(var.cloudwatch_schedule_expressions) > 1 means that it is cron task and desired_count should be 0
-  cloudwatch_schedule_expressions       = var.cloudwatch_schedule_expressions
+  cloudwatch_schedule_expressions = var.cloudwatch_schedule_expressions
 
   service_desired_count         = length(var.cloudwatch_schedule_expressions) > 1 ? 0 : var.desired_capacity
   max_size                      = var.max_size
@@ -132,8 +132,8 @@ module "service" {
   docker_image_tag          = var.docker_image_tag
   iam_role_policy_statement = var.iam_role_policy_statement
 
-  service_secrets           = var.service_secrets
-  global_secrets            = var.global_secrets
+  app_secrets    = var.app_secrets
+  global_secrets = var.global_secrets
 
   ecs_service_deployed                        = var.cloudwatch_schedule_expressions == [] ? false : true
   deployment_minimum_healthy_percent          = var.deployment_minimum_healthy_percent
@@ -146,7 +146,7 @@ module "service" {
       value = tostring(var.gpu)
   }] : []
 
-  
+
   sidecar_container_definitions = concat(
     var.web_proxy_enabled ? [module.nginx.container_definition] : [],
     var.datadog_enabled ? [module.datadog.container_definition] : [],
@@ -168,9 +168,9 @@ module "service" {
   )
 
   # TODO: instead of hardcoding the index, better use dynamic lookup by a canonical name
-  target_group_arn = var.service_type == "web" && length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : null
+  target_group_arn = var.app_type == "web" && length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : null
 
-  port_mappings = var.service_type == "web" ? [
+  port_mappings = var.app_type == "web" ? [
     {
       container_name   = var.web_proxy_enabled ? "nginx" : var.name
       container_port   = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
@@ -180,9 +180,9 @@ module "service" {
   ] : []
 
   environment = merge(var.environment, local.datadog_env_vars, {
-    APP_NAME                   = var.name
-    ENV                        = var.env
-    PROXY_ENABLED              = var.web_proxy_enabled ? "true" : "false"
+    APP_NAME      = var.name
+    ENV           = var.env
+    PROXY_ENABLED = var.web_proxy_enabled ? "true" : "false"
     },
     var.ecs_launch_type == "EC2" ? {
       DD_AGENT_HOST = "datadog-agent"
@@ -191,7 +191,7 @@ module "service" {
 }
 
 resource "aws_route53_record" "this" {
-  count   = var.service_type == "web" ? length(local.domain_names) : 0
+  count   = var.app_type == "web" ? length(local.domain_names) : 0
   zone_id = var.zone_id
   name    = local.domain_names[count.index]
   type    = "A"

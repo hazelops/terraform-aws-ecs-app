@@ -3,8 +3,8 @@ locals {
   docker_container_command    = (var.docker_container_command == [] ? [] : var.docker_container_command)
   docker_container_entrypoint = (var.docker_container_entrypoint == [] ? [] : var.docker_container_entrypoint)
 
-  ssm_secret_path             = var.ssm_secret_path != null ? var.ssm_secret_path : "/${var.env}/${var.name}"
-  ssm_global_secret_path      = var.ssm_global_secret_path != null ? var.ssm_global_secret_path : "/${var.env}/global"
+  ssm_secret_path        = var.ssm_secret_path != null ? var.ssm_secret_path : "/${var.env}/${var.name}"
+  ssm_global_secret_path = var.ssm_global_secret_path != null ? var.ssm_global_secret_path : "/${var.env}/global"
 
   # ECS Task Container definition file is filled with content here
   container_definitions = concat(var.sidecar_container_definitions, [
@@ -20,7 +20,7 @@ locals {
       memoryReservation = var.memory_reservation
       essential         = true
 
-      linuxParameters   = var.ecs_exec_enabled ? { initProcessEnabled = true } : {}
+      linuxParameters = var.ecs_exec_enabled ? { initProcessEnabled = true } : {}
 
       mountPoints = [
         # This way we ensure that we only mount main app volumes to the main app container.
@@ -29,14 +29,14 @@ locals {
 
       environment = [for k, v in local.environment : { name = k, value = v }]
 
-      secrets     = concat([for param_name in var.service_secrets :
+      secrets = concat([for param_name in var.app_secrets :
         {
           name      = param_name
           valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_secret_path}/${param_name}"
         }
-      ],[for param_name in var.global_secrets :
+        ], [for param_name in var.global_secrets :
         {
-          name      = replace(param_name, "/", "") != param_name ? element(split("/", param_name),1) : param_name
+          name      = replace(param_name, "/", "") != param_name ? element(split("/", param_name), 1) : param_name
           valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_global_secret_path}/${param_name}"
         }
       ])
@@ -60,18 +60,18 @@ locals {
       logConfiguration = var.firelens_ecs_log_enabled ? {
         "logDriver" = "awsfirelens",
         options = {
-          "Name"            = "datadog"
-          "Host"            = "http-intake.logs.datadoghq.com"
-          "apiKey"          = data.aws_ssm_parameter.dd_api_key[0].value
-          "dd_service"      = "${var.name}"
-          "dd_source"       = "ecs"
-          "dd_tags"         = "fluentbit:true,env:${var.env},service:${var.env}-${var.name}"
-          "dd_message_key"  = "log"
-          "region"          = data.aws_region.current.name
-          "TLS"             = "on"
-          "provider"        = "ecs"
+          "Name"           = "datadog"
+          "Host"           = "http-intake.logs.datadoghq.com"
+          "apiKey"         = data.aws_ssm_parameter.dd_api_key[0].value
+          "dd_service"     = "${var.name}"
+          "dd_source"      = "ecs"
+          "dd_tags"        = "fluentbit:true,env:${var.env},service:${var.env}-${var.name}"
+          "dd_message_key" = "log"
+          "region"         = data.aws_region.current.name
+          "TLS"            = "on"
+          "provider"       = "ecs"
         }
-      } : {
+        } : {
         "logDriver" = "awslogs",
         options = {
           "awslogs-group"         = aws_cloudwatch_log_group.this.name
@@ -101,21 +101,21 @@ locals {
         "Resource" = "*"
       },
       {
-        "Effect": "Allow",
-        "Action": [
+        "Effect" : "Allow",
+        "Action" : [
           "firehose:PutRecordBatch"
         ],
-        "Resource": [
+        "Resource" : [
           "*"
         ]
       },
       {
         "Effect" = "Allow",
         "Action" = [
-              "ssmmessages:CreateControlChannel",
-              "ssmmessages:CreateDataChannel",
-              "ssmmessages:OpenControlChannel",
-              "ssmmessages:OpenDataChannel"
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
         ],
         "Resource" = "*"
       },
@@ -141,7 +141,7 @@ variable "env" {
 
 variable "name" {
   type        = string
-  description = "The service name"
+  description = "ECS app name"
 }
 
 variable "memory_reservation" {
@@ -185,8 +185,8 @@ variable "environment" {
   description = "Set of environment variables"
 }
 
-variable "service_secrets" {
-  type        = list
+variable "app_secrets" {
+  type        = list(any)
   description = "List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/*"
   default     = []
 }
@@ -198,7 +198,7 @@ variable "ssm_secret_path" {
 }
 
 variable "global_secrets" {
-  type        = list
+  type        = list(any)
   description = "List of SSM ParameterStore global secrets - by default, /$var.env/global/*"
   default     = []
 }
@@ -229,7 +229,7 @@ variable "docker_container_port" {
 }
 
 variable "port_mappings" {
-  type        = list
+  type        = list(any)
   description = "Docker container port mapping to a host port. We don't forward ports from the container if we are using proxy (proxy reaches out to container via internal network)"
   default     = []
 }
@@ -316,19 +316,19 @@ variable "ecs_task_family_name" {
 }
 
 variable "ecs_volumes_from" {
-  type        = list
+  type        = list(any)
   description = "The VolumeFrom property specifies details on a data volume from another container in the same task definition"
   default     = []
 }
 
 variable "resource_requirements" {
-  type        = list
+  type        = list(any)
   description = "The ResourceRequirement property specifies the type and amount of a resource to assign to a container. The only supported resource is a GPU"
   default     = []
 }
 
 variable "volumes" {
-  type        = list
+  type        = list(any)
   description = "Amazon data volumes for ECS Task (efs/FSx/Docker volume/Bind mounts)"
   default     = []
 }
@@ -336,7 +336,7 @@ variable "volumes" {
 # https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
 variable "cloudwatch_schedule_expressions" {
   description = "List of Cron-like Cloudwatch Event Rule schedule expressions"
-  type        = list
+  type        = list(any)
   default     = []
 }
 

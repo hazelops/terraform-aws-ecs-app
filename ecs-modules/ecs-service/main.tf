@@ -1,26 +1,26 @@
 module "task" {
   source = "../ecs-task"
 
-  env                         = var.env
-  name                        = var.name
+  env  = var.env
+  name = var.name
 
-  ecs_task_family_name        = var.ecs_service_name != "" ? var.ecs_service_name : ""
-  ecs_launch_type             = var.ecs_launch_type
-  ecs_network_mode            = var.ecs_network_mode
-  ecs_volumes_from            = var.ecs_volumes_from
-  ecs_exec_enabled            = var.ecs_exec_enabled
+  ecs_task_family_name = var.ecs_service_name != "" ? var.ecs_service_name : ""
+  ecs_launch_type      = var.ecs_launch_type
+  ecs_network_mode     = var.ecs_network_mode
+  ecs_volumes_from     = var.ecs_volumes_from
+  ecs_exec_enabled     = var.ecs_exec_enabled
 
   docker_image_name           = var.docker_image_name
   docker_image_tag            = var.docker_image_tag
   docker_container_entrypoint = (var.docker_container_entrypoint == [] ? [] : var.docker_container_entrypoint)
   docker_container_command    = (var.docker_container_command == [] ? [] : var.docker_container_command)
   docker_container_depends_on = var.docker_container_depends_on
-  
-  docker_container_links      = var.docker_container_links
 
-  environment                 = var.environment                 # Non-secret Environment variables
-  service_secrets             = local.service_secrets
-  global_secrets              = local.global_secrets
+  docker_container_links = var.docker_container_links
+
+  environment    = var.environment # Non-secret Environment variables
+  app_secrets    = local.app_secrets
+  global_secrets = local.global_secrets
 
   cpu                           = var.cpu
   memory                        = var.memory

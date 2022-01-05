@@ -1,10 +1,10 @@
 module "nginx" {
-  source          = "hazelops/ecs-nginx-proxy/aws"
-  version         = "~> 1.0"
+  source  = "hazelops/ecs-nginx-proxy/aws"
+  version = "~> 1.0"
 
-  app_name        = var.name
-  env             = var.env
-  environment     = merge(var.environment, {
+  app_name = var.name
+  env      = var.env
+  environment = merge(var.environment, {
     PROXY_ENABLED = var.web_proxy_enabled ? "true" : "false"
     APP_HOST      = "127.0.0.1:${var.docker_container_port}"
   })

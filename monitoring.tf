@@ -15,11 +15,11 @@ module "route_53_health_check" {
   source  = "hazelops/route53-healthcheck/aws"
   version = "~> 1.0"
 
-  enabled                         = var.route53_health_check_enabled
-  env                             = var.env
-  fqdn                            = var.service_type == "web" ? aws_route53_record.this[0].name : null
-  domain_name                     = var.root_domain_name
-  name                            = var.name
-  subscription_endpoint_protocol  = var.sns_service_subscription_endpoint_protocol
-  subscription_endpoint           = var.sns_service_subscription_endpoint
+  enabled                        = var.route53_health_check_enabled
+  env                            = var.env
+  fqdn                           = var.app_type == "web" ? aws_route53_record.this[0].name : null
+  domain_name                    = var.root_domain_name
+  name                           = var.name
+  subscription_endpoint_protocol = var.sns_service_subscription_endpoint_protocol
+  subscription_endpoint          = var.sns_service_subscription_endpoint
 }

@@ -1,7 +1,7 @@
 locals {
-  service_secrets = concat(var.service_secrets, [])
-  global_secrets  = concat(var.global_secrets, [])
-  environment     = merge(var.environment, {})
+  app_secrets    = concat(var.app_secrets, [])
+  global_secrets = concat(var.global_secrets, [])
+  environment    = merge(var.environment, {})
 }
 
 variable "env" {
@@ -11,7 +11,7 @@ variable "env" {
 
 variable "name" {
   type        = string
-  description = "The service name"
+  description = "ECS app name"
 }
 
 variable "namespace" {
@@ -35,8 +35,8 @@ variable "ecs_platform_version" {
   type        = string
 }
 
-variable "service_secrets" {
-  type        = list
+variable "app_secrets" {
+  type        = list(any)
   description = "List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/*"
   default     = []
 }
@@ -48,7 +48,7 @@ variable "ssm_secret_path" {
 }
 
 variable "global_secrets" {
-  type        = list
+  type        = list(any)
   description = "List of SSM ParameterStore global secrets - by default, /$var.env/global/*"
   default     = []
 }
@@ -129,7 +129,7 @@ variable "service_desired_count" {
 }
 
 variable "ecs_target_task_count" {
-  description = "The target task count of 'worker' ecs service type, see $var.service_type of the root module"
+  description = "The target task count of 'worker' ecs app type, see $var.app_type of the root module"
   default     = 1
   type        = number
 }
@@ -229,13 +229,13 @@ variable "autoscale_target_value_memory" {
 }
 
 variable "subnets" {
-  type        = list
+  type        = list(any)
   description = "VPC subnets to place ECS task"
   default     = []
 }
 
 variable "security_groups" {
-  type        = list
+  type        = list(any)
   description = "Security groups to assign to ECS Fargate task/ECS EC2"
   default     = []
 }
@@ -270,7 +270,7 @@ variable "ecs_network_mode" {
 }
 
 variable "resource_requirements" {
-  type        = list
+  type        = list(any)
   description = "The ResourceRequirement property specifies the type and amount of a resource to assign to a container. The only supported resource is a GPU"
   default     = []
 }
@@ -288,13 +288,13 @@ variable "ecs_service_deployed" {
 }
 
 variable "ecs_volumes_from" {
-  type        = list
+  type        = list(any)
   description = "The VolumeFrom property specifies details on a data volume from another container in the same task definition"
   default     = []
 }
 
 variable "port_mappings" {
-  type        = list
+  type        = list(any)
   description = "Docker container port mapping to a host port. We don't forward ports from the container if we are using proxy (proxy reaches out to container via internal network)"
   default     = []
 }
@@ -308,18 +308,18 @@ variable "web_proxy_enabled" {
 # https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
 variable "cloudwatch_schedule_expressions" {
   description = "List of Cron-like Cloudwatch Event Rule schedule expressions"
-  type        = list
+  type        = list(any)
   default     = []
 }
 
 variable "autoscale_scheduled_up" {
-  type        = list
+  type        = list(any)
   description = "List of Cron-like expressions for scheduled ecs autoscale UP"
   default     = []
 }
 
 variable "autoscale_scheduled_down" {
-  type        = list
+  type        = list(any)
   description = "List of Cron-like expressions for scheduled ecs autoscale DOWN"
   default     = []
 }

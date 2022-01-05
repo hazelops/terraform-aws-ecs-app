@@ -6,7 +6,7 @@ locals {
   ecs_cluster_name = var.ecs_cluster_name != "" ? var.ecs_cluster_name : local.namespace
   domain_names     = ["${var.name}.${var.env}.${var.root_domain_name}"]
   ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : "${var.namespace}-${var.name}"
-  
+
   # Datadog Environment Variables: https://docs.datadoghq.com/agent/guide/environment-variables/
   #                                https://docs.datadoghq.com/agent/docker/apm/?tab=linux#docker-apm-agent-environment-variables
   datadog_env_vars = var.datadog_enabled ? {
@@ -21,16 +21,16 @@ locals {
 
   fluentbit_container_definition = [
     {
-        essential             = true
-        image                 = "amazon/aws-for-fluent-bit:latest"
-        name                  = "log_router"
-        memoryReservation     = 75
-        firelensConfiguration = {
-          "type"    = "fluentbit"
-          "options" = {
-              "enable-ecs-log-metadata" = "true"
-          }
+      essential         = true
+      image             = "amazon/aws-for-fluent-bit:latest"
+      name              = "log_router"
+      memoryReservation = 75
+      firelensConfiguration = {
+        "type" = "fluentbit"
+        "options" = {
+          "enable-ecs-log-metadata" = "true"
         }
+      }
     }
   ]
 
@@ -106,17 +106,17 @@ variable "namespace" {
 
 variable "name" {
   type        = string
-  description = "The service name"
+  description = "ECS app name"
 }
 
-variable "service_type" {
+variable "app_type" {
   type        = string
   description = "ECS application type. Valid values: web (with load balancer), worker (scheduled task without ALB)."
   default     = "web"
 
   validation {
-    condition     = var.service_type == "web" || var.service_type == "worker"
-    error_message = "The service_type value must be a valid type: web or worker."
+    condition     = var.app_type == "web" || var.app_type == "worker"
+    error_message = "The app_type value must be a valid type: web or worker."
   }
 }
 
@@ -151,13 +151,13 @@ variable "environment" {
 }
 
 variable "public" {
-  description = "It's publicity accessible service"
+  description = "It's publicity accessible application"
   type        = bool
   default     = true
 }
 
-variable "service_secrets" {
-  type        = list
+variable "app_secrets" {
+  type        = list(any)
   description = "List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/*"
   default     = []
 }
@@ -169,7 +169,7 @@ variable "ssm_secret_path" {
 }
 
 variable "global_secrets" {
-  type        = list
+  type        = list(any)
   description = "List of SSM ParameterStore global secrets - by default, /$var.env/global/*"
   default     = []
 }
@@ -181,19 +181,19 @@ variable "ssm_global_secret_path" {
 }
 
 variable "public_subnets" {
-  type        = list
+  type        = list(any)
   description = "VPC Public subnets to place ECS resources"
   default     = []
 }
 
 variable "private_subnets" {
-  type        = list
+  type        = list(any)
   description = "VPC Private subnets to place ECS resources"
   default     = []
 }
 
 variable "security_groups" {
-  type        = list
+  type        = list(any)
   description = "Security groups to assign to ECS Fargate task/ECS EC2"
   default     = []
 }
@@ -228,7 +228,7 @@ variable "root_domain_name" {
 }
 
 variable "domain_names" {
-  type        = list
+  type        = list(any)
   description = "Domain names for AWS Route53 A records"
   default     = []
 }
@@ -244,7 +244,7 @@ variable "vpc_id" {
 }
 
 variable "alb_security_groups" {
-  type        = list
+  type        = list(any)
   description = "Security groups to assign to ALB"
   default     = []
 }
@@ -495,53 +495,53 @@ variable "ecr_repo_name" {
 }
 
 variable "resource_requirements" {
-  type        = list
+  type        = list(any)
   description = "The ResourceRequirement property specifies the type and amount of a resource to assign to a container. The only supported resource is a GPU"
   default     = []
 }
 
 variable "root_block_device_size" {
-  type        = number
-  default     = "50"
+  type    = number
+  default = "50"
 }
 
 variable "root_block_device_type" {
-  type        = string
-  default     = "gp2"
+  type    = string
+  default = "gp2"
 }
 
 variable "alb_health_check_valid_response_codes" {
-  type        = string
-  default     = "200-399"
+  type    = string
+  default = "200-399"
 }
 
 variable "alb_deregistration_delay" {
-  type        = number
-  default     = 5
+  type    = number
+  default = 5
 }
 
 variable "alb_health_check_interval" {
-  type        = number
-  default     = 30
+  type    = number
+  default = 30
 }
 
 variable "alb_health_check_healthy_threshold" {
-  type        = number
-  default     = 3
+  type    = number
+  default = 3
 }
 
 variable "alb_health_check_unhealthy_threshold" {
-  type        = number
-  default     = 3
+  type    = number
+  default = 3
 }
 
 variable "alb_health_check_timeout" {
-  type        = number
-  default     = 6
+  type    = number
+  default = 6
 }
 
 variable "volumes" {
-  type        = list
+  type        = list(any)
   description = "Amazon data volumes for ECS Task (efs/FSx/Docker volume/Bind mounts)"
   default     = []
 }
@@ -571,7 +571,7 @@ variable "ecs_service_deployed" {
 }
 
 variable "ecs_volumes_from" {
-  type        = list
+  type        = list(any)
   description = "The VolumeFrom property specifies details on a data volume from another container in the same task definition"
   default     = []
 }
@@ -579,7 +579,7 @@ variable "ecs_volumes_from" {
 # https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
 variable "cloudwatch_schedule_expressions" {
   description = "List of Cron-like Cloudwatch Event Rule schedule expressions (UTC time zone)"
-  type        = list
+  type        = list(any)
   default     = []
 }
 

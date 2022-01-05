@@ -136,8 +136,8 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="input_root_domain_name"></a> [root\_domain\_name](#input\_root\_domain\_name) | Domain name of AWS Route53 Zone | `string` | n/a | yes |
 | <a name="input_route53_health_check_enabled"></a> [route53\_health\_check\_enabled](#input\_route53\_health\_check\_enabled) | AWS Route53 health check is enabled | `bool` | `false` | no |
 | <a name="input_security_groups"></a> [security\_groups](#input\_security\_groups) | Security groups to assign to ECS Fargate task/ECS EC2 | `list` | `[]` | no |
-| <a name="input_service_secrets"></a> [service\_secrets](#input\_service\_secrets) | List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/* | `list` | `[]` | no |
-| <a name="input_service_type"></a> [service\_type](#input\_service\_type) | ECS application type. Valid values: web (with load balancer), worker (scheduled task without ALB). | `string` | `"web"` | no |
+| <a name="input_app_secrets"></a> [service\_secrets](#input\_service\_secrets) | List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/* | `list` | `[]` | no |
+| <a name="input_app_type"></a> [service\_type](#input\_service\_type) | ECS application type. Valid values: web (with load balancer), worker (scheduled task without ALB). | `string` | `"web"` | no |
 | <a name="input_sns_service_subscription_endpoint"></a> [sns\_service\_subscription\_endpoint](#input\_sns\_service\_subscription\_endpoint) | You can use different endpoints, such as email, Pagerduty, Slack, etc. | `string` | `"exmple@example.com"` | no |
 | <a name="input_sns_service_subscription_endpoint_protocol"></a> [sns\_service\_subscription\_endpoint\_protocol](#input\_sns\_service\_subscription\_endpoint\_protocol) | See valid protocols here: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_subscription#protocol-support | `string` | `"email"` | no |
 | <a name="input_ssm_global_secret_path"></a> [ssm\_global\_secret\_path](#input\_ssm\_global\_secret\_path) | AWS SSM root path to global environment secrets like /dev/global | `string` | `null` | no |
