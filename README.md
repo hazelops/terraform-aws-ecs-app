@@ -1,5 +1,5 @@
 # Terraform AWS ECS App Module
-Terraform module to create AWS ECS application service
+Terraform module to create AWS ECS application.
 
 ## Security & Compliance [<img src="https://cloudposse.com/wp-content/uploads/2020/11/bridgecrew.svg" width="250" align="right" />](https://bridgecrew.io/)
 
