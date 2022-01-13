@@ -112,9 +112,9 @@ module "service" {
   assign_public_ip      = var.assign_public_ip
   security_groups       = var.security_groups
 
-  web_proxy_enabled = var.web_proxy_enabled
-  ecs_exec_enabled  = var.ecs_exec_enabled
-  subnets                  = var.public_service ? var.private_subnets : var.public_subnets
+  web_proxy_enabled     = var.web_proxy_enabled
+  ecs_exec_enabled      = var.ecs_exec_enabled
+  subnets               = var.public_service ? var.public_subnets : var.private_subnets
 
   # length(var.cloudwatch_schedule_expressions) > 1 means that it is cron task and desired_count should be 0
   cloudwatch_schedule_expressions = var.cloudwatch_schedule_expressions
