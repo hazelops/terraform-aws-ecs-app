@@ -19,7 +19,7 @@ module "alb" {
       target_group_index = 0
   }, ]
 
-  https_listeners = var.tls_cert_arn ? concat(
+  https_listeners = length(var.tls_cert_arn) >= 1 ? concat(
     [
       {
         port               = 443
