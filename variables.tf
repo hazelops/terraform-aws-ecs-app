@@ -158,6 +158,12 @@ variable "public" {
 
 variable "app_secrets" {
   type        = list(any)
+variable "public_service" {
+  description = "It's publicity accessible service"
+  type        = bool
+  default     = false
+}
+
   description = "List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/*"
   default     = []
 }

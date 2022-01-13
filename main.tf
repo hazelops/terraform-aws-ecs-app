@@ -19,7 +19,7 @@ module "alb" {
       target_group_index = 0
   }, ]
 
-  https_listeners = concat(
+  https_listeners = var.tls_cert_arn ? concat(
     [
       {
         port               = 443
@@ -27,7 +27,7 @@ module "alb" {
         certificate_arn    = var.tls_cert_arn
         target_group_index = 0
       }
-  ])
+    ]) : []
 
   target_groups = concat([
     {
@@ -110,11 +110,11 @@ module "service" {
   memory                = var.memory
   volumes               = local.volumes
   assign_public_ip      = var.assign_public_ip
-  subnets               = var.private_subnets
   security_groups       = var.security_groups
 
   web_proxy_enabled = var.web_proxy_enabled
   ecs_exec_enabled  = var.ecs_exec_enabled
+  subnets                  = var.public_service ? var.private_subnets : var.public_subnets
 
   # length(var.cloudwatch_schedule_expressions) > 1 means that it is cron task and desired_count should be 0
   cloudwatch_schedule_expressions = var.cloudwatch_schedule_expressions
