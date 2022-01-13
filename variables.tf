@@ -158,6 +158,12 @@ variable "public" {
 
 variable "app_secrets" {
   type        = list(any)
+variable "public_service" {
+  description = "It's publicity accessible service"
+  type        = bool
+  default     = false
+}
+
   description = "List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/*"
   default     = []
 }
@@ -516,6 +522,12 @@ variable "resource_requirements" {
 variable "root_block_device_size" {
   type    = number
   default = "50"
+}
+
+variable "http_port" {
+  type = number
+  default = 80
+  description = "Port that is used for HTTP protocol"
 }
 
 variable "root_block_device_type" {
