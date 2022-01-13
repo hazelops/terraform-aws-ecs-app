@@ -524,6 +524,12 @@ variable "root_block_device_size" {
   default = "50"
 }
 
+variable "http_port" {
+  type = number
+  default = 80
+  description = "Port that is used for HTTP protocol"
+}
+
 variable "root_block_device_type" {
   type    = string
   default = "gp2"
