@@ -109,6 +109,7 @@ module "service" {
   cpu                   = var.cpu
   memory                = var.memory
   volumes               = local.volumes
+  assign_public_ip      = var.assign_public_ip
   subnets               = var.private_subnets
   security_groups       = var.security_groups
 
@@ -127,10 +128,11 @@ module "service" {
   autoscale_target_value_cpu    = var.autoscale_target_value_cpu
   autoscale_target_value_memory = var.autoscale_target_value_memory
 
-  docker_container_command  = var.docker_container_command
-  docker_image_name         = var.docker_image_name != "" ? var.docker_image_name : "${var.docker_registry}/${var.namespace}-${var.name}"
-  docker_image_tag          = var.docker_image_tag
-  iam_role_policy_statement = var.iam_role_policy_statement
+  docker_container_entrypoint = var.docker_container_entrypoint
+  docker_container_command    = var.docker_container_command
+  docker_image_name           = var.docker_image_name != "" ? var.docker_image_name : "${var.docker_registry}/${var.namespace}-${var.name}"
+  docker_image_tag            = var.docker_image_tag
+  iam_role_policy_statement   = var.iam_role_policy_statement
 
   app_secrets    = var.app_secrets
   global_secrets = var.global_secrets

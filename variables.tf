@@ -243,6 +243,12 @@ variable "vpc_id" {
   description = "AWS VPC ID"
 }
 
+variable "assign_public_ip" {
+  type        = bool
+  description = "ECS service network configuration - assign public IP"
+  default     = false
+}
+
 variable "alb_security_groups" {
   type        = list(any)
   description = "Security groups to assign to ALB"
@@ -251,7 +257,8 @@ variable "alb_security_groups" {
 
 variable "docker_registry" {
   type        = string
-  description = "ERC docker registry"
+  description = "ECR or any other docker registry"
+  default     = "docker.io"
 }
 
 # It should include registry, e.g. hashicorp/terraform
@@ -271,6 +278,12 @@ variable "docker_container_port" {
   description = "Docker container port"
   type        = number
   default     = 3000
+}
+
+variable "docker_container_entrypoint" {
+  type        = list(string)
+  description = "Docker container entrypoint"
+  default     = []
 }
 
 variable "docker_container_command" {
