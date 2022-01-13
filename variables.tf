@@ -158,14 +158,14 @@ variable "public" {
 
 variable "app_secrets" {
   type        = list(any)
+  description = "List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/*"
+  default     = []
+}
+
 variable "public_service" {
   description = "It's publicity accessible service"
   type        = bool
   default     = false
-}
-
-  description = "List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/*"
-  default     = []
 }
 
 variable "ssm_secret_path" {
@@ -443,7 +443,7 @@ variable "sns_service_subscription_endpoint_protocol" {
   default     = "email"
 }
 
-# The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs 
+# The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs
 variable "cpu" {
   type        = number
   default     = 256
