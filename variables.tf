@@ -388,6 +388,18 @@ variable "max_size" {
   default     = 1
 }
 
+variable "autoscaling_min_size" {
+  type        = number
+  description = "Minimum number of running ECS tasks during scheduled-up-autoscaling action"
+  default     = 2
+}
+
+variable "autoscaling_max_size" {
+  type        = number
+  description = "Maximum number of running ECS tasks during scheduled-up-autoscaling action"
+  default     = 2
+}
+
 variable "desired_capacity" {
   type        = number
   description = "Desired number (capacity) of running ECS tasks"
