@@ -31,7 +31,7 @@ module "web_complete" {
   public_subnets   = local.public_subnets
   private_subnets  = local.private_subnets
   security_groups  = local.security_groups
-  root_domain_name = local.root_domain_name
+  root_domain_name = var.root_domain_name
   zone_id          = local.zone_id
 
   # Environment variables

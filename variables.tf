@@ -231,6 +231,7 @@ variable "image_id" {
 variable "root_domain_name" {
   type        = string
   description = "Domain name of AWS Route53 Zone"
+  default     = "example.com"
 }
 
 variable "domain_names" {
@@ -242,6 +243,7 @@ variable "domain_names" {
 variable "zone_id" {
   type        = string
   description = "AWS Route53 Zone ID"
+  default     = "AWS123456789"
 }
 
 variable "vpc_id" {
