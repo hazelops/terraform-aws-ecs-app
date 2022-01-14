@@ -4,7 +4,7 @@ locals {
   name_prefix      = "${substr(var.name, 0, 5)}-"
   namespace        = "${var.env}-${var.namespace}"
   ecs_cluster_name = var.ecs_cluster_name != "" ? var.ecs_cluster_name : local.namespace
-  domain_names     = ["${var.name}.${var.env}.${var.root_domain_name}"]
+  domain_names     = var.root_domain_name != "example.com" ? concat(["${var.name}.${var.env}.${var.root_domain_name}"], var.domain_names ) : []
   ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : "${var.namespace}-${var.name}"
 
   # Datadog Environment Variables: https://docs.datadoghq.com/agent/guide/environment-variables/
