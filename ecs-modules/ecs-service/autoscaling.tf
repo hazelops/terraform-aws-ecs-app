@@ -70,5 +70,5 @@ resource "aws_appautoscaling_scheduled_action" "down" {
     min_capacity = var.min_size
     max_capacity = var.max_size
   }
-  depends_on = [aws_appautoscaling_scheduled_action.up[length(var.autoscale_scheduled_up)]]
+  depends_on = [aws_appautoscaling_scheduled_action.up[count.index]]
 }
