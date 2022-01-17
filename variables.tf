@@ -402,6 +402,12 @@ variable "autoscaling_max_size" {
   default     = 2
 }
 
+variable "autoscale_scheduled_up_count" {
+  type        = number
+  description = "Count index of autoscale_scheduled_up cron expressions"
+  default     = 0
+}
+
 variable "desired_capacity" {
   type        = number
   description = "Desired number (capacity) of running ECS tasks"

@@ -127,6 +127,7 @@ module "service" {
   autoscale_scheduled_down      = var.autoscale_scheduled_down
   autoscale_target_value_cpu    = var.autoscale_target_value_cpu
   autoscale_target_value_memory = var.autoscale_target_value_memory
+  autoscale_scheduled_up_count  = var.autoscale_scheduled_up_count
 
   docker_container_entrypoint = var.docker_container_entrypoint
   docker_container_command    = var.docker_container_command
