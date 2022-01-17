@@ -58,10 +58,6 @@ resource "aws_appautoscaling_scheduled_action" "up" {
   depends_on = [aws_appautoscaling_target.this]
 }
 
-locals {
-  appautoscaling_scheduled_action_index = length(var.autoscale_scheduled_up)
-}
-
 resource "aws_appautoscaling_scheduled_action" "down" {
   count              = length(var.autoscale_scheduled_down)
   name               = "${var.name}-scheduled-down-autoscaling"
@@ -74,5 +70,5 @@ resource "aws_appautoscaling_scheduled_action" "down" {
     min_capacity = var.min_size
     max_capacity = var.max_size
   }
-  depends_on = [aws_appautoscaling_scheduled_action.up[local.appautoscaling_scheduled_action_index]]
+  depends_on = [aws_appautoscaling_target.this]
 }
