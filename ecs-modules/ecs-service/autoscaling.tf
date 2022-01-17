@@ -43,12 +43,12 @@ resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
 }
 
 resource "aws_appautoscaling_scheduled_action" "up" {
-  for_each           = toset(var.autoscale_scheduled_up)
+  count              = length(var.autoscale_scheduled_up)
   name               = "${var.name}-scheduled-up-autoscaling"
   resource_id        = aws_appautoscaling_target.this[0].resource_id
   scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
   service_namespace  = aws_appautoscaling_target.this[0].service_namespace
-  schedule           = each.key
+  schedule           = var.autoscale_scheduled_up[count.index]
 
   scalable_target_action {
     min_capacity = var.autoscaling_min_size
@@ -59,16 +59,16 @@ resource "aws_appautoscaling_scheduled_action" "up" {
 }
 
 resource "aws_appautoscaling_scheduled_action" "down" {
-  for_each           = toset(var.autoscale_scheduled_down)
+  count              = length(var.autoscale_scheduled_down)
   name               = "${var.name}-scheduled-down-autoscaling"
   resource_id        = aws_appautoscaling_target.this[0].resource_id
   scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
   service_namespace  = aws_appautoscaling_target.this[0].service_namespace
-  schedule           = each.key
+  schedule           = var.autoscale_scheduled_down[count.index]
 
   scalable_target_action {
     min_capacity = var.min_size
     max_capacity = var.max_size
   }
-  depends_on = [aws_appautoscaling_target.this]
+  depends_on = [aws_appautoscaling_scheduled_action.up[length(var.autoscale_scheduled_up)]]
 }
