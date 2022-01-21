@@ -22,7 +22,7 @@ locals {
   fluentbit_container_definition = [
     {
       essential         = true
-      image             = "amazon/aws-for-fluent-bit:latest"
+      image             = "public.ecr.aws/aws-observability/aws-for-fluent-bit:latest"
       name              = "log_router"
       memoryReservation = 75
       firelensConfiguration = {
@@ -162,7 +162,7 @@ variable "app_secrets" {
   default     = []
 }
 
-variable "public_service" {
+variable "public_ecs_service" {
   description = "It's publicity accessible service"
   type        = bool
   default     = false
