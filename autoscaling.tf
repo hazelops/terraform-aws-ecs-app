@@ -28,7 +28,7 @@ module "autoscaling" {
   target_group_arns = var.app_type == "web" ? module.alb[0].target_group_arns : []
   user_data         = var.ecs_launch_type == "EC2" ? data.template_file.asg_ecs_ec2_user_data.rendered : null
 
-  vpc_zone_identifier       = var.private_subnets
+  vpc_zone_identifier       = var.public_ecs_service ? var.public_subnets : var.private_subnets
   health_check_type         = var.autoscaling_health_check_type
   min_size                  = var.min_size
   max_size                  = var.max_size
