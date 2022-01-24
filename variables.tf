@@ -288,6 +288,12 @@ variable "docker_container_port" {
   default     = 3000
 }
 
+variable "docker_host_port" {
+  description = "Docker host port. 0 means Auto-assign."
+  type        = number
+  default     = 0
+}
+
 variable "docker_container_entrypoint" {
   type        = list(string)
   description = "Docker container entrypoint"
@@ -464,7 +470,7 @@ variable "cpu" {
   description = "Fargate CPU value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
 
   validation {
-    condition     = can(regex("256|512|1024|2048|4096", var.cpu))
+    condition     =  can(regex("256|512|1024|2048|4096", var.cpu))
     error_message = "The cpu value must be a valid CPU value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html."
   }
 }
@@ -632,4 +638,41 @@ variable "ecs_exec_enabled" {
   type        = bool
   description = "Turns on the Amazon ECS Exec for the task"
   default     = true
+}
+
+variable "additional_container_definition_parameters" {
+  type        = any
+  description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
+  default     = {}
+}
+
+
+variable "tmpfs_enabled" {
+  type = bool
+  description = "TMPFS support for non-Fargate deployments"
+  default = false
+}
+
+variable "tmpfs_size" {
+  type = number
+  description = "Size of the tmpfs in MB"
+  default = 1024
+}
+
+variable "tmpfs_container_path" {
+  type = string
+  description = "Path where tmpfs shm would be mounted"
+  default = "/tmp/"
+}
+
+variable "tmpfs_mount_options" {
+  type = list(string)
+  description = "Options for the mount of the ram disk. noatime by default to speed up access"
+  default = ["noatime"]
+}
+
+variable "shared_memory_size" {
+  type = number
+  description = "Size of the /dev/shm shared memory in MB"
+  default = 0
 }

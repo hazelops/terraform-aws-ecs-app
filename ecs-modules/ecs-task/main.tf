@@ -2,8 +2,8 @@ resource "aws_ecs_task_definition" "this" {
   family             = var.ecs_task_family_name != "" ? var.ecs_task_family_name : "${var.env}-${var.name}"
   execution_role_arn = aws_iam_role.ecs_execution.arn
   task_role_arn      = aws_iam_role.ecs_task_role.arn
-  cpu                = var.cpu
-  memory             = var.memory
+  cpu                = var.ecs_launch_type == "FARGATE" ? var.cpu : null
+  memory             = var.ecs_launch_type == "FARGATE" ? var.memory : null
 
   dynamic "volume" {
     for_each = var.volumes
@@ -44,7 +44,9 @@ resource "aws_ecs_task_definition" "this" {
     }
   }
   network_mode             = var.ecs_network_mode
-  requires_compatibilities = [var.ecs_launch_type]
+  requires_compatibilities = [
+    var.ecs_launch_type
+  ]
   container_definitions    = jsonencode(local.container_definitions)
 }
 

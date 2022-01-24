@@ -18,19 +18,27 @@ module "task" {
 
   docker_container_links = var.docker_container_links
 
-  environment    = var.environment # Non-secret Environment variables
+  environment    = var.environment
+  # Non-secret Environment variables
   app_secrets    = local.app_secrets
   global_secrets = local.global_secrets
 
-  cpu                           = var.cpu
-  memory                        = var.memory
-  volumes                       = var.volumes
-  resource_requirements         = var.resource_requirements
-  iam_role_policy_statement     = var.iam_role_policy_statement
-  sidecar_container_definitions = var.sidecar_container_definitions
-  firelens_ecs_log_enabled      = var.firelens_ecs_log_enabled
+  cpu                                        = var.cpu
+  memory                                     = var.memory
+  volumes                                    = var.volumes
+  resource_requirements                      = var.resource_requirements
+  iam_role_policy_statement                  = var.iam_role_policy_statement
+  sidecar_container_definitions              = var.sidecar_container_definitions
+  additional_container_definition_parameters = var.additional_container_definition_parameters
+  firelens_ecs_log_enabled                   = var.firelens_ecs_log_enabled
+  tmpfs_enabled                              = var.tmpfs_enabled
+  tmpfs_size                                 = var.tmpfs_size
+  tmpfs_container_path                       = var.tmpfs_container_path
+  tmpfs_mount_options                        = var.tmpfs_mount_options
+  shared_memory_size = var.shared_memory_size
 
-  port_mappings = var.web_proxy_enabled ? [] : var.port_mappings # We don't forward ports from the container if we are using proxy (proxy reaches out to container via internal network)
+  port_mappings = var.web_proxy_enabled ? [] : var.port_mappings
+  # We don't forward ports from the container if we are using proxy (proxy reaches out to container via internal network)
 }
 
 
@@ -71,7 +79,9 @@ resource "aws_ecs_service" "this" {
 
 
   dynamic "service_registries" {
-    for_each = (var.ecs_launch_type == "FARGATE" && var.ecs_service_discovery_enabled) ? [1] : []
+    for_each = (var.ecs_launch_type == "FARGATE" && var.ecs_service_discovery_enabled) ? [
+      1
+    ] : []
     content {
       registry_arn = var.ecs_service_discovery_enabled ? aws_service_discovery_service.this.arn : ""
       port         = var.docker_container_port
@@ -79,7 +89,9 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "network_configuration" {
-    for_each = var.ecs_launch_type == "FARGATE" ? [1] : []
+    for_each = var.ecs_launch_type == "FARGATE" ? [
+      1
+    ] : []
     content {
       subnets          = var.subnets
       security_groups  = var.security_groups
@@ -88,12 +100,14 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "load_balancer" {
-    for_each = [for p in var.port_mappings : {
+    for_each = [
+    for p in var.port_mappings : {
       container_name   = p.container_name
       target_group_arn = p.target_group_arn
       container_port   = p.container_port
 
-    }]
+    }
+    ]
 
     content {
       target_group_arn = load_balancer.value.target_group_arn
@@ -103,7 +117,9 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "placement_constraints" {
-    for_each = var.ecs_launch_type == "EC2" ? [1] : []
+    for_each = var.ecs_launch_type == "EC2" ? [
+      1
+    ] : []
     content {
       type       = "memberOf"
       expression = "attribute:service-group == ${var.ec2_service_group}"
@@ -137,7 +153,9 @@ resource "aws_ecs_service" "this_deployed" {
   enable_execute_command             = var.ecs_exec_enabled
 
   dynamic "service_registries" {
-    for_each = (var.ecs_launch_type == "FARGATE" && var.ecs_service_discovery_enabled) ? [1] : []
+    for_each = (var.ecs_launch_type == "FARGATE" && var.ecs_service_discovery_enabled) ? [
+      1
+    ] : []
     content {
       registry_arn = var.ecs_service_discovery_enabled ? aws_service_discovery_service.this.arn : ""
       port         = var.docker_container_port
@@ -145,7 +163,9 @@ resource "aws_ecs_service" "this_deployed" {
   }
 
   dynamic "network_configuration" {
-    for_each = var.ecs_launch_type == "FARGATE" ? [1] : []
+    for_each = var.ecs_launch_type == "FARGATE" ? [
+      1
+    ] : []
     content {
       subnets          = var.subnets
       security_groups  = var.security_groups
@@ -154,11 +174,13 @@ resource "aws_ecs_service" "this_deployed" {
   }
 
   dynamic "load_balancer" {
-    for_each = [for p in var.port_mappings : {
+    for_each = [
+    for p in var.port_mappings : {
       container_name   = p.container_name
       container_port   = p.container_port
       target_group_arn = p.target_group_arn
-    }]
+    }
+    ]
 
     content {
       target_group_arn = load_balancer.value.target_group_arn
@@ -168,7 +190,9 @@ resource "aws_ecs_service" "this_deployed" {
   }
 
   dynamic "placement_constraints" {
-    for_each = var.ecs_launch_type == "EC2" ? [1] : []
+    for_each = var.ecs_launch_type == "EC2" ? [
+      1
+    ] : []
     content {
       type       = "memberOf"
       expression = "attribute:service-group == ${var.ec2_service_group}"

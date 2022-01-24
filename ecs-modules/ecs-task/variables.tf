@@ -8,7 +8,7 @@ locals {
 
   # ECS Task Container definition file is filled with content here
   container_definitions = concat(var.sidecar_container_definitions, [
-    {
+    merge(var.additional_container_definition_parameters, {
       name    = var.name
       command = local.docker_container_command
 
@@ -16,11 +16,19 @@ locals {
       resourceRequirements = var.resource_requirements
 
 
-      cpu               = var.cpu
+      cpu               = var.ecs_launch_type == "FARGATE" ? var.cpu : null
       memoryReservation = var.memory_reservation
       essential         = true
 
-      linuxParameters = var.ecs_exec_enabled ? { initProcessEnabled = true } : {}
+      linuxParameters = {
+        sharedMemorySize = (var.shared_memory_size > 0 && var.ecs_launch_type != "FARGATE") ? var.shared_memory_size : null
+        tmpfs = (var.tmpfs_enabled && var.ecs_launch_type != "FARGATE") ? {
+          ContainerPath = var.tmpfs_container_path
+          MountOptions = var.tmpfs_mount_options
+          Size = var.tmpfs_size
+        } : null,
+        initProcessEnabled = var.ecs_exec_enabled ? true : null
+      }
 
       mountPoints = [
         # This way we ensure that we only mount main app volumes to the main app container.
@@ -81,7 +89,7 @@ locals {
       }
 
       dependsOn = var.docker_container_depends_on
-    }
+    })
   ])
 
 
@@ -150,14 +158,14 @@ variable "memory_reservation" {
   default     = 256
 }
 
-# The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs 
+# The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs
 variable "cpu" {
   type        = number
   default     = 256
   description = "Fargate CPU value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
 
   validation {
-    condition     = can(regex("256|512|1024|2048|4096", var.cpu))
+    condition     =  can(regex("256|512|1024|2048|4096", var.cpu))
     error_message = "The cpu value must be a valid CPU value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html."
   }
 }
@@ -268,6 +276,12 @@ variable "sidecar_container_definitions" {
   default     = []
 }
 
+variable "additional_container_definition_parameters" {
+  type        = any
+  description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
+  default     = {}
+}
+
 
 variable "task_group" {
   description = "ECS Task group name, e.g. app, service name etc."
@@ -350,4 +364,35 @@ variable "firelens_ecs_log_enabled" {
   type        = bool
   description = "AWSFirelens ECS logs enabled"
   default     = false
+}
+
+variable "tmpfs_enabled" {
+  type = bool
+  description = "TMPFS support for non-Fargate deployments"
+  default = false
+}
+
+variable "tmpfs_size" {
+  type = number
+  description = "Size of the tmpfs in MB"
+  default = 1024
+}
+
+variable "tmpfs_container_path" {
+  type = string
+  description = "Path where tmpfs shm would be mounted"
+  default = "/tmp/"
+}
+
+
+variable "tmpfs_mount_options" {
+  type = list(string)
+  description = "Options for the mount of the ram disk. noatime by default to speed up access"
+  default = ["noatime"]
+}
+
+variable "shared_memory_size" {
+  type = number
+  description = "Size of the /dev/shm shared memory in MB"
+  default = 0
 }
