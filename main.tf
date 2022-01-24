@@ -17,17 +17,18 @@ module "alb" {
       port               = var.http_port
       protocol           = "HTTP"
       target_group_index = 0
-  }, ]
+    },
+  ]
 
   https_listeners = var.tls_cert_arn != null ? concat(
-    [
-      {
-        port               = 443
-        protocol           = "HTTPS"
-        certificate_arn    = var.tls_cert_arn
-        target_group_index = 0
-      }
-    ]) : []
+  [
+    {
+      port               = 443
+      protocol           = "HTTPS"
+      certificate_arn    = var.tls_cert_arn
+      target_group_index = 0
+    }
+  ]) : []
 
   target_groups = concat([
     {
@@ -112,9 +113,9 @@ module "service" {
   assign_public_ip      = var.assign_public_ip
   security_groups       = var.security_groups
 
-  web_proxy_enabled     = var.web_proxy_enabled
-  ecs_exec_enabled      = var.ecs_exec_enabled
-  subnets               = var.public_ecs_service ? var.public_subnets : var.private_subnets
+  web_proxy_enabled = var.web_proxy_enabled
+  ecs_exec_enabled  = var.ecs_exec_enabled
+  subnets           = var.public_ecs_service ? var.public_subnets : var.private_subnets
 
   # length(var.cloudwatch_schedule_expressions) > 1 means that it is cron task and desired_count should be 0
   cloudwatch_schedule_expressions = var.cloudwatch_schedule_expressions
@@ -128,11 +129,12 @@ module "service" {
   autoscale_target_value_cpu    = var.autoscale_target_value_cpu
   autoscale_target_value_memory = var.autoscale_target_value_memory
 
-  docker_container_entrypoint = var.docker_container_entrypoint
-  docker_container_command    = var.docker_container_command
-  docker_image_name           = var.docker_image_name != "" ? var.docker_image_name : "${var.docker_registry}/${var.namespace}-${var.name}"
-  docker_image_tag            = var.docker_image_tag
-  iam_role_policy_statement   = var.iam_role_policy_statement
+  docker_container_entrypoint                = var.docker_container_entrypoint
+  docker_container_command                   = var.docker_container_command
+  docker_image_name                          = var.docker_image_name != "" ? var.docker_image_name : "${var.docker_registry}/${var.namespace}-${var.name}"
+  docker_image_tag                           = var.docker_image_tag
+  iam_role_policy_statement                  = var.iam_role_policy_statement
+  additional_container_definition_parameters = var.additional_container_definition_parameters
 
   app_secrets    = var.app_secrets
   global_secrets = var.global_secrets
@@ -141,32 +143,42 @@ module "service" {
   deployment_minimum_healthy_percent          = var.deployment_minimum_healthy_percent
   aws_service_discovery_private_dns_namespace = var.aws_service_discovery_private_dns_namespace
   firelens_ecs_log_enabled                    = var.firelens_ecs_log_enabled
+  tmpfs_enabled                               = var.tmpfs_enabled
+  tmpfs_size                                  = var.tmpfs_size
+  tmpfs_container_path                        = var.tmpfs_container_path
+  tmpfs_mount_options                         = var.tmpfs_mount_options
+  shared_memory_size = var.shared_memory_size
+
 
   resource_requirements = var.gpu > 0 ? [
     {
       type  = "GPU"
       value = tostring(var.gpu)
-  }] : []
+    }
+  ] : []
 
 
   sidecar_container_definitions = concat(
-    var.web_proxy_enabled ? [module.nginx.container_definition] : [],
-    var.datadog_enabled ? [module.datadog.container_definition] : [],
-    var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
+  var.web_proxy_enabled ? [
+    module.nginx.container_definition
+  ] : [], var.datadog_enabled ? [
+    module.datadog.container_definition
+  ] : [], var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
   )
 
   docker_container_links = concat(
-    var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
-      "datadog-agent:datadog-agent"
+  var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
+    "datadog-agent:datadog-agent"
   ] : [])
 
   docker_container_depends_on = concat(
-    # TODO: This needs to be pulled from datadog agent module output
-    var.datadog_enabled ? [
-      {
-        containerName = "datadog-agent",
-        condition     = "START"
-    }, ] : []
+  # TODO: This needs to be pulled from datadog agent module output
+  var.datadog_enabled ? [
+    {
+      containerName = "datadog-agent",
+      condition     = "START"
+    },
+  ] : []
   )
 
   # TODO: instead of hardcoding the index, better use dynamic lookup by a canonical name
@@ -176,7 +188,7 @@ module "service" {
     {
       container_name   = var.web_proxy_enabled ? "nginx" : var.name
       container_port   = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
-      host_port        = var.ecs_network_mode == "awsvpc" ? (var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port) : 0
+      host_port        = var.ecs_network_mode == "awsvpc" ? (var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port) : var.docker_host_port
       target_group_arn = length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : ""
     }
   ] : []
@@ -185,10 +197,9 @@ module "service" {
     APP_NAME      = var.name
     ENV           = var.env
     PROXY_ENABLED = var.web_proxy_enabled ? "true" : "false"
-    },
-    var.ecs_launch_type == "EC2" ? {
-      DD_AGENT_HOST = "datadog-agent"
-    } : {}
+  }, var.ecs_launch_type == "EC2" ? {
+    DD_AGENT_HOST = "datadog-agent"
+  } : {}
   )
 }
 
