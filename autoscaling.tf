@@ -1,3 +1,13 @@
+resource "aws_eip" "autoscaling" {
+  count             = var.ec2_asg_auto_assign_eip == "true" ? var.max_size + 1 : 0                             # CHANGE ME (Should be max_size of ASG + 1 )
+  vpc               = false
+  public_ipv4_pool  = "amazon"
+
+  tags = {
+    env  = var.env
+  }
+}
+
 module "autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 3.0"
@@ -55,3 +65,23 @@ module "autoscaling" {
 }
 
 
+# IAM Role changes for ASG Auto EIP
+resource "aws_iam_role_policy" "ec2_auto_eip" {
+  count   = var.ec2_asg_auto_assign_eip == "true" ? 1 : 0
+  name    = "EC2ChangeEIP_Policy"
+  role    = data.aws_iam_instance_profile.this.role_id
+
+  policy  = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:Describe*",
+          "ec2:AssociateAddress"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
