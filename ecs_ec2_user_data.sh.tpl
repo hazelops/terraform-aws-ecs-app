@@ -4,7 +4,7 @@ cat <<'EOF' >> /etc/ecs/cw_ecsmetrics.sh
 #!/bin/bash
 
 ### Get docker free data and push to CloudWatch metrics
-### 
+###
 ### requirements:
 ###  * must be run from inside an EC2 instance
 ###  * docker with devicemapper backing storage
@@ -50,18 +50,17 @@ echo "Done"
 TIMEOUT=20
 PAUSE=5
 
-apt-get update
-apt install -y curl awscli
+yum install -y curl aws-cli jq
 
 aws_get_instance_id() {
-	instance_id=$( (curl http://169.254.169.254/latest/meta-data/instance-id) )
+	instance_id=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 	if [ -n "$instance_id" ];	then return 0; else return 1; fi
 }
 
 aws_get_instance_region() {
-	instance_region=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone)
+	instance_region=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone)
 	# region here needs the last character removed to work
-	instance_region=${instance_region::-1}
+	instance_region=$${instance_region::-1}
 	if [ -n "$instance_region" ];	then return 0; else return 1; fi
 }
 
@@ -72,27 +71,27 @@ aws_get_instance_environment() {
 
 aws_get_unassigned_eips() {
 	local describe_addreses_response=$(aws ec2 describe-addresses --region $instance_region --filters "Name=tag:env,Values=$instance_environment" --query "Addresses[?AssociationId==null].AllocationId" --output text)
-	eips=(${describe_addreses_response///})
+	eips=($${describe_addreses_response///})
 	if [ -n "$describe_addreses_response" ]; then return 0; else return 1; fi
 }
 
 aws_get_details() {
 	if aws_get_instance_id;	then
-		echo "Instance ID: ${instance_id}."
+		echo "Instance ID: $${instance_id}."
 		if aws_get_instance_region;	then
-			echo "Instance Region: ${instance_region}."
+			echo "Instance Region: $${instance_region}."
 			if aws_get_instance_environment $instance_id;	then
-				echo "Instance Environment (env): ${instance_environment}."
+				echo "Instance Environment (env): $${instance_environment}."
 			else
-				echo "Failed to get Instance Environment (env). ${instance_environment}."
+				echo "Failed to get Instance Environment (env). $${instance_environment}."
 				return 1
 			fi
 		else
-			echo "Failed to get Instance Region. ${instance_region}."
+			echo "Failed to get Instance Region. $${instance_region}."
 			return 1
 		fi
 	else
-		echo "Failed to get Instance ID. ${instance_id}."
+		echo "Failed to get Instance ID. $${instance_id}."
 		return 1
 	fi
 }
@@ -110,7 +109,7 @@ attempt_to_assign_eip() {
 
 try_to_assign() {
 	local last_result;
-	for eip_id in "${eips[@]}"; do
+	for eip_id in "$${eips[@]}"; do
 		echo "Attempting to assign Elastic IP to instance..."
 		if attempt_to_assign_eip $eip_id;  then
 			echo "Elastic IP successfully assigned to instance."
@@ -123,14 +122,14 @@ try_to_assign() {
 main() {
 	echo "Assigning Elastic IP..."
 	local end_time=$((SECONDS+TIMEOUT))
-	echo "Timeout: ${end_time}"
+	echo "Timeout: $${end_time}"
 
 	if ! aws_get_details; then
 		exit 1
 	fi
 
 	while [ $SECONDS -lt $end_time ]; do
-		if aws_get_unassigned_eips && try_to_assign ${eips}; then
+		if aws_get_unassigned_eips && try_to_assign $${eips}; then
 			echo "Successfully assigned EIP."
 			exit 0
 		fi
@@ -147,7 +146,7 @@ declare instance_region
 declare instance_environment
 declare eips
 
-if [ "${auto_assign_eip}" == "true" ]; then
+if [ "${ec2_eip_enabled}" == "true" ]; then
     main "$@"
 else
     echo "ASG Auto Assign Elastic IP is DISABLED."
