@@ -50,11 +50,11 @@ echo "Done"
 TIMEOUT=20
 PAUSE=5
 
-apt-get update
-apt install -y curl awscli
+yum -qy -d 0 -e 0 install aws-cli
+yum -qy -d 0 -e 0 install curl
 
 aws_get_instance_id() {
-	instance_id=$( (curl http://169.254.169.254/latest/meta-data/instance-id) )
+	instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 	if [ -n "$instance_id" ];	then return 0; else return 1; fi
 }
 
