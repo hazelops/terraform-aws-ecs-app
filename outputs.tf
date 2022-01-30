@@ -25,3 +25,7 @@ output "alb_arn" {
 output "efs" {
   value = module.efs.mount_target_dns_names[*]
 }
+
+output "eips" {
+  value = var.ec2_eip_enabled ? aws_eip.autoscaling.*.public_ip : []
+}

@@ -1,3 +1,14 @@
+resource "aws_eip" "autoscaling" {
+  # If ec2_eip_count is set, use that number for number of EIPs, otherwise use var.max_size + 1 (but that might not be the best during downscaling and deletion of EIPs
+  count             = var.ec2_eip_enabled ? (var.ec2_eip_count > 0 ? var.ec2_eip_count : var.max_size + 1) : 0
+  public_ipv4_pool  = "amazon"
+
+  tags = {
+    Name = "${local.name}-${count.index + 1}"
+    env  = var.env
+  }
+}
+
 module "autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 3.0"
@@ -55,3 +66,24 @@ module "autoscaling" {
 }
 
 
+# IAM Role changes for ASG Auto EIP
+resource "aws_iam_role_policy" "ec2_auto_eip" {
+  count   = var.ec2_eip_enabled ? 1 : 0
+  name    = "EC2ChangeEIP_Policy"
+  role    = data.aws_iam_instance_profile.this.role_name
+
+
+  policy  = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:Describe*",
+          "ec2:AssociateAddress"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}

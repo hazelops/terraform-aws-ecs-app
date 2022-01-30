@@ -9,5 +9,11 @@ data "template_file" "asg_ecs_ec2_user_data" {
     ecs_cluster_name  = local.ecs_cluster_name
     env               = var.env
     ec2_service_group = var.ec2_service_group
+    ec2_eip_enabled   = tostring(var.ec2_eip_enabled)
   }
 }
+
+data "aws_iam_instance_profile" "this" {
+  name = var.iam_instance_profile
+}
+
