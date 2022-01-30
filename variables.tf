@@ -366,11 +366,18 @@ variable "autoscale_scheduled_down" {
   default     = []
 }
 
-variable "ec2_asg_auto_assign_eip" {
-  type        = string
-  description = "Enable EC2 ASG Auto Assign EIP mode. Type should be string (not bool)"
-  default     = "false"
+variable "ec2_eip_enabled" {
+  type        = bool
+  description = "Enable EC2 ASG Auto Assign EIP mode"
+  default     = false
 }
+
+variable "ec2_eip_count" {
+  type        = number
+  description = "Count of EIPs to create"
+  default = 0
+}
+
 
 variable "ecs_cluster_name" {
   type        = string
