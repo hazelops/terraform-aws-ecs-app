@@ -5,6 +5,8 @@ resource "aws_appautoscaling_target" "this" {
   resource_id        = "service/${var.ecs_cluster_name}/${var.ecs_service_name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
+
+  depends_on = [aws_ecs_service.this[0]]
 }
 
 # REF: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy
