@@ -368,7 +368,7 @@ variable "autoscale_scheduled_down" {
 
 variable "ec2_eip_enabled" {
   type        = bool
-  description = "Enable EC2 ASG Auto Assign EIP mode. Type should be string (not bool)"
+  description = "Enable EC2 ASG Auto Assign EIP mode"
   default     = false
 }
 
