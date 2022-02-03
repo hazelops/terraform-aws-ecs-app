@@ -139,7 +139,7 @@ module "service" {
   app_secrets    = var.app_secrets
   global_secrets = var.global_secrets
 
-  ecs_service_deployed                        = var.cloudwatch_schedule_expressions == [] ? false : true
+  ecs_service_deployed                        = (var.cloudwatch_schedule_expressions == [] || ! var.ecs_service_deployed) ? false : true
   deployment_minimum_healthy_percent          = var.deployment_minimum_healthy_percent
   aws_service_discovery_private_dns_namespace = var.aws_service_discovery_private_dns_namespace
   firelens_ecs_log_enabled                    = var.firelens_ecs_log_enabled
