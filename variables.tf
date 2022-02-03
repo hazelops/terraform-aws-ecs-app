@@ -689,3 +689,15 @@ variable "shared_memory_size" {
   description = "Size of the /dev/shm shared memory in MB"
   default = 0
 }
+
+variable "create_schedule" {
+  description = "Determines whether to create autoscaling group schedule or not"
+  type        = bool
+  default     = false
+}
+
+variable "schedules" {
+  description = "Map of autoscaling group schedule to create"
+  type        = map(any)
+  default     = {}
+}
