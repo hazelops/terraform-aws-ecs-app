@@ -14,11 +14,11 @@ module "autoscaling" {
   version = "~> 4.0"
 
   create_asg = var.ecs_launch_type == "EC2" ? true : false
-  create_lc  = var.ecs_launch_type == "EC2" ? true : false
+  create_lt = var.ecs_launch_type == "EC2" ? true : false
   name       = local.name
 
-  # Launch configuration
-  lc_name = local.name
+  lt_name = local.name
+  use_lt = true
 
   # Auto scaling group
   #v4.0? asg_name              = local.name
