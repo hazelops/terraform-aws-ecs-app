@@ -109,6 +109,7 @@ module "service" {
   ecs_volumes_from      = var.ecs_volumes_from
   cpu                   = var.cpu
   memory                = var.memory
+  memory_reservation    = var.memory_reservation
   volumes               = local.volumes
   assign_public_ip      = var.assign_public_ip
   security_groups       = var.security_groups
@@ -128,6 +129,8 @@ module "service" {
   autoscale_scheduled_down      = var.autoscale_scheduled_down
   autoscale_target_value_cpu    = var.autoscale_target_value_cpu
   autoscale_target_value_memory = var.autoscale_target_value_memory
+  autoscaling_min_size          = var.autoscaling_min_size
+  autoscaling_max_size          = var.autoscaling_max_size
 
   docker_container_entrypoint                = var.docker_container_entrypoint
   docker_container_command                   = var.docker_container_command
@@ -139,7 +142,7 @@ module "service" {
   app_secrets    = var.app_secrets
   global_secrets = var.global_secrets
 
-  ecs_service_deployed                        = var.cloudwatch_schedule_expressions == [] ? false : true
+  ecs_service_deployed                        = (var.cloudwatch_schedule_expressions == [] || ! var.ecs_service_deployed) ? false : true
   deployment_minimum_healthy_percent          = var.deployment_minimum_healthy_percent
   aws_service_discovery_private_dns_namespace = var.aws_service_discovery_private_dns_namespace
   firelens_ecs_log_enabled                    = var.firelens_ecs_log_enabled
@@ -147,7 +150,7 @@ module "service" {
   tmpfs_size                                  = var.tmpfs_size
   tmpfs_container_path                        = var.tmpfs_container_path
   tmpfs_mount_options                         = var.tmpfs_mount_options
-  shared_memory_size = var.shared_memory_size
+  shared_memory_size                          = var.shared_memory_size
 
 
   resource_requirements = var.gpu > 0 ? [

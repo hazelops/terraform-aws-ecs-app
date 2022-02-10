@@ -199,6 +199,13 @@ variable "memory" {
   }
 }
 
+variable "memory_reservation" {
+  type        = number
+  description = "The soft limit (in MiB) of memory to reserve for the container"
+  default     = 256
+}
+
+
 variable "min_size" {
   type        = number
   description = "Minimum number of running ECS tasks"

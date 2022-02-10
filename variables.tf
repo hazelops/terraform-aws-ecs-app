@@ -499,6 +499,12 @@ variable "memory" {
   }
 }
 
+variable "memory_reservation" {
+  type        = number
+  description = "The soft limit (in MiB) of memory to reserve for the container"
+  default     = 256
+}
+
 variable "gpu" {
   type        = number
   description = "GPU-enabled container instances"
@@ -688,4 +694,16 @@ variable "shared_memory_size" {
   type = number
   description = "Size of the /dev/shm shared memory in MB"
   default = 0
+}
+
+variable "create_schedule" {
+  description = "Determines whether to create autoscaling group schedule or not"
+  type        = bool
+  default     = false
+}
+
+variable "schedules" {
+  description = "Map of autoscaling group schedule to create"
+  type        = map(any)
+  default     = {}
 }

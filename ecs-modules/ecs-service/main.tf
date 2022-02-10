@@ -25,6 +25,7 @@ module "task" {
 
   cpu                                        = var.cpu
   memory                                     = var.memory
+  memory_reservation                         = var.memory_reservation
   volumes                                    = var.volumes
   resource_requirements                      = var.resource_requirements
   iam_role_policy_statement                  = var.iam_role_policy_statement
@@ -35,7 +36,7 @@ module "task" {
   tmpfs_size                                 = var.tmpfs_size
   tmpfs_container_path                       = var.tmpfs_container_path
   tmpfs_mount_options                        = var.tmpfs_mount_options
-  shared_memory_size = var.shared_memory_size
+  shared_memory_size                         = var.shared_memory_size
 
   port_mappings = var.web_proxy_enabled ? [] : var.port_mappings
   # We don't forward ports from the container if we are using proxy (proxy reaches out to container via internal network)

@@ -11,23 +11,23 @@ resource "aws_eip" "autoscaling" {
 
 module "autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
-  version = "~> 3.0"
+  version = "~> 4.0"
 
   create_asg = var.ecs_launch_type == "EC2" ? true : false
-  create_lc  = var.ecs_launch_type == "EC2" ? true : false
+  create_lt = var.ecs_launch_type == "EC2" ? true : false
   name       = local.name
 
-  # Launch configuration
-  lc_name = local.name
+  lt_name = local.name
+  use_lt = true
 
   # Auto scaling group
-  asg_name                     = local.name
+  #v4.0? asg_name              = local.name
   image_id                     = var.image_id
   instance_type                = var.instance_type
   security_groups              = var.security_groups
-  iam_instance_profile         = var.iam_instance_profile
+  iam_instance_profile_name    = var.iam_instance_profile # 4.0? var.iam_instance_profile - it's "ID of the IAM instance profile"
   key_name                     = var.key_name
-  recreate_asg_when_lc_changes = true
+  #4.0? recreate_asg_when_lc_changes = true
 
   root_block_device = [
     {
@@ -37,7 +37,7 @@ module "autoscaling" {
   ]
 
   target_group_arns = var.app_type == "web" ? module.alb[0].target_group_arns : []
-  user_data         = var.ecs_launch_type == "EC2" ? data.template_file.asg_ecs_ec2_user_data.rendered : null
+  user_data_base64  = var.ecs_launch_type == "EC2" ? base64encode(data.template_file.asg_ecs_ec2_user_data.rendered) : null
 
   vpc_zone_identifier       = var.public_ecs_service ? var.public_subnets : var.private_subnets
   health_check_type         = var.autoscaling_health_check_type
@@ -45,6 +45,9 @@ module "autoscaling" {
   max_size                  = var.max_size
   desired_capacity          = var.desired_capacity
   wait_for_capacity_timeout = 0
+
+  create_schedule           = var.create_schedule
+  schedules                 = var.schedules
 
   tags = [
     {
