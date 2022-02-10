@@ -109,7 +109,7 @@ module "service" {
   ecs_volumes_from      = var.ecs_volumes_from
   cpu                   = var.cpu
   memory                = var.memory
-  memory_reservation     = var.memory_reservation
+  memory_reservation    = var.memory_reservation
   volumes               = local.volumes
   assign_public_ip      = var.assign_public_ip
   security_groups       = var.security_groups
