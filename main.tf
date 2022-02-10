@@ -109,6 +109,7 @@ module "service" {
   ecs_volumes_from      = var.ecs_volumes_from
   cpu                   = var.cpu
   memory                = var.memory
+  memory_reservation     = var.memory_reservation
   volumes               = local.volumes
   assign_public_ip      = var.assign_public_ip
   security_groups       = var.security_groups
@@ -149,7 +150,7 @@ module "service" {
   tmpfs_size                                  = var.tmpfs_size
   tmpfs_container_path                        = var.tmpfs_container_path
   tmpfs_mount_options                         = var.tmpfs_mount_options
-  shared_memory_size = var.shared_memory_size
+  shared_memory_size                          = var.shared_memory_size
 
 
   resource_requirements = var.gpu > 0 ? [

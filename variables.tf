@@ -499,6 +499,12 @@ variable "memory" {
   }
 }
 
+variable "memory_reservation" {
+  type        = number
+  description = "The soft limit (in MiB) of memory to reserve for the container"
+  default     = 256
+}
+
 variable "gpu" {
   type        = number
   description = "GPU-enabled container instances"
