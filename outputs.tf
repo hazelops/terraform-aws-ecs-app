@@ -23,7 +23,7 @@ output "alb_arn" {
 }
 
 output "efs" {
-  value = module.efs.mount_target_dns_names[*]
+  value = var.efs_enabled ? module.efs.mount_target_dns_names[*] : ""
 }
 
 output "eips" {
