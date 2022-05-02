@@ -19,6 +19,10 @@ locals {
     DD_ENV                     = var.env
   } : {}
 
+  ecs_exec_env_vars = var.ecs_exec_custom_prompt_enabled ? {
+    PS1 = var.ecs_exec_prompt_string
+  } : {}
+
   fluentbit_container_definition = [
     {
       essential         = true
@@ -658,6 +662,21 @@ variable "ecs_exec_enabled" {
   description = "Turns on the Amazon ECS Exec for the task"
   default     = true
 }
+
+variable "ecs_exec_custom_prompt_enabled" {
+  type        = bool
+  description = "Enable Custom shell prompt on ECS Exec"
+  default     = false
+}
+
+variable "ecs_exec_prompt_string" {
+  type        = string
+  description = "Shell prompt that contains ENV and APP_NAME is enabled"
+  default     = <<-EOT
+  \e[1;35m★\e[0m $ENV-$APP_NAME:$(wget -qO- $ECS_CONTAINER_METADATA_URI_V4 | sed -n 's/.*"com.amazonaws.ecs.task-definition-version":"\([^"]*\).*/\1/p') \n\e[1;33m\e[0m \w \e[1;34m❯\e[0m
+  EOT
+}
+
 
 variable "additional_container_definition_parameters" {
   type        = any
