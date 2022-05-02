@@ -673,9 +673,6 @@ variable "ecs_exec_prompt_string" {
   type        = string
   description = "Shell prompt that contains ENV and APP_NAME is enabled"
   default     = "\\e[1;35m★\\e[0m $ENV-$APP_NAME:$(wget -qO- $ECS_CONTAINER_METADATA_URI_V4 | sed -n 's/.*\"com.amazonaws.ecs.task-definition-version\":\"\\([^\"]*\\).*/\\1/p') \\e[1;36m★\\e[0m $(wget -qO- $ECS_CONTAINER_METADATA_URI_V4 | sed -n 's/.*\"Image\":\"\\([^\"]*\\).*/\\1/p' | awk -F\\: '{print $2}' )\\n\\e[1;33m\\e[0m \\w \\e[1;34m❯\\e[0m "
-  #  default     = <<-EOT
-  #\e[1;35m★\e[0m $ENV-$APP_NAME:$(wget -qO- $ECS_CONTAINER_METADATA_URI_V4 | sed -n 's/.*"com.amazonaws.ecs.task-definition-version":"\([^"]*\).*/\1/p') \n\e[1;33m\e[0m \w \e[1;34m❯\e[0m
-  #EOT
 }
 
 
