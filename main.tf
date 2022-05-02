@@ -196,7 +196,7 @@ module "service" {
     }
   ] : []
 
-  environment = merge(var.environment, local.datadog_env_vars, {
+  environment = merge(var.environment, local.datadog_env_vars, local.ecs_exec_env_vars, {
     APP_NAME      = var.name
     ENV           = var.env
     PROXY_ENABLED = var.web_proxy_enabled ? "true" : "false"
