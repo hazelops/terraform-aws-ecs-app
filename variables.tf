@@ -4,7 +4,7 @@ locals {
   name_prefix      = "${substr(var.name, 0, 5)}-"
   namespace        = "${var.env}-${var.namespace}"
   ecs_cluster_name = var.ecs_cluster_name != "" ? var.ecs_cluster_name : local.namespace
-  domain_names     = var.root_domain_name != "example.com" ? concat(["${var.name}.${var.env}.${var.root_domain_name}"], var.domain_names ) : []
+  domain_names     = var.root_domain_name != "example.com" ? concat(["${var.name}.${var.env}.${var.root_domain_name}"], var.domain_names) : []
   ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : "${var.namespace}-${var.name}"
 
   # Datadog Environment Variables: https://docs.datadoghq.com/agent/guide/environment-variables/
@@ -375,7 +375,7 @@ variable "ec2_eip_enabled" {
 variable "ec2_eip_count" {
   type        = number
   description = "Count of EIPs to create"
-  default = 0
+  default     = 0
 }
 
 
@@ -458,6 +458,12 @@ variable "datadog_enabled" {
   default     = false
 }
 
+variable "datadog_jmx_enabled" {
+  type = bool
+  description = "Enables / Disables jmx monitor via the datadog agent"
+  default = false
+}
+
 variable "route53_health_check_enabled" {
   type        = bool
   description = "AWS Route53 health check is enabled"
@@ -483,7 +489,7 @@ variable "cpu" {
   description = "Fargate CPU value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
 
   validation {
-    condition     =  can(regex("256|512|1024|2048|4096", var.cpu))
+    condition     = can(regex("256|512|1024|2048|4096", var.cpu))
     error_message = "The cpu value must be a valid CPU value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html."
   }
 }
@@ -564,8 +570,8 @@ variable "root_block_device_size" {
 }
 
 variable "http_port" {
-  type = number
-  default = 80
+  type        = number
+  default     = 80
   description = "Port that is used for HTTP protocol"
 }
 
@@ -667,33 +673,33 @@ variable "additional_container_definition_parameters" {
 
 
 variable "tmpfs_enabled" {
-  type = bool
+  type        = bool
   description = "TMPFS support for non-Fargate deployments"
-  default = false
+  default     = false
 }
 
 variable "tmpfs_size" {
-  type = number
+  type        = number
   description = "Size of the tmpfs in MB"
-  default = 1024
+  default     = 1024
 }
 
 variable "tmpfs_container_path" {
-  type = string
+  type        = string
   description = "Path where tmpfs shm would be mounted"
-  default = "/tmp/"
+  default     = "/tmp/"
 }
 
 variable "tmpfs_mount_options" {
-  type = list(string)
+  type        = list(string)
   description = "Options for the mount of the ram disk. noatime by default to speed up access"
-  default = ["noatime"]
+  default     = ["noatime"]
 }
 
 variable "shared_memory_size" {
-  type = number
+  type        = number
   description = "Size of the /dev/shm shared memory in MB"
-  default = 0
+  default     = 0
 }
 
 variable "create_schedule" {
@@ -707,3 +713,10 @@ variable "schedules" {
   type        = map(any)
   default     = {}
 }
+
+variable "docker_labels" {
+  type = map(any)
+  description = "Labels to be added to the docker. Used for auto-configuration, for instance of JMX discovery"
+  default = null
+}
+

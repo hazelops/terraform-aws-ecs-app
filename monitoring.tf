@@ -1,4 +1,4 @@
-# Datadog Logging\Monitoring Module (can be enabled/disabled via datadog_enabled)
+# Datadog Logging/Monitoring Module (can be enabled/disabled via datadog_enabled)
 module "datadog" {
   source  = "hazelops/ecs-datadog-agent/aws"
   version = "~> 3.0"
@@ -8,12 +8,13 @@ module "datadog" {
   cloudwatch_log_group = module.service.cloudwatch_log_group
   ecs_launch_type      = var.ecs_launch_type
   enabled              = var.datadog_enabled
+  docker_image_tag = var.datadog_jmx_enabled ? "latest-jmx" : "latest"
 }
 
 # Route53-healthcheck Monitoring Module (can be enabled/disabled via route53_health_check_enabled)
 module "route_53_health_check" {
   count   = var.route53_health_check_enabled ? 1 : 0
-  
+
   source  = "hazelops/route53-healthcheck/aws"
   version = "~> 1.0"
 

@@ -37,6 +37,7 @@ module "task" {
   tmpfs_container_path                       = var.tmpfs_container_path
   tmpfs_mount_options                        = var.tmpfs_mount_options
   shared_memory_size                         = var.shared_memory_size
+  docker_labels                              = var.docker_labels
 
   port_mappings = var.web_proxy_enabled ? [] : var.port_mappings
   # We don't forward ports from the container if we are using proxy (proxy reaches out to container via internal network)
