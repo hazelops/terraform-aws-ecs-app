@@ -15,6 +15,8 @@ locals {
       image                = "${var.docker_image_name}:${var.docker_image_tag}"
       resourceRequirements = var.resource_requirements
 
+      dockerLabels: var.docker_labels
+
 
       cpu               = var.ecs_launch_type == "FARGATE" ? var.cpu : null
       memoryReservation = var.memory_reservation
@@ -22,11 +24,12 @@ locals {
 
       linuxParameters = {
         sharedMemorySize = (var.shared_memory_size > 0 && var.ecs_launch_type != "FARGATE") ? var.shared_memory_size : null
-        tmpfs = (var.tmpfs_enabled && var.ecs_launch_type != "FARGATE") ? {
+        tmpfs = (var.tmpfs_enabled && var.ecs_launch_type != "FARGATE") ? [
+        {
           ContainerPath = var.tmpfs_container_path
           MountOptions = var.tmpfs_mount_options
           Size = var.tmpfs_size
-        } : null,
+        }] : null,
         initProcessEnabled = var.ecs_exec_enabled ? true : null
       }
 
@@ -380,7 +383,7 @@ variable "tmpfs_size" {
 
 variable "tmpfs_container_path" {
   type = string
-  description = "Path where tmpfs shm would be mounted"
+  description = "Path where tmpfs tmpfs would be mounted"
   default = "/tmp/"
 }
 
@@ -395,4 +398,10 @@ variable "shared_memory_size" {
   type = number
   description = "Size of the /dev/shm shared memory in MB"
   default = 0
+}
+
+variable "docker_labels" {
+  type = map(any)
+  description = "Labels to be added to the docker. Used for auto-configuration, for instance of JMX discovery"
+  default = null
 }

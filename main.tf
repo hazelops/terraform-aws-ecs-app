@@ -151,7 +151,8 @@ module "service" {
   tmpfs_container_path                        = var.tmpfs_container_path
   tmpfs_mount_options                         = var.tmpfs_mount_options
   shared_memory_size                          = var.shared_memory_size
-
+  # TODO: This should be expanded to read some standard labels from datadog module to configure JMX, http and other checks. per https://docs.datadoghq.com/agent/docker/integrations/?tab=docker#configuration
+  docker_labels                               = var.docker_labels
 
   resource_requirements = var.gpu > 0 ? [
     {
@@ -183,6 +184,7 @@ module "service" {
     },
   ] : []
   )
+
 
   # TODO: instead of hardcoding the index, better use dynamic lookup by a canonical name
   target_group_arn = var.app_type == "web" && length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : null

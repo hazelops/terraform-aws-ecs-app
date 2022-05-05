@@ -392,3 +392,9 @@ variable "shared_memory_size" {
   description = "Size of the /dev/shm shared memory in MB"
   default = 0
 }
+
+variable "docker_labels" {
+  type = map(any)
+  description = "Labels to be added to the docker. Used for auto-configuration, for instance of JMX discovery"
+  default = null
+}
