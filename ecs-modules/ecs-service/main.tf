@@ -4,11 +4,12 @@ module "task" {
   env  = var.env
   name = var.name
 
-  ecs_task_family_name = var.ecs_service_name != "" ? var.ecs_service_name : ""
-  ecs_launch_type      = var.ecs_launch_type
-  ecs_network_mode     = var.ecs_network_mode
-  ecs_volumes_from     = var.ecs_volumes_from
-  ecs_exec_enabled     = var.ecs_exec_enabled
+  ecs_task_family_name          = var.ecs_service_name != "" ? var.ecs_service_name : ""
+  ecs_launch_type               = var.ecs_launch_type
+  ecs_network_mode              = var.ecs_network_mode
+  ecs_volumes_from              = var.ecs_volumes_from
+  ecs_exec_enabled              = var.ecs_exec_enabled
+  ecs_task_health_check_command = var.ecs_task_health_check_command
 
   docker_image_name           = var.docker_image_name
   docker_image_tag            = var.docker_image_tag
@@ -81,7 +82,7 @@ resource "aws_ecs_service" "this" {
 
 
   dynamic "service_registries" {
-    for_each = (var.ecs_launch_type == "FARGATE" && var.ecs_service_discovery_enabled) ? [
+    for_each = (var.ecs_launch_type == "FARGATE" && var.ecs_service_discovery_enabled && var.app_type == "web") ? [
       1
     ] : []
     content {
@@ -102,14 +103,14 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "load_balancer" {
-    for_each = [
+    for_each = var.app_type == "web" ? [
     for p in var.port_mappings : {
       container_name   = p.container_name
       target_group_arn = p.target_group_arn
       container_port   = p.container_port
 
     }
-    ]
+    ]: []
 
     content {
       target_group_arn = load_balancer.value.target_group_arn
@@ -176,13 +177,14 @@ resource "aws_ecs_service" "this_deployed" {
   }
 
   dynamic "load_balancer" {
-    for_each = [
+    for_each = var.app_type == "web" ? [
     for p in var.port_mappings : {
       container_name   = p.container_name
       container_port   = p.container_port
       target_group_arn = p.target_group_arn
     }
-    ]
+    ] : []
+
 
     content {
       target_group_arn = load_balancer.value.target_group_arn

@@ -29,3 +29,11 @@ output "efs" {
 output "eips" {
   value = var.ec2_eip_enabled ? aws_eip.autoscaling.*.public_ip : []
 }
+
+output "public_ip" {
+  value = (var.ec2_eip_enabled && length(aws_eip.autoscaling)>0) ? aws_eip.autoscaling.0.public_ip : ""
+}
+
+output "ec2_dns_name" {
+  value = var.ec2_eip_dns_enabled ? aws_route53_record.ec2.0.fqdn : ""
+}

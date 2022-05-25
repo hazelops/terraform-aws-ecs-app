@@ -98,21 +98,23 @@ module "service" {
   env              = var.env
   name             = var.name
   namespace        = var.namespace
+  app_type         = var.app_type
   ecs_cluster_name = local.ecs_cluster_name
   ecs_service_name = local.ecs_service_name
 
-  ecs_platform_version  = var.ecs_launch_type == "FARGATE" ? var.ecs_platform_version : null
-  ecs_launch_type       = var.ecs_launch_type
-  ec2_service_group     = var.ec2_service_group
-  docker_container_port = var.docker_container_port
-  ecs_network_mode      = var.ecs_network_mode
-  ecs_volumes_from      = var.ecs_volumes_from
-  cpu                   = var.cpu
-  memory                = var.memory
-  memory_reservation    = var.memory_reservation
-  volumes               = local.volumes
-  assign_public_ip      = var.assign_public_ip
-  security_groups       = var.security_groups
+  ecs_platform_version          = var.ecs_launch_type == "FARGATE" ? var.ecs_platform_version : null
+  ecs_launch_type               = var.ecs_launch_type
+  ecs_task_health_check_command = var.ecs_task_health_check_command
+  ec2_service_group             = var.ec2_service_group
+  docker_container_port         = var.docker_container_port
+  ecs_network_mode              = var.ecs_network_mode
+  ecs_volumes_from              = var.ecs_volumes_from
+  cpu                           = var.cpu
+  memory                        = var.memory
+  memory_reservation            = var.memory_reservation
+  volumes                       = local.volumes
+  assign_public_ip              = var.assign_public_ip
+  security_groups               = var.security_groups
 
   web_proxy_enabled = var.web_proxy_enabled
   ecs_exec_enabled  = var.ecs_exec_enabled
@@ -190,35 +192,42 @@ module "service" {
   # TODO: instead of hardcoding the index, better use dynamic lookup by a canonical name
   target_group_arn = var.app_type == "web" && length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : null
 
-  port_mappings = var.app_type == "web" ? [
+  port_mappings = jsondecode(var.app_type == "web" ? jsonencode([
     {
       container_name   = var.web_proxy_enabled ? "nginx" : var.name
       container_port   = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
       host_port        = var.ecs_network_mode == "awsvpc" ? (var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port) : var.docker_host_port
       target_group_arn = length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : ""
     }
-  ] : []
+  ]) : jsonencode(var.port_mappings))
 
   environment = merge(var.environment, local.datadog_env_vars, local.ecs_exec_env_vars, {
     APP_NAME      = var.name
     ENV           = var.env
     PROXY_ENABLED = var.web_proxy_enabled ? "true" : "false"
-  }, var.ecs_launch_type == "EC2" ? {
-    DD_AGENT_HOST = "datadog-agent"
-  } : {}
+  }
   )
 }
 
-resource "aws_route53_record" "this" {
+resource "aws_route53_record" "alb" {
   count   = var.app_type == "web" ? length(local.domain_names) : 0
   zone_id = var.zone_id
   name    = local.domain_names[count.index]
   type    = "A"
 
-  alias {
-    name                   = module.alb[0].this_lb_dns_name
-    zone_id                = module.alb[0].this_lb_zone_id
-    evaluate_target_health = true
-  }
+  alias  {
+      name                   = module.alb[0].this_lb_dns_name
+      zone_id                = module.alb[0].this_lb_zone_id
+      evaluate_target_health = true
+    }
+}
+
+resource "aws_route53_record" "ec2" {
+  count   = (var.ecs_launch_type == "EC2" && var.ec2_eip_enabled && var.ec2_eip_dns_enabled) ? length(local.domain_names) : 0
+  zone_id = var.zone_id
+  name    = local.domain_names[count.index]
+  type    = "A"
+
+  records = var.ec2_eip_enabled ? aws_eip.autoscaling.*.public_ip : []
 }
 
