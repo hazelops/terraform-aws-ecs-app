@@ -54,6 +54,7 @@ resource "aws_appautoscaling_scheduled_action" "up" {
   scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
   service_namespace  = aws_appautoscaling_target.this[0].service_namespace
   schedule           = var.autoscale_scheduled_up[count.index]
+  timezone           = var.autoscale_scheduled_timezone
 
   scalable_target_action {
     min_capacity = var.autoscaling_min_size
@@ -69,6 +70,7 @@ resource "aws_appautoscaling_scheduled_action" "down" {
   scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
   service_namespace  = aws_appautoscaling_target.this[0].service_namespace
   schedule           = var.autoscale_scheduled_down[count.index]
+  timezone           = var.autoscale_scheduled_timezone
 
   scalable_target_action {
     min_capacity = var.min_size
