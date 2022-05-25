@@ -10,14 +10,20 @@ locals {
   # Datadog Environment Variables: https://docs.datadoghq.com/agent/guide/environment-variables/
   #                                https://docs.datadoghq.com/agent/docker/apm/?tab=linux#docker-apm-agent-environment-variables
   datadog_env_vars = var.datadog_enabled ? {
-    DD_PROFILING_ENABLED       = "true"
-    DD_TRACE_ENABLED           = "true"
-    DD_RUNTIME_METRICS_ENABLED = "true"
-    DD_APM_ENABLED             = "true"
-    DD_SERVICE                 = var.name
-    DD_SERVICE_NAME            = var.name
-    DD_ENV                     = var.env
+    DD_PROFILING_ENABLED        = "true"
+    DD_TRACE_ENABLED            = "true"
+    DD_RUNTIME_METRICS_ENABLED  = "true"
+    DD_APM_ENABLED              = "true"
+    DD_SERVICE                  = var.name
+    DD_SERVICE_NAME             = var.name
+    DD_ENV                      = var.env
+    DD_AGENT_HOST               = local.datadog_agent_host
+    OTEL_EXPORTER_OTLP_ENDPOINT = "http://${local.datadog_agent_host}:4318"
+    OTEL_TRACES_EXPORTER        = "otlp"
+    OTEL_RESOURCE_ATTRIBUTES    = "service.name=${var.name}"
   } : {}
+
+  datadog_agent_host = (var.ecs_network_mode != "host" && var.ecs_network_mode != "awsvpc") ? "datadog-agent" : "localhost"
 
   ecs_exec_env_vars = var.ecs_exec_custom_prompt_enabled ? {
     PS1 = var.ecs_exec_prompt_string
@@ -115,7 +121,7 @@ variable "name" {
 
 variable "app_type" {
   type        = string
-  description = "ECS application type. Valid values: web (with load balancer), worker (scheduled task without ALB)."
+  description = "ECS application type. Valid values: web (with ALB), worker (without ALB)."
   default     = "web"
 
   validation {
@@ -146,7 +152,7 @@ variable "ec2_service_group" {
 variable "instance_type" {
   type        = string
   description = "EC2 instance type for ECS"
-  default     = "t3.micro"
+  default     = "t3.small"
 }
 
 variable "environment" {
@@ -298,6 +304,12 @@ variable "docker_host_port" {
   default     = 0
 }
 
+variable "port_mappings" {
+  description = "List of ports to open from a service"
+  type = list(any)
+  default = []
+}
+
 variable "docker_container_entrypoint" {
   type        = list(string)
   description = "Docker container entrypoint"
@@ -382,6 +394,12 @@ variable "ec2_eip_count" {
   default     = 0
 }
 
+variable "ec2_eip_dns_enabled" {
+  type        = bool
+  description = "Whether to manage DNS records to be attached to the EIP"
+  default     = false
+}
+
 
 variable "ecs_cluster_name" {
   type        = string
@@ -393,6 +411,12 @@ variable "autoscaling_health_check_type" {
   type        = string
   description = "ECS 'EC2' or 'ELB' health check type"
   default     = "EC2"
+}
+
+variable "ecs_task_health_check_command" {
+  type        = string
+  description = "Command to check for the health of the container"
+  default     = ""
 }
 
 variable "alb_health_check_path" {

@@ -21,6 +21,16 @@ locals {
       cpu               = var.ecs_launch_type == "FARGATE" ? var.cpu : null
       memoryReservation = var.memory_reservation
       essential         = true
+      healthCheck       = length(var.ecs_task_health_check_command) > 0 ? {
+        retries    = 3
+        timeout    = 5
+        interval   = 30
+        startPerid = null
+        command    = [
+          "CMD-SHELL",
+          var.ecs_task_health_check_command
+        ]
+      } : null
 
       linuxParameters = {
         sharedMemorySize = (var.shared_memory_size > 0 && var.ecs_launch_type != "FARGATE") ? var.shared_memory_size : null
@@ -74,7 +84,7 @@ locals {
           "Name"           = "datadog"
           "Host"           = "http-intake.logs.datadoghq.com"
           "apiKey"         = data.aws_ssm_parameter.dd_api_key[0].value
-          "dd_service"     = "${var.name}"
+          "dd_service"     = var.name
           "dd_source"      = "ecs"
           "dd_tags"        = "fluentbit:true,env:${var.env},service:${var.env}-${var.name}"
           "dd_message_key" = "log"
@@ -336,6 +346,11 @@ variable "ecs_volumes_from" {
   type        = list(any)
   description = "The VolumeFrom property specifies details on a data volume from another container in the same task definition"
   default     = []
+}
+
+variable "ecs_task_health_check_command" {
+  type        = string
+  description = "Command to check for the health of the container"
 }
 
 variable "resource_requirements" {

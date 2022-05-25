@@ -14,6 +14,17 @@ variable "name" {
   description = "ECS app name"
 }
 
+variable "app_type" {
+  type        = string
+  description = "ECS application type. Valid values: web (with load balancer), worker (scheduled task without ALB)."
+  default     = "web"
+
+  validation {
+    condition     = var.app_type == "web" || var.app_type == "worker"
+    error_message = "The app_type value must be a valid type: web or worker."
+  }
+}
+
 variable "namespace" {
   type        = string
   description = "Namespace name within the infrastructure"
@@ -282,6 +293,11 @@ variable "aws_service_discovery_private_dns_namespace" {
   type        = string
   description = "Amazon ECS Service Discovery private DNS namespace"
   default     = ""
+}
+
+variable "ecs_task_health_check_command" {
+  type        = string
+  description = "Command to check for the health of the container"
 }
 
 variable "ecs_network_mode" {

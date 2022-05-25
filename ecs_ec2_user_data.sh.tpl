@@ -70,7 +70,7 @@ aws_get_instance_environment() {
 }
 
 aws_get_unassigned_eips() {
-	local describe_addreses_response=$(aws ec2 describe-addresses --region $instance_region --filters "Name=tag:env,Values=$instance_environment" --query "Addresses[?AssociationId==null].AllocationId" --output text)
+	local describe_addreses_response=$(aws ec2 describe-addresses --region $instance_region --filters "Name=tag:env,Values=$instance_environment" "Name=tag:service,Values=${service}" --query "Addresses[?AssociationId==null].AllocationId" --output text)
 	eips=($${describe_addreses_response///})
 	if [ -n "$describe_addreses_response" ]; then return 0; else return 1; fi
 }
