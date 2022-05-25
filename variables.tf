@@ -370,6 +370,12 @@ variable "autoscale_scheduled_down" {
   default     = []
 }
 
+variable "autoscale_scheduled_timezone" {
+  type = string
+  description = "Time Zone for the scheduled event"
+  default = "UTC"
+}
+
 variable "ec2_eip_enabled" {
   type        = bool
   description = "Enable EC2 ASG Auto Assign EIP mode"

@@ -129,6 +129,7 @@ module "service" {
   autoscale_scheduled_down      = var.autoscale_scheduled_down
   autoscale_target_value_cpu    = var.autoscale_target_value_cpu
   autoscale_target_value_memory = var.autoscale_target_value_memory
+  autoscale_scheduled_timezone  = var.autoscale_scheduled_timezone
   autoscaling_min_size          = var.autoscaling_min_size
   autoscaling_max_size          = var.autoscaling_max_size
 

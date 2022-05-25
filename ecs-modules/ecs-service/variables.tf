@@ -350,6 +350,12 @@ variable "autoscale_scheduled_down" {
   default     = []
 }
 
+variable "autoscale_scheduled_timezone" {
+  type = string
+  description = "Time Zone for the scheduled event"
+  default = "UTC"
+}
+
 variable "ecs_exec_enabled" {
   type        = bool
   description = "Turns on the Amazon ECS Exec for the task"
