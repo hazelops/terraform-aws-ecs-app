@@ -32,7 +32,7 @@ locals {
         ]
       } : null
 
-      linuxParameters = {
+      linuxParameters = var.operating_system_family == "LINUX" ? {
         sharedMemorySize = (var.shared_memory_size > 0 && var.ecs_launch_type != "FARGATE") ? var.shared_memory_size : null
         tmpfs = (var.tmpfs_enabled && var.ecs_launch_type != "FARGATE") ? [
         {
@@ -41,7 +41,7 @@ locals {
           Size = var.tmpfs_size
         }] : null,
         initProcessEnabled = var.ecs_exec_enabled ? true : null
-      }
+      } : null
 
       mountPoints = [
         # This way we ensure that we only mount main app volumes to the main app container.
@@ -420,3 +420,7 @@ variable "docker_labels" {
   description = "Labels to be added to the docker. Used for auto-configuration, for instance of JMX discovery"
   default = null
 }
+
+variable "operating_system_family" {}
+
+variable "cpu_architecture" {}
