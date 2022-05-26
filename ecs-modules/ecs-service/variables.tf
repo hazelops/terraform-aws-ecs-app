@@ -420,3 +420,7 @@ variable "docker_labels" {
   description = "Labels to be added to the docker. Used for auto-configuration, for instance of JMX discovery"
   default = null
 }
+
+variable "operating_system_family" {}
+
+variable "cpu_architecture" {}

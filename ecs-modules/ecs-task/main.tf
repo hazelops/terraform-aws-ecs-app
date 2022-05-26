@@ -48,6 +48,11 @@ resource "aws_ecs_task_definition" "this" {
     var.ecs_launch_type
   ]
   container_definitions    = jsonencode(local.container_definitions)
+
+  runtime_platform {
+    operating_system_family = var.operating_system_family
+    cpu_architecture        = var.cpu_architecture
+  }
 }
 
 resource "aws_cloudwatch_log_group" "this" {

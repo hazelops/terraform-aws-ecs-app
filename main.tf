@@ -115,6 +115,8 @@ module "service" {
   volumes                       = local.volumes
   assign_public_ip              = var.assign_public_ip
   security_groups               = var.security_groups
+  operating_system_family       = var.operating_system_family
+  cpu_architecture              = var.cpu_architecture
 
   web_proxy_enabled = var.web_proxy_enabled
   ecs_exec_enabled  = var.ecs_exec_enabled
