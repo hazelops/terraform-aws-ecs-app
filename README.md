@@ -46,7 +46,7 @@ Security scanning is graciously provided by Bridgecrew.
 |------|--------|---------|
 | <a name="module_alb"></a> [alb](#module\_alb) | terraform-aws-modules/alb/aws | ~> 5.0 |
 | <a name="module_autoscaling"></a> [autoscaling](#module\_autoscaling) | terraform-aws-modules/autoscaling/aws | ~> 4.0 |
-| <a name="module_datadog"></a> [datadog](#module\_datadog) | hazelops/ecs-datadog-agent/aws | ~> 3.2 |
+| <a name="module_datadog"></a> [datadog](#module\_datadog) | hazelops/ecs-datadog-agent/aws | ~> 3.0 |
 | <a name="module_ecr"></a> [ecr](#module\_ecr) | hazelops/ecr/aws | ~> 1.0 |
 | <a name="module_efs"></a> [efs](#module\_efs) | cloudposse/efs/aws | ~> 0.31 |
 | <a name="module_nginx"></a> [nginx](#module\_nginx) | hazelops/ecs-nginx-proxy/aws | ~> 1.0 |
@@ -59,8 +59,7 @@ Security scanning is graciously provided by Bridgecrew.
 |------|------|
 | [aws_eip.autoscaling](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
 | [aws_iam_role_policy.ec2_auto_eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
-| [aws_route53_record.alb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
-| [aws_route53_record.ec2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_route53_record.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_instance_profile.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_instance_profile) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
@@ -81,11 +80,10 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="input_alb_idle_timeout"></a> [alb\_idle\_timeout](#input\_alb\_idle\_timeout) | The time in seconds that the connection is allowed to be idle. | `number` | `60` | no |
 | <a name="input_alb_security_groups"></a> [alb\_security\_groups](#input\_alb\_security\_groups) | Security groups to assign to ALB | `list(any)` | `[]` | no |
 | <a name="input_app_secrets"></a> [app\_secrets](#input\_app\_secrets) | List of SSM ParameterStore secret parameters - by default, /$var.env/$var.name/* | `list(any)` | `[]` | no |
-| <a name="input_app_type"></a> [app\_type](#input\_app\_type) | ECS application type. Valid values: web (with ALB), worker (without ALB). | `string` | `"web"` | no |
+| <a name="input_app_type"></a> [app\_type](#input\_app\_type) | ECS application type. Valid values: web (with load balancer), worker (scheduled task without ALB). | `string` | `"web"` | no |
 | <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | ECS service network configuration - assign public IP | `bool` | `false` | no |
 | <a name="input_autoscale_enabled"></a> [autoscale\_enabled](#input\_autoscale\_enabled) | ECS Autoscaling enabled | `bool` | `false` | no |
 | <a name="input_autoscale_scheduled_down"></a> [autoscale\_scheduled\_down](#input\_autoscale\_scheduled\_down) | List of Cron-like expressions for scheduled ecs autoscale DOWN | `list` | `[]` | no |
-| <a name="input_autoscale_scheduled_timezone"></a> [autoscale\_scheduled\_timezone](#input\_autoscale\_scheduled\_timezone) | Time Zone for the scheduled event | `string` | `"UTC"` | no |
 | <a name="input_autoscale_scheduled_up"></a> [autoscale\_scheduled\_up](#input\_autoscale\_scheduled\_up) | List of Cron-like expressions for scheduled ecs autoscale UP | `list` | `[]` | no |
 | <a name="input_autoscale_target_value_cpu"></a> [autoscale\_target\_value\_cpu](#input\_autoscale\_target\_value\_cpu) | ECS Service Average CPU Utilization threshold. Integer value for percentage - IE 80 | `number` | `50` | no |
 | <a name="input_autoscale_target_value_memory"></a> [autoscale\_target\_value\_memory](#input\_autoscale\_target\_value\_memory) | ECS Service Average Memory Utilization threshold. Integer value for percentage. IE 60 | `number` | `50` | no |
@@ -111,7 +109,6 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="input_docker_registry"></a> [docker\_registry](#input\_docker\_registry) | ECR or any other docker registry | `string` | `"docker.io"` | no |
 | <a name="input_domain_names"></a> [domain\_names](#input\_domain\_names) | Domain names for AWS Route53 A records | `list(any)` | `[]` | no |
 | <a name="input_ec2_eip_count"></a> [ec2\_eip\_count](#input\_ec2\_eip\_count) | Count of EIPs to create | `number` | `0` | no |
-| <a name="input_ec2_eip_dns_enabled"></a> [ec2\_eip\_dns\_enabled](#input\_ec2\_eip\_dns\_enabled) | Whether to manage DNS records to be attached to the EIP | `bool` | `false` | no |
 | <a name="input_ec2_eip_enabled"></a> [ec2\_eip\_enabled](#input\_ec2\_eip\_enabled) | Enable EC2 ASG Auto Assign EIP mode | `bool` | `false` | no |
 | <a name="input_ec2_service_group"></a> [ec2\_service\_group](#input\_ec2\_service\_group) | Service group name, e.g. app, service name etc. | `string` | `"app"` | no |
 | <a name="input_ecr_repo_create"></a> [ecr\_repo\_create](#input\_ecr\_repo\_create) | Creation of a ECR repo | `bool` | `false` | no |
@@ -126,7 +123,6 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="input_ecs_service_deployed"></a> [ecs\_service\_deployed](#input\_ecs\_service\_deployed) | This service resource doesn't have task definition lifecycle policy, so terraform is used to deploy it (instead of ecs cli) | `bool` | `false` | no |
 | <a name="input_ecs_service_discovery_enabled"></a> [ecs\_service\_discovery\_enabled](#input\_ecs\_service\_discovery\_enabled) | ECS service can optionally be configured to use Amazon ECS Service Discovery | `bool` | `false` | no |
 | <a name="input_ecs_service_name"></a> [ecs\_service\_name](#input\_ecs\_service\_name) | The ECS service name | `string` | `""` | no |
-| <a name="input_ecs_task_health_check_command"></a> [ecs\_task\_health\_check\_command](#input\_ecs\_task\_health\_check\_command) | Command to check for the health of the container | `string` | `""` | no |
 | <a name="input_ecs_volumes_from"></a> [ecs\_volumes\_from](#input\_ecs\_volumes\_from) | The VolumeFrom property specifies details on a data volume from another container in the same task definition | `list(any)` | `[]` | no |
 | <a name="input_efs_enabled"></a> [efs\_enabled](#input\_efs\_enabled) | EFS Enabled | `bool` | `false` | no |
 | <a name="input_efs_mount_point"></a> [efs\_mount\_point](#input\_efs\_mount\_point) | EFS mount point | `string` | `"/mnt/efs"` | no |
@@ -140,7 +136,7 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="input_iam_instance_profile"></a> [iam\_instance\_profile](#input\_iam\_instance\_profile) | IAM Instance Profile | `string` | `null` | no |
 | <a name="input_iam_role_policy_statement"></a> [iam\_role\_policy\_statement](#input\_iam\_role\_policy\_statement) | ECS Service IAM Role policy statement | `list(any)` | `[]` | no |
 | <a name="input_image_id"></a> [image\_id](#input\_image\_id) | EC2 AMI id | `string` | `null` | no |
-| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | EC2 instance type for ECS | `string` | `"t3.small"` | no |
+| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | EC2 instance type for ECS | `string` | `"t3.micro"` | no |
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | EC2 key name | `string` | `null` | no |
 | <a name="input_max_size"></a> [max\_size](#input\_max\_size) | Maximum number of running ECS tasks | `number` | `1` | no |
 | <a name="input_memory"></a> [memory](#input\_memory) | Fargate Memory value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html) | `number` | `512` | no |
@@ -149,7 +145,6 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="input_name"></a> [name](#input\_name) | ECS app name | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Namespace name within the infrastructure | `string` | n/a | yes |
 | <a name="input_operating_system_family"></a> [operating\_system\_family](#input\_operating\_system\_family) | Platform to be used with ECS. The valid values for Amazon ECS tasks hosted on Fargate are LINUX, WINDOWS\_SERVER\_2019\_FULL, and WINDOWS\_SERVER\_2019\_CORE. The valid values for Amazon ECS tasks hosted on EC2 are LINUX, WINDOWS\_SERVER\_2022\_CORE, WINDOWS\_SERVER\_2022\_FULL, WINDOWS\_SERVER\_2019\_FULL, and WINDOWS\_SERVER\_2019\_CORE, WINDOWS\_SERVER\_2016\_FULL, WINDOWS\_SERVER\_2004\_CORE, and WINDOWS\_SERVER\_20H2\_CORE. | `string` | `"LINUX"` | no |
-| <a name="input_port_mappings"></a> [port\_mappings](#input\_port\_mappings) | List of ports to open from a service | `list(any)` | `[]` | no |
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | VPC Private subnets to place ECS resources | `list(any)` | `[]` | no |
 | <a name="input_proxy_docker_container_command"></a> [proxy\_docker\_container\_command](#input\_proxy\_docker\_container\_command) | Proxy docker container CMD | `list(string)` | <pre>[<br>  "nginx",<br>  "-g",<br>  "daemon off;"<br>]</pre> | no |
 | <a name="input_proxy_docker_entrypoint"></a> [proxy\_docker\_entrypoint](#input\_proxy\_docker\_entrypoint) | Proxy docker container entrypoint | `list` | <pre>[<br>  "/docker-entrypoint.sh"<br>]</pre> | no |
@@ -189,9 +184,7 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | n/a |
 | <a name="output_alb_dns_zone"></a> [alb\_dns\_zone](#output\_alb\_dns\_zone) | n/a |
 | <a name="output_cloudwatch_log_group"></a> [cloudwatch\_log\_group](#output\_cloudwatch\_log\_group) | n/a |
-| <a name="output_ec2_dns_name"></a> [ec2\_dns\_name](#output\_ec2\_dns\_name) | n/a |
 | <a name="output_efs"></a> [efs](#output\_efs) | n/a |
 | <a name="output_eips"></a> [eips](#output\_eips) | n/a |
-| <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | n/a |
 | <a name="output_this_target_group_arn"></a> [this\_target\_group\_arn](#output\_this\_target\_group\_arn) | n/a |
 | <a name="output_this_task_definition_arn"></a> [this\_task\_definition\_arn](#output\_this\_task\_definition\_arn) | n/a |
