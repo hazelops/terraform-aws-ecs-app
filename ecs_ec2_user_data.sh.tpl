@@ -42,6 +42,7 @@ echo "*/5 * * * * root /etc/ecs/cw_ecsmetrics.sh" > /etc/cron.d/ecsmetrics
     echo "ECS_IMAGE_CLEANUP_INTERVAL=10m"
     echo "ECS_IMAGE_MINIMUM_CLEANUP_AGE=15m"
     echo "ECS_NUM_IMAGES_DELETE_PER_CYCLE=10"
+    echo "ECS_AVAILABLE_LOGGING_DRIVERS=[\"json-file\",\"syslog\",\"fluentd\",\"awslogs\"]"
 } >> /etc/ecs/ecs.config
 start ecs
 echo "Done"
