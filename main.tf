@@ -168,11 +168,10 @@ module "service" {
 
 
   sidecar_container_definitions = concat(
-  var.web_proxy_enabled ? [
-    module.nginx.container_definition
-  ] : [], var.datadog_enabled ? [
-    module.datadog.container_definition
-  ] : [], var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
+    var.sidecar_container_definitions,
+    var.web_proxy_enabled ? [ module.nginx.container_definition ] : [],
+    var.datadog_enabled ? [ module.datadog.container_definition ] : [],
+    var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
   )
 
   docker_container_links = concat(

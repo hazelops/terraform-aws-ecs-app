@@ -322,6 +322,12 @@ variable "docker_container_command" {
   default     = []
 }
 
+variable "sidecar_container_definitions" {
+  type        = list(any)
+  description = "Sidecar container definitions for ECS task"
+  default     = []
+}
+
 variable "alb_idle_timeout" {
   description = "The time in seconds that the connection is allowed to be idle."
   type        = number
