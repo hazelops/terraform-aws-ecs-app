@@ -15,6 +15,7 @@ data "template_file" "asg_ecs_ec2_user_data" {
 }
 
 data "aws_iam_instance_profile" "this" {
-  name = var.iam_instance_profile
+  count = var.ecs_launch_type == "EC2" ? 1 : 0
+  name  = var.iam_instance_profile
 }
 
