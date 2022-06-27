@@ -73,9 +73,9 @@ module "autoscaling" {
 
 # IAM Role changes for ASG Auto EIP
 resource "aws_iam_role_policy" "ec2_auto_eip" {
-  count   = var.ec2_eip_enabled ? 1 : 0
+  count   = var.ec2_eip_enabled && var.ecs_launch_type == "EC2" ? 1 : 0
   name    = "EC2ChangeEIP_Policy"
-  role    = data.aws_iam_instance_profile.this.role_name
+  role    = data.aws_iam_instance_profile.this[0].role_name
 
 
   policy  = jsonencode({
