@@ -323,7 +323,7 @@ variable "docker_container_command" {
 }
 
 variable "sidecar_container_definitions" {
-  type        = list(any)
+  type        = any
   description = "Sidecar container definitions for ECS task"
   default     = []
 }
