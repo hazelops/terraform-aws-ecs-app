@@ -88,7 +88,6 @@ locals {
           "dd_source"      = "ecs"
           "dd_tags"        = "fluentbit:true,env:${var.env},service:${var.env}-${var.name}"
           "dd_message_key" = "log"
-          "region"         = data.aws_region.current.name
           "TLS"            = "on"
           "provider"       = "ecs"
         }
