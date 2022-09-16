@@ -26,7 +26,6 @@ Security scanning is graciously provided by Bridgecrew.
 | [![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/hazelops/terraform-aws-ecs-app/cis_gke_11)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=hazelops%2Fterraform-aws-ecs-app&benchmark=CIS+GKE+V1.1) | Center for Internet Security, GKE V1.1 Compliance |
 | [![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/hazelops/terraform-aws-ecs-app/cis_kubernetes_16)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=hazelops%2Fterraform-aws-ecs-app&benchmark=CIS+KUBERNETES+V1.6) | Center for Internet Security, KUBERNETES V1.6 Compliance |
 
-
 ## Requirements
 
 | Name | Version |
@@ -44,13 +43,13 @@ Security scanning is graciously provided by Bridgecrew.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_alb"></a> [alb](#module\_alb) | terraform-aws-modules/alb/aws | ~> 5.0 |
+| <a name="module_alb"></a> [alb](#module\_alb) | registry.terraform.io/terraform-aws-modules/alb/aws | ~> 5.0 |
 | <a name="module_autoscaling"></a> [autoscaling](#module\_autoscaling) | terraform-aws-modules/autoscaling/aws | ~> 4.0 |
-| <a name="module_datadog"></a> [datadog](#module\_datadog) | hazelops/ecs-datadog-agent/aws | ~> 3.2 |
-| <a name="module_ecr"></a> [ecr](#module\_ecr) | hazelops/ecr/aws | ~> 1.0 |
-| <a name="module_efs"></a> [efs](#module\_efs) | cloudposse/efs/aws | ~> 0.31 |
-| <a name="module_nginx"></a> [nginx](#module\_nginx) | hazelops/ecs-nginx-proxy/aws | ~> 1.0 |
-| <a name="module_route_53_health_check"></a> [route\_53\_health\_check](#module\_route\_53\_health\_check) | hazelops/route53-healthcheck/aws | ~> 1.0 |
+| <a name="module_datadog"></a> [datadog](#module\_datadog) | registry.terraform.io/hazelops/ecs-datadog-agent/aws | ~> 3.2 |
+| <a name="module_ecr"></a> [ecr](#module\_ecr) | registry.terraform.io/hazelops/ecr/aws | ~> 1.0 |
+| <a name="module_efs"></a> [efs](#module\_efs) | registry.terraform.io/cloudposse/efs/aws | ~> 0.31 |
+| <a name="module_nginx"></a> [nginx](#module\_nginx) | registry.terraform.io/hazelops/ecs-nginx-proxy/aws | ~> 1.0 |
+| <a name="module_route_53_health_check"></a> [route\_53\_health\_check](#module\_route\_53\_health\_check) | registry.terraform.io/hazelops/route53-healthcheck/aws | ~> 1.0 |
 | <a name="module_service"></a> [service](#module\_service) | ./ecs-modules/ecs-service | n/a |
 
 ## Resources
@@ -116,6 +115,7 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="input_ec2_service_group"></a> [ec2\_service\_group](#input\_ec2\_service\_group) | Service group name, e.g. app, service name etc. | `string` | `"app"` | no |
 | <a name="input_ecr_repo_create"></a> [ecr\_repo\_create](#input\_ecr\_repo\_create) | Creation of a ECR repo | `bool` | `false` | no |
 | <a name="input_ecr_repo_name"></a> [ecr\_repo\_name](#input\_ecr\_repo\_name) | ECR repository name | `string` | `""` | no |
+| <a name="input_ecs_cluster_arn"></a> [ecs\_cluster\_arn](#input\_ecs\_cluster\_arn) | ECS cluster arn. Should be specified to avoid data query by cluster name | `string` | `""` | no |
 | <a name="input_ecs_cluster_name"></a> [ecs\_cluster\_name](#input\_ecs\_cluster\_name) | ECS cluster name | `string` | `""` | no |
 | <a name="input_ecs_exec_custom_prompt_enabled"></a> [ecs\_exec\_custom\_prompt\_enabled](#input\_ecs\_exec\_custom\_prompt\_enabled) | Enable Custom shell prompt on ECS Exec | `bool` | `false` | no |
 | <a name="input_ecs_exec_enabled"></a> [ecs\_exec\_enabled](#input\_ecs\_exec\_enabled) | Turns on the Amazon ECS Exec for the task | `bool` | `true` | no |
@@ -137,6 +137,7 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="input_global_secrets"></a> [global\_secrets](#input\_global\_secrets) | List of SSM ParameterStore global secrets - by default, /$var.env/global/* | `list(any)` | `[]` | no |
 | <a name="input_gpu"></a> [gpu](#input\_gpu) | GPU-enabled container instances | `number` | `0` | no |
 | <a name="input_http_port"></a> [http\_port](#input\_http\_port) | Port that is used for HTTP protocol | `number` | `80` | no |
+| <a name="input_https_enabled"></a> [https\_enabled](#input\_https\_enabled) | Whether enable https or not (still needs tls\_cert\_arn) | `string` | `true` | no |
 | <a name="input_iam_instance_profile"></a> [iam\_instance\_profile](#input\_iam\_instance\_profile) | IAM Instance Profile | `string` | `null` | no |
 | <a name="input_iam_role_policy_statement"></a> [iam\_role\_policy\_statement](#input\_iam\_role\_policy\_statement) | ECS Service IAM Role policy statement | `list(any)` | `[]` | no |
 | <a name="input_image_id"></a> [image\_id](#input\_image\_id) | EC2 AMI id | `string` | `null` | no |

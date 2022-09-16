@@ -1,6 +1,6 @@
 # Datadog Logging/Monitoring Module (can be enabled/disabled via datadog_enabled)
 module "datadog" {
-  source  = "hazelops/ecs-datadog-agent/aws"
+  source  = "registry.terraform.io/hazelops/ecs-datadog-agent/aws"
   version = "~> 3.2"
 
   app_name             = var.name
@@ -15,7 +15,7 @@ module "datadog" {
 module "route_53_health_check" {
   count   = var.route53_health_check_enabled ? 1 : 0
 
-  source  = "hazelops/route53-healthcheck/aws"
+  source  = "registry.terraform.io/hazelops/route53-healthcheck/aws"
   version = "~> 1.0"
 
   enabled                        = var.route53_health_check_enabled

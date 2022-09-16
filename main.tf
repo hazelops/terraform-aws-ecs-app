@@ -1,7 +1,7 @@
 module "alb" {
   count = var.app_type == "web" ? 1 : 0
 
-  source  = "terraform-aws-modules/alb/aws"
+  source  = "registry.terraform.io/terraform-aws-modules/alb/aws"
   version = "~> 5.0"
 
   name               = var.public ? local.name : "${local.name}-private"
@@ -20,15 +20,15 @@ module "alb" {
     },
   ]
 
-  https_listeners = var.tls_cert_arn != null ? concat(
-  [
-    {
-      port               = 443
-      protocol           = "HTTPS"
-      certificate_arn    = var.tls_cert_arn
-      target_group_index = 0
-    }
-  ]) : []
+  https_listeners = var.https_enabled ? concat(
+    [
+      {
+        port               = 443
+        protocol           = "HTTPS"
+        certificate_arn    = var.tls_cert_arn
+        target_group_index = 0
+      }
+    ]) : []
 
   target_groups = concat([
     {
@@ -65,7 +65,7 @@ module "alb" {
 }
 
 module "ecr" {
-  source  = "hazelops/ecr/aws"
+  source  = "registry.terraform.io/hazelops/ecr/aws"
   version = "~> 1.0"
 
   name    = local.ecr_repo_name
@@ -73,7 +73,7 @@ module "ecr" {
 }
 
 module "efs" {
-  source  = "cloudposse/efs/aws"
+  source  = "registry.terraform.io/cloudposse/efs/aws"
   version = "~> 0.31"
 
   enabled         = var.efs_enabled
@@ -100,6 +100,8 @@ module "service" {
   namespace        = var.namespace
   app_type         = var.app_type
   ecs_cluster_name = local.ecs_cluster_name
+  ecs_cluster_arn  = var.ecs_cluster_arn
+
   ecs_service_name = local.ecs_service_name
 
   ecs_platform_version          = var.ecs_launch_type == "FARGATE" ? var.ecs_platform_version : null
@@ -147,7 +149,7 @@ module "service" {
   app_secrets    = var.app_secrets
   global_secrets = var.global_secrets
 
-  ecs_service_deployed                        = (var.cloudwatch_schedule_expressions == [] || ! var.ecs_service_deployed) ? false : true
+  ecs_service_deployed                        = (var.cloudwatch_schedule_expressions == [] || !var.ecs_service_deployed) ? false : true
   deployment_minimum_healthy_percent          = var.deployment_minimum_healthy_percent
   aws_service_discovery_private_dns_namespace = var.aws_service_discovery_private_dns_namespace
   firelens_ecs_log_enabled                    = var.firelens_ecs_log_enabled
@@ -169,24 +171,28 @@ module "service" {
 
   sidecar_container_definitions = concat(
     var.sidecar_container_definitions,
-    var.web_proxy_enabled ? [ module.nginx.container_definition ] : [],
-    var.datadog_enabled ? [ module.datadog.container_definition ] : [],
+    var.web_proxy_enabled ? [
+      module.nginx.container_definition
+    ] : [],
+    var.datadog_enabled ? [
+      module.datadog.container_definition
+    ] : [],
     var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
   )
 
   docker_container_links = concat(
-  var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
-    "datadog-agent:datadog-agent"
-  ] : [])
+    var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
+      "datadog-agent:datadog-agent"
+    ] : [])
 
   docker_container_depends_on = concat(
-  # TODO: This needs to be pulled from datadog agent module output
-  var.datadog_enabled ? [
-    {
-      containerName = "datadog-agent",
-      condition     = "START"
-    },
-  ] : []
+    # TODO: This needs to be pulled from datadog agent module output
+    var.datadog_enabled ? [
+      {
+        containerName = "datadog-agent",
+        condition     = "START"
+      },
+    ] : []
   )
 
 
@@ -216,11 +222,11 @@ resource "aws_route53_record" "alb" {
   name    = local.domain_names[count.index]
   type    = "A"
 
-  alias  {
-      name                   = module.alb[0].this_lb_dns_name
-      zone_id                = module.alb[0].this_lb_zone_id
-      evaluate_target_health = true
-    }
+  alias {
+    name                   = module.alb[0].this_lb_dns_name
+    zone_id                = module.alb[0].this_lb_zone_id
+    evaluate_target_health = true
+  }
 }
 
 resource "aws_route53_record" "ec2" {
