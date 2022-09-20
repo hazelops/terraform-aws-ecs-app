@@ -100,8 +100,7 @@ module "service" {
   namespace        = var.namespace
   app_type         = var.app_type
   ecs_cluster_name = local.ecs_cluster_name
-  ecs_cluster_arn  = var.ecs_cluster_arn
-
+  ecs_cluster_arn  = local.ecs_cluster_arn
   ecs_service_name = local.ecs_service_name
 
   ecs_platform_version          = var.ecs_launch_type == "FARGATE" ? var.ecs_platform_version : null
