@@ -59,7 +59,7 @@ module "autoscaling" {
     },
     {
       key                 = "cluster"
-      value               = local.namespace
+      value               = local.ecs_cluster_name
       propagate_at_launch = true
     },
     {

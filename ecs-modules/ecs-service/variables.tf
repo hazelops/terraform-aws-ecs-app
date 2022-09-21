@@ -1,9 +1,3 @@
-locals {
-  app_secrets    = concat(var.app_secrets, [])
-  global_secrets = concat(var.global_secrets, [])
-  environment    = merge(var.environment, {})
-}
-
 variable "env" {
   type        = string
   description = "Target environment name of the infrastructure"
@@ -73,6 +67,11 @@ variable "ssm_global_secret_path" {
 variable "ecs_cluster_name" {
   type        = string
   description = "ECS cluster name"
+}
+
+variable "ecs_cluster_arn" {
+  type        = string
+  description = "ECS cluster arn. Should be specified to avoid data query by cluster name"
 }
 
 variable "ecs_service_name" {

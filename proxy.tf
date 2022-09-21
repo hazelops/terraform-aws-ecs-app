@@ -1,5 +1,5 @@
 module "nginx" {
-  source  = "hazelops/ecs-nginx-proxy/aws"
+  source  = "registry.terraform.io/hazelops/ecs-nginx-proxy/aws"
   version = "~> 1.0"
 
   app_name = var.name

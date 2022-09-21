@@ -223,7 +223,7 @@ resource "aws_cloudwatch_event_target" "this" {
   count = length(var.cloudwatch_schedule_expressions)
 
   target_id = var.ecs_service_name != "" ? "${var.ecs_service_name}-${count.index}" : "${var.env}-${var.name}-${count.index}"
-  arn       = data.aws_ecs_cluster.current.arn
+  arn       = var.ecs_cluster_arn
   rule      = aws_cloudwatch_event_rule.this[count.index].name
   role_arn  = aws_iam_role.ecs_events[0].arn
 
