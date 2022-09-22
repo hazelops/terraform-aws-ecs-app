@@ -20,7 +20,7 @@ module "alb" {
     },
   ]
 
-  https_listeners = var.https_enabled ? concat(
+  https_listeners = var.https_enabled && var.tls_cert_arn != null ? concat(
     [
       {
         port               = 443
