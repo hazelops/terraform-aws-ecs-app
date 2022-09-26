@@ -109,7 +109,7 @@ resource "aws_ecs_service" "this" {
     for port_mapping in var.port_mappings : {
       container_name   = port_mapping.container_name
       target_group_arn = port_mapping.target_group_arn
-      container_port   = p.container_port
+      container_port   = port_mapping.container_port
 
     }
     ]: []
