@@ -14,8 +14,8 @@ variable "app_type" {
   default     = "web"
 
   validation {
-    condition     = var.app_type == "web" || var.app_type == "worker"
-    error_message = "The app_type value must be a valid type: web or worker."
+    condition     = var.app_type == "web" || var.app_type == "tcp-app" || var.app_type == "worker"
+    error_message = "The app_type value must be a valid type: web, worker or tcp-app."
   }
 }
 

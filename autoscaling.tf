@@ -38,7 +38,7 @@ module "autoscaling" {
     },
   ]
 
-  target_group_arns = var.app_type == "web" ? module.alb[0].target_group_arns : []
+  target_group_arns = var.app_type == "web" || var.app_type == "tcp-app" ? module.alb[0].target_group_arns : []
   user_data_base64  = var.ecs_launch_type == "EC2" ? base64encode(data.template_file.asg_ecs_ec2_user_data.rendered) : null
 
   vpc_zone_identifier       = var.public_ecs_service ? var.public_subnets : var.private_subnets

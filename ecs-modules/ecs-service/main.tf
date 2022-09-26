@@ -105,10 +105,10 @@ resource "aws_ecs_service" "this" {
   }
 
   dynamic "load_balancer" {
-    for_each = var.app_type == "web" ? [
-    for p in var.port_mappings : {
-      container_name   = p.container_name
-      target_group_arn = p.target_group_arn
+    for_each = var.app_type == "web" || var.app_type == "tcp-app" ? [
+    for port_mapping in var.port_mappings : {
+      container_name   = port_mapping.container_name
+      target_group_arn = port_mapping.target_group_arn
       container_port   = p.container_port
 
     }
@@ -179,7 +179,7 @@ resource "aws_ecs_service" "this_deployed" {
   }
 
   dynamic "load_balancer" {
-    for_each = var.app_type == "web" ? [
+    for_each = var.app_type == "web" || var.app_type == "tcp-app" ? [
     for p in var.port_mappings : {
       container_name   = p.container_name
       container_port   = p.container_port

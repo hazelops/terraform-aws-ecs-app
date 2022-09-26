@@ -1,62 +1,32 @@
 module "alb" {
-  count = var.app_type == "web" ? 1 : 0
+  count = var.app_type == "web" || var.app_type == "tcp-app" ? 1 : 0
 
   source  = "registry.terraform.io/terraform-aws-modules/alb/aws"
   version = "~> 5.0"
 
   name               = var.public ? local.name : "${local.name}-private"
-  load_balancer_type = "application"
+  load_balancer_type = var.app_type == "web" ? "application" : "network" 
   internal           = var.public ? false : true
   vpc_id             = var.vpc_id
   security_groups    = var.alb_security_groups
   subnets            = var.public ? var.public_subnets : var.private_subnets
   idle_timeout       = var.alb_idle_timeout
 
-  http_tcp_listeners = [
+  http_tcp_listeners = local.http_tcp_listeners
+
+
+  https_listeners = var.app_type == "web" && var.https_enabled && var.tls_cert_arn != null ? concat(
+  [
     {
-      port               = var.http_port
-      protocol           = "HTTP"
+      port               = 443
+      protocol           = "HTTPS"
+      certificate_arn    = var.tls_cert_arn
       target_group_index = 0
-    },
-  ]
-
-  https_listeners = var.https_enabled && var.tls_cert_arn != null ? concat(
-    [
-      {
-        port               = 443
-        protocol           = "HTTPS"
-        certificate_arn    = var.tls_cert_arn
-        target_group_index = 0
-      }
-    ]) : []
-
-  target_groups = concat([
-    {
-      name_prefix          = local.name_prefix
-      backend_protocol     = "HTTP"
-      backend_port         = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
-      target_type          = var.ecs_launch_type == "EC2" ? "instance" : "ip"
-      deregistration_delay = var.alb_deregistration_delay
-
-      health_check = {
-        enabled             = true
-        interval            = var.alb_health_check_interval
-        path                = var.alb_health_check_path
-        healthy_threshold   = var.alb_health_check_healthy_threshold
-        unhealthy_threshold = var.alb_health_check_unhealthy_threshold
-        timeout             = var.alb_health_check_timeout
-        matcher             = var.alb_health_check_valid_response_codes
-        port                = "traffic-port"
-        protocol            = "HTTP"
-      }
-
-      tags = {
-        Name = var.name
-        env  = var.env
-        app  = local.name
-      }
     }
-  ])
+  ]) : []
+
+  target_groups = concat(var.app_type == "web" ? local.target_groups_web : local.target_groups_tcp)
+
 
   tags = {
     env = var.env
@@ -205,7 +175,7 @@ module "service" {
       host_port        = var.ecs_network_mode == "awsvpc" ? (var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port) : var.docker_host_port
       target_group_arn = length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : ""
     }
-  ]) : jsonencode(var.port_mappings))
+  ]) : ( var.app_type == "tcp-app" ? jsonencode(local.ecs_service_tcp_port_mappings) : jsonencode(var.port_mappings)))
 
   environment = merge(var.environment, local.datadog_env_vars, local.ecs_exec_env_vars, {
     APP_NAME      = var.name
@@ -216,7 +186,7 @@ module "service" {
 }
 
 resource "aws_route53_record" "alb" {
-  count   = var.app_type == "web" ? length(local.domain_names) : 0
+  count   = var.app_type == "web" || var.app_type == "tcp-app" ? length(local.domain_names) : 0
   zone_id = var.zone_id
   name    = local.domain_names[count.index]
   type    = "A"
