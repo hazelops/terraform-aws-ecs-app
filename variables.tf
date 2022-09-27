@@ -487,7 +487,7 @@ variable "tls_cert_arn" {
 }
 
 variable "https_enabled" {
-  type        = string
+  type        = bool
   description = "Whether enable https or not (still needs tls_cert_arn)"
   default     = true
 }
