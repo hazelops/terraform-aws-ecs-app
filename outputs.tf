@@ -37,3 +37,7 @@ output "public_ip" {
 output "ec2_dns_name" {
   value = var.ec2_eip_dns_enabled ? aws_route53_record.ec2.0.fqdn : ""
 }
+
+output "r53_lb_dns_name" {
+  value = var.app_type == "web" || var.app_type == "tcp-app" ? aws_route53_record.alb.0.fqdn : ""
+}
