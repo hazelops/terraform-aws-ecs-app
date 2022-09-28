@@ -690,3 +690,15 @@ variable "cpu_architecture" {
   description = "When you register a task definition, you specify the CPU architecture. The valid values are X86_64 and ARM64"
   default     = "X86_64"
 }
+
+variable "service_discovery_id" {
+  type        = string
+  description = "When you use Service Discovery"
+  default     = ""
+}
+
+variable "public" {
+  type        = bool
+  default     = false
+  description = "Set as true to use with public load balancer"
+}

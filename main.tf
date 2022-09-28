@@ -183,6 +183,13 @@ module "service" {
     PROXY_ENABLED = var.web_proxy_enabled ? "true" : "false"
   }
   )
+
+  dynamic service_registries {
+    for_each = var.public ? [] : [1]
+    content {
+      registry_arn = aws_service_discovery_service.main[0].arn
+    }
+  }  
 }
 
 resource "aws_route53_record" "alb" {
