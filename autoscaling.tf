@@ -29,8 +29,8 @@ module "autoscaling" {
 
   # EC2 Instance Profile
   create_iam_instance_profile   = true
-  iam_instance_profile_name     = local.default_name
-  iam_role_name                 = "${local.default_name}-ec2-profile-role"
+  iam_instance_profile_name     = "${var.env}-${var.namespace}"
+  iam_role_name                 = "${var.env}-${var.namespace}-ec2-profile-role"
   iam_role_path                 = "/ec2/"
   iam_role_policies = {
     AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
