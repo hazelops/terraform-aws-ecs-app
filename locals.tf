@@ -1,7 +1,8 @@
 locals {
+  default_name     = "${var.env}-${var.namespace}"
   name             = var.app_type == "tcp-app" ? "${var.env}-${var.name}-tcp" : "${var.env}-${var.name}"
   ecs_service_name = var.ecs_service_name != "" ? var.ecs_service_name : "${var.env}-${var.name}"
-  ecs_cluster_name = var.ecs_cluster_name != "" ? var.ecs_cluster_name : "${var.env}-${var.namespace}"
+  ecs_cluster_name = var.ecs_cluster_name != "" ? var.ecs_cluster_name : local.default_name
   ecs_cluster_arn  = length(var.ecs_cluster_arn) != "" ? var.ecs_cluster_arn : "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${local.ecs_cluster_name}"
   ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : "${var.namespace}-${var.name}"
   name_prefix      = "${substr(var.name, 0, 5)}-"

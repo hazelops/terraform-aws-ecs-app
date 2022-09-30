@@ -498,6 +498,12 @@ variable "ecr_repo_create" {
   default     = false
 }
 
+variable "create_iam_instance_profile" {
+  type        = bool
+  description = "Determines whether an IAM instance profile is created or to use an existing IAM instance profile"
+  default     = true
+}
+
 variable "ecr_repo_name" {
   type        = string
   description = "ECR repository name"
