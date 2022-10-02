@@ -26,7 +26,7 @@ Security scanning is graciously provided by Bridgecrew.
 | [![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/hazelops/terraform-aws-ecs-app/cis_gke_11)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=hazelops%2Fterraform-aws-ecs-app&benchmark=CIS+GKE+V1.1) | Center for Internet Security, GKE V1.1 Compliance |
 | [![Infrastructure Tests](https://www.bridgecrew.cloud/badges/github/hazelops/terraform-aws-ecs-app/cis_kubernetes_16)](https://www.bridgecrew.cloud/link/badge?vcs=github&fullRepo=hazelops%2Fterraform-aws-ecs-app&benchmark=CIS+KUBERNETES+V1.6) | Center for Internet Security, KUBERNETES V1.6 Compliance |
 
-## Requirements
+### Requirements
 
 | Name | Version |
 |------|---------|
@@ -134,10 +134,11 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="input_env"></a> [env](#input\_env) | Target environment name of the infrastructure | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | Set of environment variables | `map(string)` | n/a | yes |
 | <a name="input_firelens_ecs_log_enabled"></a> [firelens\_ecs\_log\_enabled](#input\_firelens\_ecs\_log\_enabled) | AWSFirelens ECS logs enabled | `bool` | `false` | no |
+| <a name="input_force_delete"></a> [force\_delete](#input\_force\_delete) | If true, will delete the ECR repository even if it contains images. | `bool` | `false` | no |
 | <a name="input_global_secrets"></a> [global\_secrets](#input\_global\_secrets) | List of SSM ParameterStore global secrets - by default, /$var.env/global/* | `list(any)` | `[]` | no |
 | <a name="input_gpu"></a> [gpu](#input\_gpu) | GPU-enabled container instances | `number` | `0` | no |
 | <a name="input_http_port"></a> [http\_port](#input\_http\_port) | Port that is used for HTTP protocol | `number` | `80` | no |
-| <a name="input_https_enabled"></a> [https\_enabled](#input\_https\_enabled) | Whether enable https or not (still needs tls\_cert\_arn) | `string` | `true` | no |
+| <a name="input_https_enabled"></a> [https\_enabled](#input\_https\_enabled) | Whether enable https or not (still needs tls\_cert\_arn) | `bool` | `true` | no |
 | <a name="input_iam_instance_profile"></a> [iam\_instance\_profile](#input\_iam\_instance\_profile) | IAM Instance Profile | `string` | `null` | no |
 | <a name="input_iam_role_policy_statement"></a> [iam\_role\_policy\_statement](#input\_iam\_role\_policy\_statement) | ECS Service IAM Role policy statement | `list(any)` | `[]` | no |
 | <a name="input_image_id"></a> [image\_id](#input\_image\_id) | EC2 AMI id | `string` | `null` | no |
@@ -195,5 +196,6 @@ Security scanning is graciously provided by Bridgecrew.
 | <a name="output_efs"></a> [efs](#output\_efs) | n/a |
 | <a name="output_eips"></a> [eips](#output\_eips) | n/a |
 | <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | n/a |
+| <a name="output_r53_lb_dns_name"></a> [r53\_lb\_dns\_name](#output\_r53\_lb\_dns\_name) | n/a |
 | <a name="output_this_target_group_arn"></a> [this\_target\_group\_arn](#output\_this\_target\_group\_arn) | n/a |
 | <a name="output_this_task_definition_arn"></a> [this\_task\_definition\_arn](#output\_this\_task\_definition\_arn) | n/a |
