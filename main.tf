@@ -15,7 +15,7 @@ module "alb" {
   http_tcp_listeners = local.http_tcp_listeners
 
 
-  https_listeners = var.app_type == "web" && var.https_enabled && var.tls_cert_arn != null ? concat(
+  https_listeners = var.app_type == "web" && var.https_enabled ? concat(
   [
     {
       port               = 443
@@ -38,8 +38,9 @@ module "ecr" {
   source  = "registry.terraform.io/hazelops/ecr/aws"
   version = "~> 1.0"
 
-  name    = local.ecr_repo_name
-  enabled = var.ecr_repo_create
+  name         = local.ecr_repo_name
+  enabled      = var.ecr_repo_create
+  force_delete = var.ecr_force_delete
 }
 
 module "efs" {
