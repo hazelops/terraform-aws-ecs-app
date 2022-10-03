@@ -691,7 +691,7 @@ variable "cpu_architecture" {
   default     = "X86_64"
 }
 
-variable "force_delete" {
+variable "ecr_force_delete" {
   default = false
   description = "If true, will delete the ECR repository even if it contains images."
 }

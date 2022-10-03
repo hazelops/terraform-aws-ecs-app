@@ -40,7 +40,7 @@ module "ecr" {
 
   name         = local.ecr_repo_name
   enabled      = var.ecr_repo_create
-  force_delete = var.force_delete
+  force_delete = var.ecr_force_delete
 }
 
 module "efs" {
