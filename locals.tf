@@ -117,6 +117,22 @@ locals {
         target_group_index = 0
       },]
 
+  https_listeners = var.app_type == "tcp-app" ? [
+    for index, port_mapping in var.port_mappings :
+      {
+        port               = port_mapping.host_port
+        protocol           = "TCP"
+        certificate_arn    = var.tls_cert_arn
+        target_group_index = index
+      }
+    ] : [
+      {
+        port               = 443
+        protocol           = "HTTPS"
+        certificate_arn    = var.tls_cert_arn
+        target_group_index = 0
+      },]
+
   ecs_service_tcp_port_mappings = [
     for index, port_mapping in var.port_mappings :
       {
