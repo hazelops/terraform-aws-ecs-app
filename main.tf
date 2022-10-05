@@ -63,6 +63,31 @@ module "efs" {
 
 }
 
+resource "aws_service_discovery_service" "main" {
+  count = var.public == true ? 0 : 1
+  name  = "${var.namespace}-${var.wenv}-${vlocal.ecs_service_name}"
+
+  tags = {
+    env   = var.env
+    Env   = var.env
+    Name  = local.ecs_service_name
+  }
+
+  dns_config {
+    namespace_id    = var.service_discovery_id
+    routing_policy  = "MULTIVALUE"
+
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+  }
+
+  health_check_custom_config {
+    failure_threshold = 1
+  }
+}
+
 module "service" {
   source = "./ecs-modules/ecs-service"
 
