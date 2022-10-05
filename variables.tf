@@ -498,6 +498,12 @@ variable "ecr_repo_create" {
   default     = false
 }
 
+variable "create_iam_instance_profile" {
+  type        = bool
+  description = "Determines whether an IAM instance profile is created or to use an existing IAM instance profile"
+  default     = true
+}
+
 variable "ecr_repo_name" {
   type        = string
   description = "ECR repository name"
@@ -697,8 +703,7 @@ variable "service_discovery_id" {
   default     = ""
 }
 
-variable "public" {
-  type        = bool
-  default     = false
-  description = "Set as true to use with public load balancer"
+variable "ecr_force_delete" {
+  default = false
+  description = "If true, will delete the ECR repository even if it contains images."
 }
