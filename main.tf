@@ -13,7 +13,7 @@ module "alb" {
   idle_timeout       = var.alb_idle_timeout
 
   http_tcp_listeners = local.http_tcp_listeners
-  https_listeners    = var.https_enabled ? concat(local.https_listeners) : []
+  https_listeners    = var.https_enabled ? concat(local.https_tls_listeners) : []
 
   target_groups      = concat(var.app_type == "web" ? local.target_groups_web : local.target_groups_tcp)
 
