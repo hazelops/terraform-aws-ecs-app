@@ -2,7 +2,7 @@ module "alb" {
   count = var.app_type == "web" || var.app_type == "tcp-app" ? 1 : 0
 
   source  = "registry.terraform.io/terraform-aws-modules/alb/aws"
-  version = "~> 5.0"
+  version = "~> 7.0"
 
   name               = var.public ? local.name : "${local.name}-private"
   load_balancer_type = var.app_type == "web" ? "application" : "network" 
@@ -193,8 +193,8 @@ resource "aws_route53_record" "alb" {
   type    = "A"
 
   alias {
-    name                   = module.alb[0].this_lb_dns_name
-    zone_id                = module.alb[0].this_lb_zone_id
+    name                   = module.alb[0].lb_dns_name
+    zone_id                = module.alb[0].lb_zone_id
     evaluate_target_health = true
   }
 }
