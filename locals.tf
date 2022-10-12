@@ -109,11 +109,27 @@ locals {
         port               = port_mapping.host_port
         protocol           = "TCP"
         target_group_index = index
-      }
+      } if port_mapping.https_listener == false
     ] : [
       {
         port               = var.http_port
         protocol           = "HTTP"
+        target_group_index = 0
+      },]
+
+  https_tls_listeners = var.app_type == "tcp-app" ? [
+    for index, port_mapping in var.port_mappings :
+      {
+        port               = port_mapping.host_port
+        protocol           = "TLS"
+        certificate_arn    = var.tls_cert_arn
+        target_group_index = index
+      } if port_mapping.https_listener == true
+    ] : [
+      {
+        port               = 443
+        protocol           = "HTTPS"
+        certificate_arn    = var.tls_cert_arn
         target_group_index = 0
       },]
 
@@ -169,7 +185,7 @@ locals {
         port                = port_mapping.host_port
         protocol            = "TCP"
       }
-
+      
     }
   ]
   

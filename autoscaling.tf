@@ -28,7 +28,7 @@ module "autoscaling" {
   key_name                     = var.key_name
 
   # EC2 Instance Profile
-  create_iam_instance_profile   = true
+  create_iam_instance_profile   = var.ecs_launch_type == "EC2" ? var.create_iam_instance_profile : false
   iam_instance_profile_name     = "${var.env}-${var.namespace}"
   iam_role_name                 = "${var.env}-${var.namespace}-ec2-profile-role"
   iam_role_path                 = "/ec2/"
