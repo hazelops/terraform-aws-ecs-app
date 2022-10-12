@@ -11,15 +11,15 @@ output "cloudwatch_log_group" {
 }
 
 output "alb_dns_name" {
-  value = length(module.alb[*].this_lb_dns_name) >= 1 ? module.alb[0].this_lb_dns_name : ""
+  value = length(module.alb[*].lb_dns_name) >= 1 ? module.alb[0].lb_dns_name : ""
 }
 
 output "alb_dns_zone" {
-  value = length(module.alb[*].this_lb_zone_id) >= 1 ? module.alb[0].this_lb_zone_id : ""
+  value = length(module.alb[*].lb_zone_id) >= 1 ? module.alb[0].lb_zone_id : ""
 }
 
 output "alb_arn" {
-  value = length(module.alb[*].this_lb_arn) >= 1 ? module.alb[0].this_lb_arn : ""
+  value = length(module.alb[*].lb_arn) >= 1 ? module.alb[0].lb_arn : ""
 }
 
 output "efs" {
