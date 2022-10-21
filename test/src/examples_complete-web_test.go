@@ -23,7 +23,7 @@ func TestExamplesCompleteWeb(t *testing.T) {
 
 	rootFolder := "../../"
 	terraformFolderRelativeToRoot := "examples/complete-web"
-	varFiles := []string{"terraform.tfvars"}
+	varFiles := []string{"/Users/iharkotau/IT/PRJ/hazelops/github/hzo/terraform-aws-ecs-app/examples/complete-web/terraform.tfvars"}
 
 	tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, rootFolder, terraformFolderRelativeToRoot)
 
@@ -56,6 +56,15 @@ func TestExamplesCompleteWeb(t *testing.T) {
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, []string{"10.30.20.0/23", "10.30.22.0/23", "10.30.24.0/23"}, privateSubnetCidrs)
 
+	// Run `terraform output` to get the value of an output variable
+	cloudWatchLogGroup := terraform.Output(t, terraformOptions, "cloudwatch_log_group")
+	// Verify we're getting back the outputs we expect
+	assert.Equal(t, "examples-app", cloudWatchLogGroup)
+
+	// Run `terraform output` to get the value of an output variable
+	ecsClusterName := terraform.Output(t, terraformOptions, "ecs_cluster_name")
+	// Verify we're getting back the outputs we expect
+	assert.Equal(t, "examples-complete-web", ecsClusterName)
 	/*
 		// Run `terraform output` to get the value of an output variable
 		proxyEndpoint := terraform.Output(t, terraformOptions, "proxy_endpoint")
