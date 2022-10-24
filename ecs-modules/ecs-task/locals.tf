@@ -45,7 +45,7 @@ locals {
 
       mountPoints = [
       # This way we ensure that we only mount main app volumes to the main app container.
-      for volume in var.volumes : lookup(volume, "mount_point", null) if(lookup(volume, "mount_point", false))
+      for volume in var.volumes : lookup(volume, "mount_point", {}) if(contains(keys(volume), "mount_point"))
       ]
 
       environment = [for k, v in local.environment : { name = k, value = v }]
