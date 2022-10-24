@@ -65,6 +65,11 @@ func TestExamplesCompleteWeb(t *testing.T) {
 	ecsClusterName := terraform.Output(t, terraformOptions, "ecs_cluster_name")
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, "examples-complete-web", ecsClusterName)
+
+	// Run `terraform output` to get the value of an output variable
+	r53AppDnsName := terraform.Output(t, terraformOptions, "r53_lb_dns_name")
+	// Verify we're getting back the outputs we expect
+	assert.Equal(t, "app.examples.nutcorp.net", r53AppDnsName)
 	/*
 		// Run `terraform output` to get the value of an output variable
 		proxyEndpoint := terraform.Output(t, terraformOptions, "proxy_endpoint")
