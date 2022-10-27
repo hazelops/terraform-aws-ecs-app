@@ -701,3 +701,14 @@ variable "ecr_force_delete" {
   default = false
   description = "If true, will delete the ECR repository even if it contains images."
 }
+
+variable "alb_access_logs_enabled" {
+  default = false
+  description = "If true, ALB access logs will be writing to S3"
+}
+
+variable "alb_access_logs_s3bucket_name" {
+  type        = string
+  description = "S3 bucket name for ALB access logs"
+  default     = ""
+}
