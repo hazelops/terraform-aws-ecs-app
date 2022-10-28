@@ -42,11 +42,6 @@ resource "aws_security_group" "default_permissive" {
     ]
   }
 
-  tags = {
-    Terraform = "true"
-    Env       = var.env
-    Name      = "${var.env}-default-permissive"
-  }
 }
 
 resource "aws_route53_record" "env_ns_record" {
