@@ -103,8 +103,6 @@ module "worker_complete" {
   app_secrets = [
   ]
   environment = {
-    ENV      = var.env
-    APP_NAME = "App"
   }
 
   iam_role_policy_statement = [

@@ -120,15 +120,12 @@ module "web_complete" {
   zone_id                       = local.zone_id
   route53_health_check_enabled  = false
   domain_names                  = [
-    "app.${var.root_domain_name}"
   ]
 
   # Environment variables
   app_secrets = [
   ]
   environment = {
-    ENV       = var.env
-    APP_NAME  = "App"
   }
 }
 
