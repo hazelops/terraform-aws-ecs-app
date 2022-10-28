@@ -3,17 +3,17 @@ module "vpc" {
   version = "~> 3.0"
 
   name = "${var.env}-vpc"
-  cidr = "10.30.0.0/16"
+  cidr = "10.0.0.0/16"
 
   azs = [
     "${var.aws_region}a"
   ]
   public_subnets = [
-    "10.30.10.0/23"
+    "10.0.10.0/23"
   ]
 
   private_subnets = [
-    "10.30.20.0/23"
+    "10.0.20.0/23"
   ]
 
   manage_default_network_acl          = true
