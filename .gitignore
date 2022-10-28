@@ -26,7 +26,6 @@ __pycache__
 terraform*.tfstate
 .terraform.lock.hcl
 *.tfvars
-*.wpvars
 backend.tf
 output.json
 tfplan*
