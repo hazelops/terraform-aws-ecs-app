@@ -17,7 +17,3 @@ data "aws_ami" "amazon_linux_ecs_generic" {
   }
 }
 
-data "aws_route53_zone" "root" {
-  name         = "${var.root_domain_name}."
-  private_zone = false
-}
