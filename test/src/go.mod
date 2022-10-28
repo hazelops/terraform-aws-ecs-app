@@ -1,4 +1,4 @@
-module github.com/terraform-aws-modules/terraform-aws-ecs
+module github.com/hazelops/terraform-aws-ecs-app
 
 go 1.18
 
