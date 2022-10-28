@@ -89,7 +89,6 @@ module "worker_complete" {
   docker_image_tag     = local.docker_image_tag
 
   docker_container_command           = ["rake", "notify:daily"]
-  cloudwatch_schedule_expressions    = ["cron(0 * * * ? *)"]
   deployment_minimum_healthy_percent = 0
 
   # Network
