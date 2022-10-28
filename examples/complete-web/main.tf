@@ -6,28 +6,15 @@ module "vpc" {
   cidr = "10.30.0.0/16"
 
   azs = [
-    "${var.aws_region}a",
-    "${var.aws_region}b",
-    "${var.aws_region}c"
+    "${var.aws_region}a"
   ]
   public_subnets = [
-    "10.30.10.0/23",
-    "10.30.12.0/23",
-    "10.30.14.0/23"
+    "10.30.10.0/23"
   ]
 
   private_subnets = [
-    "10.30.20.0/23",
-    "10.30.22.0/23",
-    "10.30.24.0/23"
+    "10.30.20.0/23"
   ]
-  # database_subnets    = ["10.0.21.0/24", "10.0.22.0/24"]
-  enable_nat_gateway                  = true
-  single_nat_gateway                  = true
-  enable_vpn_gateway                  = false
-
-  enable_dns_hostnames                = true
-  enable_dns_support                  = true
   manage_default_network_acl          = true
   default_network_acl_name            = "${var.env}-${var.namespace}"
 }

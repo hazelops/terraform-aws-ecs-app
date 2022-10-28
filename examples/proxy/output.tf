@@ -7,11 +7,7 @@ output "private_subnet_cidrs" {
 }
 
 output "cloudwatch_log_group" {
-  value = module.worker_complete.cloudwatch_log_group
-}
-
-output "cloudwatch_event_rule_id" {
-  value = module.worker_complete.cloudwatch_event_rule_id
+  value = module.web_complete.cloudwatch_log_group
 }
 
 output "ecs_cluster_name" {

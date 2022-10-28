@@ -15,6 +15,7 @@ locals {
   docker_image_tag     = var.docker_image_tag
 
   ecs_cluster_name     = module.ecs.cluster_name
+  tls_cert_arn         = length(module.env_acm.acm_certificate_arn) > 0 ? module.env_acm.acm_certificate_arn : null
 }
 
 variable "env" {}
