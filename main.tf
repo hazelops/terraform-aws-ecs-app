@@ -17,6 +17,10 @@ module "alb" {
 
   target_groups      = concat(var.app_type == "web" ? local.target_groups_web : local.target_groups_tcp)
 
+  access_logs = var.alb_access_logs_enabled && var.alb_access_logs_s3bucket_name != "" ? {
+    bucket = var.alb_access_logs_s3bucket_name
+  } : {}
+
   tags = {
     env = var.env
     Env = var.env
