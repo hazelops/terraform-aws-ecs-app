@@ -64,22 +64,6 @@ resource "aws_route53_zone" "env_domain" {
   name = "${var.env}.${var.root_domain_name}"
 }
 
-module "env_acm" {
-  source  = "registry.terraform.io/terraform-aws-modules/acm/aws"
-  version = "~> 4.0"
-
-  domain_name = "${local.env}.${local.root_domain_name}"
-
-  subject_alternative_names = [
-    "*.${local.env}.${local.root_domain_name}"
-  ]
-
-  zone_id = local.zone_id
-
-  tags = {
-    Name = "${var.env}.${var.root_domain_name}"
-  }
-}
 
 module "ecs" {
   source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
