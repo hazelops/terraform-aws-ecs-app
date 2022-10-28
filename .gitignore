@@ -22,7 +22,6 @@ override.tf.json
 *_override.tf.json
 
 # Infra
-__pycache__
 terraform*.tfstate
 .terraform.lock.hcl
 *.tfvars
