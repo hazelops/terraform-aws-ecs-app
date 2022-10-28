@@ -41,20 +41,12 @@ resource "aws_security_group" "default_permissive" {
     ]
   }
 
-  tags = {
-    Terraform = "true"
-    Env       = var.env
-    Name      = "${var.env}-default-permissive"
-  }
 }
 
 resource "aws_route53_record" "env_ns_record" {
   zone_id = data.aws_route53_zone.root.id
   name    = "${var.env}.${var.root_domain_name}"
   type    = "NS"
-  //  ttl  = "172800"
-
-  // Fast TTL for dev
   ttl     = "60"
   records = aws_route53_zone.env_domain.name_servers
 }
