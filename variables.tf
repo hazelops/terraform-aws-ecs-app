@@ -200,7 +200,7 @@ variable "docker_host_port" {
 
 variable "port_mappings" {
   description = "List of ports to open from a service"
-  type = list(any)
+  type = any
   default = []
 }
 

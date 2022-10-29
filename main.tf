@@ -5,17 +5,19 @@ module "alb" {
   version = "~> 7.0"
 
   name               = var.public ? local.name : "${local.name}-private"
-  load_balancer_type = var.app_type == "web" ? "application" : "network" 
+  load_balancer_type = var.app_type == "web" ? "application" : "network"
   internal           = var.public ? false : true
   vpc_id             = var.vpc_id
   security_groups    = var.alb_security_groups
   subnets            = var.public ? var.public_subnets : var.private_subnets
   idle_timeout       = var.alb_idle_timeout
 
-  http_tcp_listeners = local.http_tcp_listeners
-  https_listeners    = var.https_enabled ? concat(local.https_tls_listeners) : []
 
-  target_groups      = concat(var.app_type == "web" ? local.target_groups_web : local.target_groups_tcp)
+
+  http_tcp_listeners  = local.alb_http_tcp_listeners
+  https_listeners = var.https_enabled ? concat(local.alb_https_listeners) : []
+
+  target_groups = concat(var.app_type == "web" ? local.target_groups_web : local.target_groups_tcp)
 
   access_logs = var.alb_access_logs_enabled && var.alb_access_logs_s3bucket_name != "" ? {
     bucket = var.alb_access_logs_s3bucket_name
