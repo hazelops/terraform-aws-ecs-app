@@ -21,7 +21,7 @@ module "web_complete" {
   image_id             = local.image_id
   docker_image_tag     = local.docker_image_tag
 
-  docker_container_command           = ["rake", "notify:daily"]
+  docker_container_command           = ["echo", "here-is-the-output"]
   cloudwatch_schedule_expressions    = ["cron(0 * * * ? *)"]
   deployment_minimum_healthy_percent = 0
 
@@ -36,16 +36,6 @@ module "web_complete" {
   # Environment variables
   app_secrets = [
   ]
-  environment = {
-    ENV      = var.env
-    APP_NAME = "App"
-  }
 
-  iam_role_policy_statement = [
-    {
-      Effect   = "Allow",
-      Action   = "s3:*",
-      Resource = "*"
-  }]
 }
 
