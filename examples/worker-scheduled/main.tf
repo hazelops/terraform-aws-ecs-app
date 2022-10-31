@@ -37,11 +37,5 @@ module "web_complete" {
   app_secrets = [
   ]
 
-  iam_role_policy_statement = [
-    {
-      Effect   = "Allow",
-      Action   = "s3:*",
-      Resource = "*"
-  }]
 }
 
