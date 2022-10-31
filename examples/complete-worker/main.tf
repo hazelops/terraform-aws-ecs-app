@@ -74,7 +74,7 @@ module "worker_complete" {
   image_id             = local.image_id
   docker_image_tag     = local.docker_image_tag
 
-  docker_container_command           = ["rake", "notify:daily"]
+  docker_container_command           = ["echo", "command-output"]
   deployment_minimum_healthy_percent = 0
 
   # Network
