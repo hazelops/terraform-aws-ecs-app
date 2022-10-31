@@ -59,10 +59,10 @@ module "env_acm" {
   source  = "registry.terraform.io/terraform-aws-modules/acm/aws"
   version = "~> 4.0"
 
-  domain_name = "${local.env}.${local.root_domain_name}"
+  domain_name = "${var.env}.${var.root_domain_name}"
 
   subject_alternative_names = [
-    "*.${local.env}.${local.root_domain_name}"
+    "*.${var.env}.${var.root_domain_name}"
   ]
 
   zone_id = local.zone_id
@@ -87,10 +87,10 @@ module "web_complete" {
   namespace             = var.namespace
   
   # Containers
-  ecs_cluster_name      = local.ecs_cluster_name
-  docker_registry       = local.docker_registry
+  ecs_cluster_name      = module.ecs.cluster_name
+  docker_registry       = var.docker_registry
   image_id              = local.image_id
-  docker_image_tag      = local.docker_image_tag
+  docker_image_tag      = var.docker_image_tag
 
   # Load Balancer
   public                = true
