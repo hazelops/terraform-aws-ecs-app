@@ -10,6 +10,10 @@ output "cloudwatch_log_group" {
   value = module.service.cloudwatch_log_group
 }
 
+output "cloudwatch_event_rule_id" {
+  value = module.service.cloudwatch_event_rule_id
+}
+
 output "alb_dns_name" {
   value = length(module.alb[*].lb_dns_name) >= 1 ? module.alb[0].lb_dns_name : ""
 }

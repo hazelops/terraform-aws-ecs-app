@@ -21,6 +21,15 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
+# Infra
+terraform*.tfstate
+.terraform.lock.hcl
+*.tfvars
+backend.tf
+output.json
+tfplan*
+tflog*
+
 # Include override files you do wish to add to version control using negated pattern
 #
 # !example_override.tf

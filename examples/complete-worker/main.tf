@@ -1,7 +1,60 @@
-module "web_complete" {
+module "vpc" {
+  source  = "registry.terraform.io/terraform-aws-modules/vpc/aws"
+  version = "~> 3.0"
+
+  name = "${var.env}-vpc"
+  cidr = "10.0.0.0/16"
+
+  azs = [
+    "${var.aws_region}a"
+  ]
+  public_subnets = [
+    "10.0.10.0/23"
+  ]
+
+  private_subnets = [
+    "10.0.20.0/23"
+  ]
+
+  manage_default_network_acl          = true
+  default_network_acl_name            = "${var.env}-${var.namespace}"
+}
+resource "aws_security_group" "default_permissive" {
+  name        = "${var.env}-default-permissive"
+  vpc_id      = module.vpc.vpc_id
+  description = "Managed by Terraform"
+
+  ingress {
+    protocol    = -1
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
+
+  egress {
+    protocol    = -1
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
+
+}
+
+
+module "ecs" {
+  source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
+  version            = "~> 4.0"
+  cluster_name       = "${var.env}-${var.namespace}"
+}
+
+module "worker_complete" {
   source = "../.."
 
-  name             = "app"
+  name             = "worker"
   app_type         = "worker"
   env              = var.env
   namespace        = var.namespace
@@ -16,14 +69,11 @@ module "web_complete" {
   cpu              = 1024
 
   # Containers
+  ecs_cluster_arn      = module.ecs.cluster_arn
   docker_registry      = local.docker_registry
-  image_id             = local.image_id
   docker_image_tag     = local.docker_image_tag
-  iam_instance_profile = local.iam_instance_profile
-  key_name             = local.key_name
 
-  docker_container_command           = ["rake", "notify:daily"]
-  cloudwatch_schedule_expressions    = ["cron(0 * * * ? *)"]
+  docker_container_command           = ["echo", "command-output"]
   deployment_minimum_healthy_percent = 0
 
   # Network
@@ -38,8 +88,6 @@ module "web_complete" {
   app_secrets = [
   ]
   environment = {
-    ENV      = var.env
-    APP_NAME = "App"
   }
 
   iam_role_policy_statement = [

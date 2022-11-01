@@ -3,18 +3,19 @@ module "vpc" {
   version = "~> 3.0"
 
   name = "${var.env}-vpc"
-  cidr = "10.0.0.0/16"
+  cidr = "10.30.0.0/16"
 
   azs = [
     "${var.aws_region}a"
   ]
   public_subnets = [
-    "10.0.10.0/23"
+    "10.30.10.0/23"
   ]
 
   private_subnets = [
-    "10.0.20.0/23"
+    "10.30.20.0/23"
   ]
+
   manage_default_network_acl          = true
   default_network_acl_name            = "${var.env}-${var.namespace}"
 }
@@ -41,12 +42,20 @@ resource "aws_security_group" "default_permissive" {
     ]
   }
 
+  tags = {
+    Terraform = "true"
+    Env       = var.env
+    Name      = "${var.env}-default-permissive"
+  }
 }
 
 resource "aws_route53_record" "env_ns_record" {
   zone_id = data.aws_route53_zone.root.id
   name    = "${var.env}.${var.root_domain_name}"
   type    = "NS"
+  //  ttl  = "172800"
+
+  // Fast TTL for dev
   ttl     = "60"
   records = aws_route53_zone.env_domain.name_servers
 }
@@ -55,22 +64,6 @@ resource "aws_route53_zone" "env_domain" {
   name = "${var.env}.${var.root_domain_name}"
 }
 
-module "env_acm" {
-  source  = "registry.terraform.io/terraform-aws-modules/acm/aws"
-  version = "~> 4.0"
-
-  domain_name = "${var.env}.${var.root_domain_name}"
-
-  subject_alternative_names = [
-    "*.${var.env}.${var.root_domain_name}"
-  ]
-
-  zone_id = local.zone_id
-
-  tags = {
-    Name = "${var.env}.${var.root_domain_name}"
-  }
-}
 
 module "ecs" {
   source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
@@ -81,15 +74,22 @@ module "ecs" {
 module "web_complete" {
   source = "../.."
 
-  name                  = "app"
-  app_type              = "web"
-  env                   = var.env
-  namespace             = var.namespace
-  
+  name             = "app"
+  app_type         = "web"
+  env              = var.env
+  namespace        = var.namespace
+  ecs_cluster_name = local.ecs_cluster_name
+
+  # Proxy enabling
+  web_proxy_enabled = true
+
+  # Image should have some customization, see Dockerfile example at ./simple-prj
   # Containers
-  ecs_cluster_name      = module.ecs.cluster_name
-  docker_registry       = var.docker_registry
-  docker_image_tag      = var.docker_image_tag
+  docker_registry      = local.docker_registry
+  image_id             = local.image_id
+  docker_image_tag     = local.docker_image_tag
+  iam_instance_profile = local.iam_instance_profile
+  key_name             = local.key_name
 
   # Load Balancer
   public                = true
@@ -98,25 +98,28 @@ module "web_complete" {
   tls_cert_arn          = local.tls_cert_arn
 
   # EFS settings
-  efs_enabled           = false
-  efs_mount_point       = "/mnt/efs"
-  efs_root_directory    = "/"
+  efs_enabled        = false
+  efs_mount_point    = "/mnt/efs"
+  efs_root_directory = "/"
 
   # Network
-  vpc_id                        = local.vpc_id
-  public_subnets                = local.public_subnets
-  private_subnets               = local.private_subnets
-  security_groups               = local.security_groups
-  root_domain_name              = var.root_domain_name
-  zone_id                       = local.zone_id
-  route53_health_check_enabled  = false
-  domain_names                  = [
+  vpc_id                       = local.vpc_id
+  public_subnets               = local.public_subnets
+  private_subnets              = local.private_subnets
+  security_groups              = local.security_groups
+  root_domain_name             = var.root_domain_name
+  zone_id                      = local.zone_id
+  route53_health_check_enabled = false
+  domain_names = [
+    "app.${var.root_domain_name}"
   ]
 
   # Environment variables
   app_secrets = [
   ]
   environment = {
+    ENV      = var.env
+    APP_NAME = "App"
   }
 }
 
