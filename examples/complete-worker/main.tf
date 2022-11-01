@@ -71,7 +71,6 @@ module "worker_complete" {
   # Containers
   ecs_cluster_arn      = module.ecs.cluster_arn
   docker_registry      = local.docker_registry
-  image_id             = local.image_id
   docker_image_tag     = local.docker_image_tag
 
   docker_container_command           = ["echo", "command-output"]

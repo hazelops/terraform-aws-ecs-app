@@ -10,7 +10,6 @@ locals {
   root_domain_name     = var.root_domain_name
   zone_id              = aws_route53_zone.env_domain.id
 
-  image_id             = data.aws_ami.amazon_linux_ecs_generic.id
   docker_registry      = var.docker_registry
   docker_image_tag     = var.docker_image_tag
 

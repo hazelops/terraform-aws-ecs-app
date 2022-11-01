@@ -6,7 +6,6 @@ locals {
   alb_security_groups  = [aws_security_group.default_permissive.id]
   zone_id              = aws_route53_zone.env_domain.id
 
-  image_id             = data.aws_ami.amazon_linux_ecs_generic.id
   tls_cert_arn         = length(module.env_acm.acm_certificate_arn) > 0 ? module.env_acm.acm_certificate_arn : null
 }
 

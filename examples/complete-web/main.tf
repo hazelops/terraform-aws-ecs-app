@@ -89,7 +89,6 @@ module "web_complete" {
   # Containers
   ecs_cluster_name      = module.ecs.cluster_name
   docker_registry       = var.docker_registry
-  image_id              = local.image_id
   docker_image_tag      = var.docker_image_tag
 
   # Load Balancer
