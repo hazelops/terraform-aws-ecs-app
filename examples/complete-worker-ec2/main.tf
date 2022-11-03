@@ -8,6 +8,23 @@ terraform {
   required_version = ">= 1.0"
 }
 
+# Data
+data "aws_ami" "amazon_linux_ecs_generic" {
+  most_recent = true
+
+  owners = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-ecs-hvm-*-x86_64-ebs"]
+  }
+
+  filter {
+    name   = "owner-alias"
+    values = ["amazon"]
+  }
+}
+
 # Main
 module "vpc" {
   source  = "registry.terraform.io/terraform-aws-modules/vpc/aws"
@@ -60,7 +77,7 @@ module "ecs" {
   cluster_name       = "${var.env}-${var.namespace}"
 }
 
-module "worker_scheduled" {
+module "worker_complete" {
   source = "../.."
 
   name             = "worker"
@@ -69,10 +86,12 @@ module "worker_scheduled" {
   namespace        = var.namespace
 
   public           = false
-  ecs_launch_type  = "FARGATE"
-  min_size         = 1
+  ecs_launch_type  = "EC2"
+  ecs_network_mode = "host"
+  instance_type    = "t3.large"
   max_size         = 1
   desired_capacity = 0
+
 
   # Containers
   ecs_cluster_arn       = module.ecs.cluster_arn
@@ -82,12 +101,14 @@ module "worker_scheduled" {
 
   docker_container_command           = ["echo", "command-output"]
   deployment_minimum_healthy_percent = 0
-  cloudwatch_schedule_expressions    = ["cron(0 * * * ? *)"]
 
   # Network
   vpc_id                        = module.vpc.vpc_id
   private_subnets               = module.vpc.private_subnets
   security_groups               = [aws_security_group.default_permissive.id]
+  key_name                      = var.ec2_key_pair_name
+  create_iam_instance_profile   = true
+  image_id                      = data.aws_ami.amazon_linux_ecs_generic.id
 
   # Environment variables
   app_secrets = [
