@@ -157,7 +157,7 @@ locals {
       backend_port         = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
       target_type          = var.ecs_launch_type == "EC2" ? "instance" : "ip"
       deregistration_delay = var.alb_deregistration_delay
-      preserve_client_ip   = false
+      preserve_client_ip   = null
       # This is specified for compatibility with the tcp target groups. It's not actually used in a lookup.
 
       health_check = {
