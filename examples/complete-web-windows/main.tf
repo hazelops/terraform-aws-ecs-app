@@ -73,23 +73,6 @@ resource "aws_route53_zone" "env_domain" {
   name = "${var.env}.${var.root_domain_name}"
 }
 
-module "env_acm" {
-  source  = "registry.terraform.io/terraform-aws-modules/acm/aws"
-  version = "~> 4.0"
-
-  domain_name = "${var.env}.${var.root_domain_name}"
-
-  subject_alternative_names = [
-    "*.${var.env}.${var.root_domain_name}"
-  ]
-
-  zone_id = aws_route53_zone.env_domain.id
-
-  tags = {
-    Name = "${var.env}.${var.root_domain_name}"
-  }
-}
-
 module "ecs" {
   source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
   version            = "~> 4.0"
@@ -105,16 +88,18 @@ module "web_complete" {
   namespace             = var.namespace
   
   # Containers
-  ecs_cluster_name      = module.ecs.cluster_name
-  docker_registry       = var.docker_registry
-  docker_image_tag      = var.docker_image_tag
+  cpu                     = 1024
+  memory                  = 2048
+  operating_system_family = "WINDOWS_SERVER_2019_CORE"
+  ecs_cluster_name        = module.ecs.cluster_name
+  docker_registry         = var.docker_registry
+  docker_image_tag        = var.docker_image_tag
 
   # Load Balancer
   public                = true
-  https_enabled         = true
+  https_enabled         = false
   alb_health_check_path = "/"
   alb_security_groups   = [aws_security_group.default_permissive.id]
-  tls_cert_arn          = local.tls_cert_arn
 
   # EFS settings
   efs_enabled           = false

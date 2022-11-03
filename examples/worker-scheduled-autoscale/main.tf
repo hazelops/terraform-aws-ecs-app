@@ -70,9 +70,6 @@ module "worker_scheduled" {
 
   public           = false
   ecs_launch_type  = "FARGATE"
-  min_size         = 1
-  max_size         = 1
-  desired_capacity = 0
 
   # Containers
   ecs_cluster_arn       = module.ecs.cluster_arn
@@ -82,7 +79,30 @@ module "worker_scheduled" {
 
   docker_container_command           = ["echo", "command-output"]
   deployment_minimum_healthy_percent = 0
-  cloudwatch_schedule_expressions    = ["cron(0 * * * ? *)"]
+
+  # Autoscaling
+  autoscale_enabled = true
+  min_size          = 1
+  max_size          = 1
+  desired_capacity  = 1
+
+  # Scheduled ECS scaling up/down
+  autoscaling_min_size         = 1
+  autoscaling_max_size         = 4
+  autoscale_scheduled_timezone = "America/Los_Angeles"
+
+  # Scaling to the value of autoscaling_max_size
+  # Time is in PST here (see `autoscale_scheduled_timezone` parameter)
+  autoscale_scheduled_up = [
+    "cron(30 21 * * ? *)",
+    "cron(30 13 * * ? *)",
+  ]
+
+  # Scaling down - back to default autoscaling_min_size
+  autoscale_scheduled_down = [
+    "cron(00 03 * * ? *)",
+    "cron(00 15 * * ? *)",
+  ]
 
   # Network
   vpc_id                        = module.vpc.vpc_id

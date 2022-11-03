@@ -96,11 +96,11 @@ module "ecs" {
   cluster_name       = "${var.env}-${var.namespace}"
 }
 
-module "web_complete" {
+module "tcp_app" {
   source = "../.."
 
-  name                  = "app"
-  app_type              = "web"
+  name                  = "tcpapp"
+  app_type              = "tcp-app"
   env                   = var.env
   namespace             = var.namespace
   
@@ -112,14 +112,23 @@ module "web_complete" {
   # Load Balancer
   public                = true
   https_enabled         = true
-  alb_health_check_path = "/"
-  alb_security_groups   = [aws_security_group.default_permissive.id]
   tls_cert_arn          = local.tls_cert_arn
 
-  # EFS settings
-  efs_enabled           = false
-  efs_mount_point       = "/mnt/efs"
-  efs_root_directory    = "/"
+  port_mappings = [
+    {
+      container_port = 4442
+      host_port      = 4442
+    },
+    {
+      container_port = 4443
+      host_port      = 4443
+    },
+    {
+      container_port = 4444
+      host_port      = 4444
+      tls            = true
+    }
+  ]
 
   # Network
   vpc_id                        = module.vpc.vpc_id
