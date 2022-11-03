@@ -71,6 +71,17 @@ resource "aws_security_group" "default_permissive" {
 
 }
 
+resource "aws_key_pair" "root" {
+  key_name   = var.ec2_key_pair_name
+  public_key = var.ssh_public_key
+
+  lifecycle {
+    ignore_changes = [
+      public_key
+    ]
+  }
+}
+
 module "ecs" {
   source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
   version            = "~> 4.0"
@@ -88,7 +99,7 @@ module "worker_complete" {
   public           = false
   ecs_launch_type  = "EC2"
   ecs_network_mode = "host"
-  instance_type    = "t3.large"
+  instance_type    = "t3.medium"
   max_size         = 1
   desired_capacity = 0
 
