@@ -1,7 +1,3 @@
-locals {
-  tls_cert_arn  = length(module.env_acm.acm_certificate_arn) > 0 ? module.env_acm.acm_certificate_arn : null
-}
-
 variable "env" {}
 variable "namespace" {}
 variable "aws_profile" {}

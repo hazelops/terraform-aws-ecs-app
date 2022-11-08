@@ -76,23 +76,6 @@ resource "aws_route53_zone" "env_domain" {
   name = "${var.env}.${var.root_domain_name}"
 }
 
-module "env_acm" {
-  source  = "registry.terraform.io/terraform-aws-modules/acm/aws"
-  version = "~> 4.0"
-
-  domain_name = "${var.env}.${var.root_domain_name}"
-
-  subject_alternative_names = [
-    "*.${var.env}.${var.root_domain_name}"
-  ]
-
-  zone_id = aws_route53_zone.env_domain.id
-
-  tags = {
-    Name = "${var.env}.${var.root_domain_name}"
-  }
-}
-
 module "ecs" {
   source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
   version            = "~> 4.0"
@@ -114,12 +97,11 @@ module "web_proxy" {
   # Containers
   ecs_cluster_name      = module.ecs.cluster_name
   docker_registry       = var.docker_registry
-  docker_image_name     = "322403564058.dkr.ecr.us-west-2.amazonaws.com/nginx-proxy"
   docker_image_tag      = var.docker_image_tag
 
   # Load Balancer
   public                = true
-  https_enabled         = true
+  https_enabled         = false
   alb_health_check_path = "/"
   alb_security_groups   = [aws_security_group.default_permissive.id]
   tls_cert_arn          = local.tls_cert_arn
