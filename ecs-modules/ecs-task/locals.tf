@@ -121,11 +121,11 @@ locals {
         "Resource" = "*"
       },
       {
-        "Effect" : "Allow",
-        "Action" : [
+        "Effect" = "Allow",
+        "Action" = [
           "firehose:PutRecordBatch"
         ],
-        "Resource" : [
+        "Resource" = [
           "*"
         ]
       },
@@ -150,11 +150,11 @@ locals {
         ]
       },
       {
-          "Action": [
+          "Action" = [
             "kms:Decrypt"
           ],
-          "Effect": "Allow",
-          "Resource": "*"
+          "Effect" = "Allow",
+          "Resource" = "*"
       }
     ])
   }
