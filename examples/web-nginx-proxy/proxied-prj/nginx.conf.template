@@ -1,7 +1,7 @@
 client_max_body_size 20M;
 
 upstream app {
-    # Puma socket, as defined previously
+    # Application server socket, as defined previously
     server ${APP_HOST} fail_timeout=10;
 }
 
@@ -16,7 +16,7 @@ server {
         add_header Cache-Control public;
     }
 
-    try_files $uri/index.html $uri @app;
+    try_files $uri @app;
 
     location @app {
         proxy_pass http://app;

@@ -121,11 +121,11 @@ locals {
         "Resource" = "*"
       },
       {
-        "Effect" : "Allow",
-        "Action" : [
+        "Effect" = "Allow",
+        "Action" = [
           "firehose:PutRecordBatch"
         ],
-        "Resource" : [
+        "Resource" = [
           "*"
         ]
       },
@@ -148,6 +148,13 @@ locals {
           "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_secret_path}/*",
           "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_global_secret_path}/*"
         ]
+      },
+      {
+          "Action" = [
+            "kms:Decrypt"
+          ],
+          "Effect" = "Allow",
+          "Resource" = "*"
       }
     ])
   }

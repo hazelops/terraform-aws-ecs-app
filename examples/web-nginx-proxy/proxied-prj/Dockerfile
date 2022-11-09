@@ -19,17 +19,17 @@ RUN set -ex && \
     ln -s /usr/bin/python3 /usr/bin/python
 
 # Copy files and pipenv
-COPY ${PROJECT_PATH}/public/index.html  ./public/index.html
+COPY ${PROJECT_PATH}/public/style.css  ./public/style.css
 COPY ${PROJECT_PATH}/app.py  ./
 COPY ${PROJECT_PATH}/Pipfile* ./
 COPY ${PROJECT_PATH}/nginx.conf.template ./
-COPY ${PROJECT_PATH}/docker-entrypoint.sh /
+COPY ${PROJECT_PATH}/entrypoint.sh /
 
 
 RUN python3 -m pip install pipenv
 
 RUN pipenv install --deploy --system
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 3000
