@@ -52,20 +52,16 @@ jobs:
       - name: ize init
         run: ize init
 
-      - name: Create AWS Profile
+      - name: ize create AWS Profile
         run: ize gen aws-profile
-
-      #- name: Create ize env dir
-      #  run: mkdir -p .infra/env/examples
-
-      - name: test ize
-        run: ize status
 
       - name: gen tfenv 
         run: ize gen tfenv
       
       - name: Copy generated files
-        run: cp -R .ize/env/examples/*.* examples/${{ github.job }}/ 
+        run: |
+          cp -R .ize/env/${{ env.ENV }}/*.* examples/${{ github.job }}/
+          cat examples/${{ github.job }}/backend.tf
 
       - name: Go TF Test
         run: |
