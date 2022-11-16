@@ -51,6 +51,9 @@ jobs:
 
       - name: test ize
         run: ize status
+        
+      - name: ize configure
+        run: ize configure
 
       - name: gen tfenv 
         run: ize gen tfenv
