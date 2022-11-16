@@ -51,7 +51,13 @@ jobs:
 
       - name: test ize
         run: ize status
+
+      - name: gen tfenv 
+        run: ize gen tfenv
       
+      - name: Copy generated files
+        run: cp -R .infra/env/examples/*.* examples/${{ github.job }}/ 
+
       - name: Go TF Test
         run: |
           cd test/src
