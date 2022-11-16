@@ -23,7 +23,13 @@ func TestExamplesCompleteWorker(t *testing.T) {
 
 	rootFolder := "../../"
 	terraformFolderRelativeToRoot := "examples/complete-worker"
-	varFiles := []string{"./../../examples/complete-worker/terraform.tfvars"}
+	currDir, _ := os.Getwd()
+	t.Log(currDir)
+	dir, _ := os.ReadDir(currDir)
+	for _, d := range dir {
+		t.Log(d.Name())
+	}
+	varFiles := []string{currDir + "/terraform.tfvars"}
 
 	tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, rootFolder, terraformFolderRelativeToRoot)
 
