@@ -49,8 +49,8 @@ jobs:
       - name: Create AWS Profile
         run: ize gen aws-profile
 
-      - name: test ize
-        run: mkdir .infra/env/examples
+      - name: Create ize env dir
+        run: mkdir -p .infra/env/examples
 
       - name: test ize
         run: ize status
