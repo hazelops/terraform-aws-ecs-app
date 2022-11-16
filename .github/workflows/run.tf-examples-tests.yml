@@ -50,10 +50,10 @@ jobs:
         run: ize gen aws-profile
 
       - name: test ize
+        run: mkdir .infra/env/examples
+
+      - name: test ize
         run: ize status
-        
-      - name: ize configure
-        run: ize configure -p ${{ env.AWS_PROFILE }} -r  ${{ env.AWS_REGION }} -e ${{ env.ENV }} -n ${{ env.NAMESPACE }}
 
       - name: gen tfenv 
         run: ize gen tfenv
