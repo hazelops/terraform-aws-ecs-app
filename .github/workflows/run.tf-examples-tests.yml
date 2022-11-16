@@ -41,16 +41,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_SA }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Generate Test SSH Key
+        run: ssh-keygen -q -f ~/.ssh/id_rsa
+
       - name: ize setup
         uses: hazelops/action-setup-ize@0.0.1
         with:
           version: ${{ env.IZE_VERSION }}
 
+      - name: ize init
+        run: ize init
+
       - name: Create AWS Profile
         run: ize gen aws-profile
 
-      - name: Create ize env dir
-        run: mkdir -p .infra/env/examples
+      #- name: Create ize env dir
+      #  run: mkdir -p .infra/env/examples
 
       - name: test ize
         run: ize status
@@ -59,7 +65,7 @@ jobs:
         run: ize gen tfenv
       
       - name: Copy generated files
-        run: cp -R .infra/env/examples/*.* examples/${{ github.job }}/ 
+        run: cp -R .ize/env/examples/*.* examples/${{ github.job }}/ 
 
       - name: Go TF Test
         run: |
