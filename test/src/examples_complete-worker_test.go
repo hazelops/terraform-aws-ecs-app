@@ -31,6 +31,10 @@ func TestExamplesCompleteWorker(t *testing.T) {
 	//}
 
 	tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, rootFolder, terraformFolderRelativeToRoot)
+	dir, _ := os.ReadDir(tempTestFolder)
+	for _, d := range dir {
+		t.Log(d.Name())
+	}
 	varFiles := []string{tempTestFolder + "/terraform.tfvars"}
 
 	terraformOptions := &terraform.Options{
