@@ -136,11 +136,6 @@ func TestExamplesCompleteWorker(t *testing.T) {
 	assert.Equal(t, "examples-worker", cloudWatchLogGroup)
 
 	// Run `terraform output` to get the value of an output variable
-	cloudWatchEventRuleId := terraform.Output(t, terraformOptions, "cloudwatch_event_rule_id")
-	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples-worker-0", cloudWatchEventRuleId)
-
-	// Run `terraform output` to get the value of an output variable
 	ecsClusterName := terraform.Output(t, terraformOptions, "ecs_cluster_name")
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, "examples-tftest", ecsClusterName)
