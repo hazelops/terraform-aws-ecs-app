@@ -123,27 +123,27 @@ func TestExamplesCompleteWorker(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	vpcCidr := terraform.Output(t, terraformOptions, "vpc_cidr")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "10.30.0.0/16", vpcCidr)
+	assert.Equal(t, "10.0.0.0/16", vpcCidr)
 
 	// Run `terraform output` to get the value of an output variable
 	privateSubnetCidrs := terraform.OutputList(t, terraformOptions, "private_subnet_cidrs")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, []string{"10.30.20.0/23", "10.30.22.0/23", "10.30.24.0/23"}, privateSubnetCidrs)
+	assert.Equal(t, []string{"10.0.20.0/23"}, privateSubnetCidrs)
 
 	// Run `terraform output` to get the value of an output variable
 	cloudWatchLogGroup := terraform.Output(t, terraformOptions, "cloudwatch_log_group")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples2-worker", cloudWatchLogGroup)
+	assert.Equal(t, "examples-worker", cloudWatchLogGroup)
 
 	// Run `terraform output` to get the value of an output variable
 	cloudWatchEventRuleId := terraform.Output(t, terraformOptions, "cloudwatch_event_rule_id")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples2-worker-0", cloudWatchEventRuleId)
+	assert.Equal(t, "examples-worker-0", cloudWatchEventRuleId)
 
 	// Run `terraform output` to get the value of an output variable
 	ecsClusterName := terraform.Output(t, terraformOptions, "ecs_cluster_name")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples2-complete-worker", ecsClusterName)
+	assert.Equal(t, "examples-tftest", ecsClusterName)
 
 	/*
 		// Run `terraform output` to get the value of an output variable
