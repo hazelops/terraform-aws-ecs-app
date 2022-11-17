@@ -62,7 +62,8 @@ jobs:
         run: |
           cp -R .ize/env/${{ env.ENV }}/*.* examples/${{ github.job }}/
           cat examples/${{ github.job }}/backend.tf
-          cat examples/${{ github.job }}/terraform.tfvar
+          ls -la examples/${{ github.job }}
+          ls -la .ize/env/${{ env.ENV }}
 
       - name: Go TF Test
         run: |
