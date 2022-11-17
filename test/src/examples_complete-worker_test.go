@@ -2,13 +2,45 @@ package test
 
 import (
 	//"github.com/gruntwork-io/terratest/modules/random"
+	"fmt"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	test_structure "github.com/gruntwork-io/terratest/modules/test-structure"
 	"github.com/stretchr/testify/assert"
+	"io"
 	"os"
 	//"strings"
 	"testing"
 )
+
+func CopyFile(src, dst string) (err error) {
+	sfi, err := os.Stat(src)
+	if err != nil {
+		return
+	}
+	if !sfi.Mode().IsRegular() {
+		// cannot copy non-regular files (e.g., directories,
+		// symlinks, devices, etc.)
+		return fmt.Errorf("CopyFile: non-regular source file %s (%q)", sfi.Name(), sfi.Mode().String())
+	}
+	dfi, err := os.Stat(dst)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return
+		}
+	} else {
+		if !(dfi.Mode().IsRegular()) {
+			return fmt.Errorf("CopyFile: non-regular destination file %s (%q)", dfi.Name(), dfi.Mode().String())
+		}
+		if os.SameFile(sfi, dfi) {
+			return
+		}
+	}
+	if err = os.Link(src, dst); err == nil {
+		return
+	}
+	err = copyFileContents(src, dst)
+	return
+}
 
 func cleanupExamplesCompleteWorker(t *testing.T, terraformOptions *terraform.Options, tempTestFolder string) {
 	terraform.Destroy(t, terraformOptions)
@@ -31,6 +63,15 @@ func TestExamplesCompleteWorker(t *testing.T) {
 	//}
 
 	tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, rootFolder, terraformFolderRelativeToRoot)
+	fullRootPath := rootFolder + terraformFolderRelativeToRoot
+
+	fmt.Printf("Copying %s to %s\n", fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
+	err := CopyFile(fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
+	if err != nil {
+		fmt.Printf("CopyFile failed %q\n", err)
+	} else {
+		fmt.Printf("CopyFile succeeded\n")
+	}
 	dir, _ := os.ReadDir(tempTestFolder)
 	for _, d := range dir {
 		t.Log(d.Name())
