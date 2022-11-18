@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func CopyFile(src, dst string) (err error) {
+func CopyFileCompleteWeb(src, dst string) (err error) {
 	sfi, err := os.Stat(src)
 	if err != nil {
 		return
@@ -38,11 +38,11 @@ func CopyFile(src, dst string) (err error) {
 	if err = os.Link(src, dst); err == nil {
 		return
 	}
-	err = copyFileContents(src, dst)
+	err = copyFileContentsCompleteWeb(src, dst)
 	return
 }
 
-func copyFileContents(src, dst string) (err error) {
+func copyFileContentsCompleteWeb(src, dst string) (err error) {
 	in, err := os.Open(src)
 	if err != nil {
 		return
@@ -65,7 +65,7 @@ func copyFileContents(src, dst string) (err error) {
 	return
 }
 
-func cleanupExamplesCompleteWorker(t *testing.T, terraformOptions *terraform.Options, tempTestFolder string) {
+func cleanupExamplesCompleteWeb(t *testing.T, terraformOptions *terraform.Options, tempTestFolder string) {
 	terraform.Destroy(t, terraformOptions)
 	os.RemoveAll(tempTestFolder)
 }
@@ -84,7 +84,7 @@ func TestExamplesCompleteWeb(t *testing.T) {
 
 	// Copy terraform.tfvars
 	fmt.Printf("Copying %s to %s\n", fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
-	err := CopyFile(fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
+	err := CopyFileCompleteWeb(fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
 	if err != nil {
 		fmt.Printf("CopyFile failed %q\n", err)
 	} else {
@@ -110,7 +110,7 @@ func TestExamplesCompleteWeb(t *testing.T) {
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
-	defer cleanupExamplesCompleteWorker(t, terraformOptions, tempTestFolder)
+	defer cleanupExamplesCompleteWeb(t, terraformOptions, tempTestFolder)
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
