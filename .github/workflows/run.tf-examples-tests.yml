@@ -114,9 +114,6 @@ jobs:
       - name: Copy generated files
         run: |
           cp -R .ize/env/${{ env.ENV }}/*.* examples/${{ github.job }}/
-#debug     cat examples/${{ github.job }}/backend.tf
-#          ls -la examples/${{ github.job }}
-#          ls -la .ize/env/${{ env.ENV }}
 
       - name: Go TF Test
         run: |
