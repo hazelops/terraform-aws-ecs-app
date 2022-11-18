@@ -13,4 +13,6 @@ output "cloudwatch_log_group" {
 output "ecs_cluster_name" {
   value = module.ecs.cluster_name
 }
-
+output "r53_lb_dns_name" {
+  value = module.worker_complete.r53_lb_dns_name
+}

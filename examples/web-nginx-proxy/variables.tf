@@ -8,4 +8,6 @@ variable "docker_registry" {
 variable "docker_image_tag" {
   default     = "latest"
 }
-variable "root_domain_name" {}
+variable "root_domain_name" {
+  default     = "nutcorp.net"
+}

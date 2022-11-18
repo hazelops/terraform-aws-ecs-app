@@ -129,6 +129,9 @@ jobs:
     name: complete-worker
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    needs:
+      - complete-web
+      - web-nginx-proxy
 
     steps:
       - name: Install Go
