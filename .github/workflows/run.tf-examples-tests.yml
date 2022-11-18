@@ -72,6 +72,59 @@ jobs:
           go mod tidy
           go test -v -timeout 60m -run TestExamplesCompleteWeb
 
+
+  web-nginx-proxy:
+    name: web-nginx-proxy
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18.x
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_SA }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_SA }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Generate Test SSH Key
+        run: ssh-keygen -q -f ~/.ssh/id_rsa
+
+      - name: IZE setup
+        uses: hazelops/action-setup-ize@0.0.1
+        with:
+          version: ${{ env.IZE_VERSION }}
+
+      - name: IZE init
+        run: ize init
+
+      - name: IZE create AWS Profile
+        run: ize gen aws-profile
+
+      - name: IZE gen tfenv 
+        run: ize gen tfenv
+      
+      - name: Copy generated files
+        run: |
+          cp -R .ize/env/${{ env.ENV }}/*.* examples/${{ github.job }}/
+#debug     cat examples/${{ github.job }}/backend.tf
+#          ls -la examples/${{ github.job }}
+#          ls -la .ize/env/${{ env.ENV }}
+
+      - name: Go TF Test
+        run: |
+          NAME=${{ github.job }}
+          cd test/src
+          go mod tidy
+          go test -v -timeout 60m -run TestExamplesWebProxy
+
   complete-worker:
     name: complete-worker
     runs-on: ubuntu-latest
