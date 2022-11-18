@@ -104,7 +104,6 @@ module "web_proxy" {
   https_enabled         = false
   alb_health_check_path = "/"
   alb_security_groups   = [aws_security_group.default_permissive.id]
-  tls_cert_arn          = local.tls_cert_arn
 
   # Network
   vpc_id                        = module.vpc.vpc_id
