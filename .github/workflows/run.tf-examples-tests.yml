@@ -70,7 +70,7 @@ jobs:
           NAME=${{ github.job }}
           cd test/src
           go mod tidy
-          go test -v -timeout 60m -run TestExamples${NAME//-/}
+          go test -v -timeout 60m -run TestExamplesCompleteWeb
 
   complete-worker:
     name: complete-worker
@@ -122,7 +122,7 @@ jobs:
           NAME=${{ github.job }}
           cd test/src
           go mod tidy
-          go test -v -timeout 60m -run TestExamples${NAME//-/}
+          go test -v -timeout 60m -run TestExamplesCompleteWorker
 
 
 

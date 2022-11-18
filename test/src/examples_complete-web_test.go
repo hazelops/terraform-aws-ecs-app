@@ -71,7 +71,7 @@ func cleanupExamplesCompleteWorker(t *testing.T, terraformOptions *terraform.Opt
 }
 
 // Test the Terraform module in examples/complete using Terratest.
-func TestExamplescompleteweb(t *testing.T) {
+func TestExamplesCompleteWeb(t *testing.T) {
 	t.Parallel()
 	// randID := strings.ToLower(random.UniqueId())
 	// attributes := []string{randID}
