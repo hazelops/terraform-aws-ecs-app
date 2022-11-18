@@ -133,7 +133,7 @@ func TestExamplesCompleteWorker(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	ecsClusterName := terraform.Output(t, terraformOptions, "ecs_cluster_name")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples-tftest", ecsClusterName)
+	assert.Equal(t, "examples-tftest-worker", ecsClusterName)
 
 	/*
 		// Run `terraform output` to get the value of an output variable

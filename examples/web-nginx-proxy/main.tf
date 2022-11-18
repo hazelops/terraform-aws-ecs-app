@@ -20,19 +20,19 @@ module "vpc" {
   version = "~> 3.0"
 
   name = "${var.env}-vpc"
-  cidr = "10.0.0.0/16"
+  cidr = "10.2.0.0/16"
 
   azs = [
     "${var.aws_region}a",
     "${var.aws_region}b"
   ]
   public_subnets = [
-    "10.0.10.0/23",
-    "10.0.12.0/23"
+    "10.2.10.0/23",
+    "10.2.12.0/23"
   ]
 
   private_subnets = [
-    "10.0.20.0/23"
+    "10.2.20.0/23"
   ]
 
   enable_nat_gateway                  = true
@@ -79,13 +79,13 @@ resource "aws_route53_zone" "env_domain" {
 module "ecs" {
   source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
   version            = "~> 4.0"
-  cluster_name       = "${var.env}-${var.namespace}"
+  cluster_name       = "${var.env}-${var.namespace}-proxy"
 }
 
 module "web_proxy" {
   source = "../.."
 
-  name                  = "app"
+  name                  = "proxy"
   app_type              = "web"
   env                   = var.env
   namespace             = var.namespace
