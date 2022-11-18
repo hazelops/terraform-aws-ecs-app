@@ -71,23 +71,18 @@ func cleanupExamplesCompleteWorker(t *testing.T, terraformOptions *terraform.Opt
 }
 
 // Test the Terraform module in examples/complete using Terratest.
-func TestExamplesCompleteWorker(t *testing.T) {
+func TestExamples-complete-worker(t *testing.T) {
 	t.Parallel()
 	// randID := strings.ToLower(random.UniqueId())
 	// attributes := []string{randID}
 
 	rootFolder := "../../"
 	terraformFolderRelativeToRoot := "examples/complete-worker"
-	//currDir, _ := os.Getwd()
-	//t.Log(currDir)
-	//dir, _ := os.ReadDir(currDir)
-	//for _, d := range dir {
-	//	t.Log(d.Name())
-	//}
 
 	tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, rootFolder, terraformFolderRelativeToRoot)
 	fullRootPath := rootFolder + terraformFolderRelativeToRoot
 
+	// Copy terraform.tfvars
 	fmt.Printf("Copying %s to %s\n", fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
 	err := CopyFile(fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
 	if err != nil {
