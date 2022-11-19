@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func CopyFileWorkerScheduled(src, dst string) (err error) {
+func CopyFileWorkerSchedule(src, dst string) (err error) {
 	sfi, err := os.Stat(src)
 	if err != nil {
 		return
@@ -38,11 +38,11 @@ func CopyFileWorkerScheduled(src, dst string) (err error) {
 	if err = os.Link(src, dst); err == nil {
 		return
 	}
-	err = copyFileContentsWorkerScheduled(src, dst)
+	err = copyFileContentsWorkerSchedule(src, dst)
 	return
 }
 
-func copyFileContentsWorkerScheduled(src, dst string) (err error) {
+func copyFileContentsWorkerSchedule(src, dst string) (err error) {
 	in, err := os.Open(src)
 	if err != nil {
 		return
@@ -65,13 +65,13 @@ func copyFileContentsWorkerScheduled(src, dst string) (err error) {
 	return
 }
 
-func cleanupExamplesWorkerScheduled(t *testing.T, terraformOptions *terraform.Options, tempTestFolder string) {
+func cleanupExamplesWorkerSchedule(t *testing.T, terraformOptions *terraform.Options, tempTestFolder string) {
 	terraform.Destroy(t, terraformOptions)
 	os.RemoveAll(tempTestFolder)
 }
 
 // Test the Terraform module in examples/complete using Terratest.
-func TestExamplesWorkerScheduled(t *testing.T) {
+func TestExamplesWorkerSchedule(t *testing.T) {
 	t.Parallel()
 	// randID := strings.ToLower(random.UniqueId())
 	// attributes := []string{randID}
@@ -84,7 +84,7 @@ func TestExamplesWorkerScheduled(t *testing.T) {
 
 	// Copy terraform.tfvars
 	fmt.Printf("Copying %s to %s\n", fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
-	err := CopyFileWorkerScheduled(fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
+	err := CopyFileWorkerSchedule(fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
 	if err != nil {
 		fmt.Printf("CopyFile failed %q\n", err)
 	} else {
@@ -110,7 +110,7 @@ func TestExamplesWorkerScheduled(t *testing.T) {
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
-	defer cleanupExamplesWorkerScheduled(t, terraformOptions, tempTestFolder)
+	defer cleanupExamplesWorkerSchedule(t, terraformOptions, tempTestFolder)
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
