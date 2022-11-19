@@ -128,7 +128,7 @@ func TestExamplesWorkerSchedule(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	cloudWatchLogGroup := terraform.Output(t, terraformOptions, "cloudwatch_log_group")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples2-worker", cloudWatchLogGroup)
+	assert.Equal(t, "examples2-worker-scheduled", cloudWatchLogGroup)
 
 	// Run `terraform output` to get the value of an output variable
 	ecsClusterName := terraform.Output(t, terraformOptions, "ecs_cluster_name")
