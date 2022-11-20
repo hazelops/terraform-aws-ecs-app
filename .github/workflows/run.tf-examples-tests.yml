@@ -14,9 +14,7 @@ env:
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - core-448
+  pull_request:
 
 jobs:
   complete-worker:
