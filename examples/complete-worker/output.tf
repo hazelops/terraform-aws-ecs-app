@@ -17,4 +17,3 @@ output "cloudwatch_event_rule_id" {
 output "ecs_cluster_name" {
   value = module.ecs.cluster_name
 }
-

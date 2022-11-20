@@ -58,7 +58,7 @@ resource "aws_security_group" "default_permissive" {
 module "ecs" {
   source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
   version            = "~> 4.0"
-  cluster_name       = "${var.env}-${var.namespace}"
+  cluster_name       = "${var.env}-${var.namespace}-worker"
 }
 
 module "worker_complete" {

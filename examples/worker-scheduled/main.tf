@@ -14,17 +14,17 @@ module "vpc" {
   version = "~> 3.0"
 
   name = "${var.env}-vpc"
-  cidr = "10.0.0.0/16"
+  cidr = "10.4.0.0/16"
 
   azs = [
     "${var.aws_region}a"
   ]
   public_subnets = [
-    "10.0.10.0/23"
+    "10.4.10.0/23"
   ]
 
   private_subnets = [
-    "10.0.20.0/23"
+    "10.4.20.0/23"
   ]
 
   manage_default_network_acl          = true
@@ -57,13 +57,13 @@ resource "aws_security_group" "default_permissive" {
 module "ecs" {
   source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
   version            = "~> 4.0"
-  cluster_name       = "${var.env}-${var.namespace}"
+  cluster_name       = "${var.env}-${var.namespace}-worker-scheduled"
 }
 
 module "worker_scheduled" {
   source = "../.."
 
-  name             = "worker"
+  name             = "worker-scheduled"
   app_type         = "worker"
   env              = var.env
   namespace        = var.namespace

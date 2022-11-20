@@ -14,3 +14,6 @@ output "ecs_cluster_name" {
   value = module.ecs.cluster_name
 }
 
+output "r53_lb_dns_name" {
+  value = module.web_proxy.r53_lb_dns_name
+}

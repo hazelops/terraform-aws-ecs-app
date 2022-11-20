@@ -20,19 +20,19 @@ module "vpc" {
   version = "~> 3.0"
 
   name = "${var.env}-vpc"
-  cidr = "10.0.0.0/16"
+  cidr = "10.1.0.0/16"
 
   azs = [
     "${var.aws_region}a",
     "${var.aws_region}b"
   ]
   public_subnets = [
-    "10.0.10.0/23",
-    "10.0.12.0/23"
+    "10.1.10.0/23",
+    "10.1.12.0/23"
   ]
 
   private_subnets = [
-    "10.0.20.0/23"
+    "10.1.20.0/23"
   ]
   manage_default_network_acl          = true
   default_network_acl_name            = "${var.env}-${var.namespace}"
@@ -93,7 +93,7 @@ module "env_acm" {
 module "ecs" {
   source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
   version            = "~> 4.0"
-  cluster_name       = "${var.env}-${var.namespace}"
+  cluster_name       = "${var.env}-${var.namespace}-app"
 }
 
 module "web_complete" {
