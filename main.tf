@@ -65,7 +65,7 @@ module "efs" {
 
 resource "aws_service_discovery_service" "main" {
   count = var.public == true ? 0 : 1
-  name  = "${var.namespace}-${var.wenv}-${vlocal.ecs_service_name}"
+  name  = "${var.namespace}-${var.env}-${local.ecs_service_name}"
 
   tags = {
     env   = var.env
