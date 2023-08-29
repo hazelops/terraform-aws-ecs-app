@@ -1,7 +1,7 @@
 # Datadog Logging/Monitoring Module (can be enabled/disabled via datadog_enabled)
 module "datadog" {
   source  = "registry.terraform.io/hazelops/ecs-datadog-agent/aws"
-  version = "~> 3.2"
+  version = "~> 3.3"
 
   app_name             = var.name
   env                  = var.env
