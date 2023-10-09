@@ -712,3 +712,9 @@ variable "alb_access_logs_s3bucket_name" {
   description = "S3 bucket name for ALB access logs"
   default     = ""
 }
+
+variable "alb_access_logs_s3prefix" {
+  type        = string
+  description = "S3 prefix for ALB access logs"
+  default     = ""
+}

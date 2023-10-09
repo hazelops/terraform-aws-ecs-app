@@ -21,6 +21,7 @@ module "alb" {
 
   access_logs = var.alb_access_logs_enabled && var.alb_access_logs_s3bucket_name != "" ? {
     bucket = var.alb_access_logs_s3bucket_name
+    prefix = var.alb_access_logs_s3prefix
   } : {}
 
   tags = {
