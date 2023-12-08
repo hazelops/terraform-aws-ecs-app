@@ -697,6 +697,12 @@ variable "cpu_architecture" {
   default     = "X86_64"
 }
 
+variable "service_discovery_id" {
+  type        = string
+  description = "When you use Service Discovery"
+  default     = ""
+}
+
 variable "ecr_force_delete" {
   default = false
   description = "If true, will delete the ECR repository even if it contains images."
