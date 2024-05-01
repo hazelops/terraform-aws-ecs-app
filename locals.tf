@@ -4,7 +4,7 @@ locals {
   ecs_cluster_name = var.ecs_cluster_name != "" ? var.ecs_cluster_name : "${var.env}-${var.namespace}"
   ecs_cluster_arn  = length(var.ecs_cluster_arn) != "" ? var.ecs_cluster_arn : "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${local.ecs_cluster_name}"
   ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : "${var.namespace}-${var.name}"
-  name_prefix      = "${substr(var.name, 0, 5)}-"
+  name_prefix = "${substr(var.name, 0, 5)}-" # Short prefix for target groups
   domain_names     = var.root_domain_name != "example.com" ? concat([
     "${var.name}.${var.env}.${var.root_domain_name}"
   ], var.domain_names) : []
@@ -33,12 +33,12 @@ locals {
 
   fluentbit_container_definition = [
     {
-      essential             = true
-      image                 = "public.ecr.aws/aws-observability/aws-for-fluent-bit:latest"
-      name                  = "log_router"
-      memoryReservation     = 75
+      essential         = true
+      image             = "public.ecr.aws/aws-observability/aws-for-fluent-bit:latest"
+      name              = "log_router"
+      memoryReservation = 75
       firelensConfiguration = {
-        "type"    = "fluentbit"
+        "type" = "fluentbit"
         "options" = {
           "enable-ecs-log-metadata" = "true"
         }
@@ -46,47 +46,49 @@ locals {
     }
   ]
 
-  volumes = concat(var.web_proxy_enabled ? [
-    {
-      name        = "nginx-templates",
-      mount_point = {
-        "sourceVolume"  = "nginx-templates"
-        "containerPath" = "/etc/nginx/templates/"
-        "readOnly"      = null
-      }
-
-      docker_volume_configuration = [
-        {
-          "scope" : "task",
-          "driver" : "local",
-          "labels" : {
-            "scratch" : "space"
-          }
-        }
-      ]
-    },
-    {
-      name        = "nginx-app",
-      mount_point = {
-        "sourceVolume"  = "nginx-app"
-        "containerPath" = "/etc/nginx/app/"
-        "readOnly"      = null
-      }
-
-      docker_volume_configuration = [
-        {
-          "scope" : "task",
-          "driver" : "local",
-          "labels" : {
-            "scratch" : "space"
-          }
-        }
-      ]
-    },
-  ] : [],
-    var.efs_enabled ? [
+  volumes = concat(
+      var.web_proxy_enabled ? [
       {
-        name        = "efs",
+        name = "nginx-templates",
+        mount_point = {
+          "sourceVolume"  = "nginx-templates"
+          "containerPath" = "/etc/nginx/templates/"
+          "readOnly"      = null
+        }
+
+        docker_volume_configuration = [
+          {
+            "scope" : "task",
+            "driver" : "local",
+            "labels" : {
+              "scratch" : "space"
+            }
+          }
+        ]
+      },
+      {
+        name = "nginx-app",
+        mount_point = {
+          "sourceVolume"  = "nginx-app"
+          "containerPath" = "/etc/nginx/app/"
+          "readOnly"      = null
+        }
+
+        docker_volume_configuration = [
+          {
+            "scope" : "task",
+            "driver" : "local",
+            "labels" : {
+              "scratch" : "space"
+            }
+          }
+        ]
+      },
+    ] : [],
+
+      var.efs_mount_enabled ? [
+      {
+        name = "efs",
         mount_point = {
           "sourceVolume"  = "efs"
           "containerPath" = var.efs_mount_point,
@@ -95,7 +97,7 @@ locals {
 
         efs_volume_configuration = [
           {
-            file_system_id : module.efs.id
+            file_system_id : var.efs_file_system_id
             root_directory : var.efs_root_directory
             transit_encryption : "ENABLED"
             transit_encryption_port : 2999
@@ -104,7 +106,7 @@ locals {
         ]
       }
     ] : [],
-    (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
+      (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
   )
 
   alb_http_tcp_listeners = var.app_type == "tcp-app" ? [
@@ -113,13 +115,13 @@ locals {
       port               = port_mapping["host_port"]
       protocol           = "TCP"
       target_group_index = index
-    } if ! lookup(port_mapping, "tls", false)
-    ] : [
-      {
-        port               = var.http_port
-        protocol           = "HTTP"
-        target_group_index = 0
-      }
+    } if !lookup(port_mapping, "tls", false)
+  ] : [
+    {
+      port               = var.http_port
+      protocol           = "HTTP"
+      target_group_index = 0
+    }
   ]
 
   # In case app type is "tcp-app" and port_mapping has "tls" config and is true we use tcp over tls.
@@ -157,7 +159,7 @@ locals {
       backend_port         = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
       target_type          = var.ecs_launch_type == "EC2" ? "instance" : "ip"
       deregistration_delay = var.alb_deregistration_delay
-      preserve_client_ip   = null
+      preserve_client_ip = null
       # This is specified for compatibility with the tcp target groups. It's not actually used in a lookup.
 
       health_check = {

@@ -1,8 +1,8 @@
-output "this_target_group_arn" {
-  value = length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : ""
+output "target_group_arn" {
+  value = length(module.alb[*].target_groups) >= 1 ? module.alb[0].target_groups[0] : ""
 }
 
-output "this_task_definition_arn" {
+output "task_definition_arn" {
   value = module.service.task_definition_arn
 }
 
@@ -15,19 +15,15 @@ output "cloudwatch_event_rule_id" {
 }
 
 output "alb_dns_name" {
-  value = length(module.alb[*].lb_dns_name) >= 1 ? module.alb[0].lb_dns_name : ""
+  value = length(module.alb[*].dns_name) >= 1 ? module.alb[0].dns_name : ""
 }
 
 output "alb_dns_zone" {
-  value = length(module.alb[*].lb_zone_id) >= 1 ? module.alb[0].lb_zone_id : ""
+  value = length(module.alb[*].zone_id) >= 1 ? module.alb[0].zone_id : ""
 }
 
 output "alb_arn" {
-  value = length(module.alb[*].lb_arn) >= 1 ? module.alb[0].lb_arn : ""
-}
-
-output "efs" {
-  value = var.efs_enabled ? module.efs.mount_target_dns_names[*] : ""
+  value = length(module.alb[*].arn) >= 1 ? module.alb[0].arn : ""
 }
 
 output "eips" {

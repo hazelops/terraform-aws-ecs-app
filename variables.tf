@@ -200,8 +200,8 @@ variable "docker_host_port" {
 
 variable "port_mappings" {
   description = "List of ports to open from a service"
-  type = any
-  default = []
+  type        = any
+  default     = []
 }
 
 variable "docker_container_entrypoint" {
@@ -283,9 +283,9 @@ variable "autoscale_scheduled_down" {
 }
 
 variable "autoscale_scheduled_timezone" {
-  type = string
+  type        = string
   description = "Time Zone for the scheduled event"
-  default = "UTC"
+  default     = "UTC"
 }
 
 variable "ec2_eip_enabled" {
@@ -316,7 +316,7 @@ variable "ecs_cluster_name" {
 variable "ecs_cluster_arn" {
   type        = string
   description = "ECS cluster arn. Should be specified to avoid data query by cluster name"
-  default = ""
+  default     = ""
 }
 
 variable "autoscaling_health_check_type" {
@@ -399,9 +399,9 @@ variable "datadog_enabled" {
 }
 
 variable "datadog_jmx_enabled" {
-  type = bool
+  type        = bool
   description = "Enables / Disables jmx monitor via the datadog agent"
-  default = false
+  default     = false
 }
 
 variable "route53_health_check_enabled" {
@@ -568,10 +568,16 @@ variable "volumes" {
   default     = []
 }
 
-variable "efs_enabled" {
+variable "efs_mount_enabled" {
   type        = bool
-  description = "EFS Enabled"
+  description = "EFS mount Enabled. This will mount the EFS volume to the ECS task"
   default     = false
+}
+
+variable "efs_file_system_id" {
+  type        = string
+  description = "EFS file system ID"
+  default     = ""
 }
 
 variable "efs_mount_point" {
@@ -633,7 +639,7 @@ variable "ecs_exec_prompt_string" {
 variable "additional_container_definition_parameters" {
   type        = any
   description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
-  default     = {}
+  default = {}
 }
 
 
@@ -676,13 +682,13 @@ variable "create_schedule" {
 variable "schedules" {
   description = "Map of autoscaling group schedule to create"
   type        = map(any)
-  default     = {}
+  default = {}
 }
 
 variable "docker_labels" {
-  type = map(any)
+  type        = map(any)
   description = "Labels to be added to the docker. Used for auto-configuration, for instance of JMX discovery"
-  default = null
+  default     = null
 }
 
 variable "operating_system_family" {
@@ -698,12 +704,12 @@ variable "cpu_architecture" {
 }
 
 variable "ecr_force_delete" {
-  default = false
+  default     = false
   description = "If true, will delete the ECR repository even if it contains images."
 }
 
 variable "alb_access_logs_enabled" {
-  default = false
+  default     = false
   description = "If true, ALB access logs will be writing to S3"
 }
 

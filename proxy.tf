@@ -1,3 +1,4 @@
+# Nginx Proxy Module. This module is used to create an Nginx proxy container that will route traffic to the main application container.
 module "nginx" {
   source  = "registry.terraform.io/hazelops/ecs-nginx-proxy/aws"
   version = "~> 1.0"

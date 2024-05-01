@@ -1,65 +1,5 @@
-module "alb" {
-  count = var.app_type == "web" || var.app_type == "tcp-app" ? 1 : 0
-
-  source  = "registry.terraform.io/terraform-aws-modules/alb/aws"
-  version = "~> 7.0"
-
-  name               = var.public ? local.name : "${local.name}-private"
-  load_balancer_type = var.app_type == "web" ? "application" : "network"
-  internal           = var.public ? false : true
-  vpc_id             = var.vpc_id
-  security_groups    = var.alb_security_groups
-  subnets            = var.public ? var.public_subnets : var.private_subnets
-  idle_timeout       = var.alb_idle_timeout
-
-
-
-  http_tcp_listeners  = local.alb_http_tcp_listeners
-  https_listeners = var.https_enabled ? concat(local.alb_https_listeners) : []
-
-  target_groups = concat(var.app_type == "web" ? local.target_groups_web : local.target_groups_tcp)
-
-  access_logs = var.alb_access_logs_enabled && var.alb_access_logs_s3bucket_name != "" ? {
-    bucket = var.alb_access_logs_s3bucket_name
-  } : {}
-
-  tags = {
-    env = var.env
-    Env = var.env
-  }
-}
-
-module "ecr" {
-  source  = "registry.terraform.io/hazelops/ecr/aws"
-  version = "~> 1.1"
-
-  name         = local.ecr_repo_name
-  enabled      = var.ecr_repo_create
-  force_delete = var.ecr_force_delete
-}
-
-module "efs" {
-  source  = "registry.terraform.io/cloudposse/efs/aws"
-  version = "~> 0.31"
-
-  enabled         = var.efs_enabled
-  namespace       = var.namespace
-  stage           = var.env
-  name            = var.name
-  region          = data.aws_region.current.name
-  vpc_id          = var.vpc_id
-  security_groups = var.security_groups
-
-  # This is a workaround for 2-zone legacy setups
-  subnets = length(regexall("legacy", var.env)) > 0 ? [
-    var.private_subnets[0],
-    var.private_subnets[1]
-  ] : var.private_subnets
-
-}
-
 module "service" {
-  source = "./ecs-modules/ecs-service"
+  source = "./modules/ecs-service"
 
   env              = var.env
   name             = var.name
@@ -87,7 +27,7 @@ module "service" {
 
   web_proxy_enabled = var.web_proxy_enabled
   ecs_exec_enabled  = var.ecs_exec_enabled
-  subnets           = var.public_ecs_service ? var.public_subnets : var.private_subnets
+  subnets = var.public_ecs_service ? var.public_subnets : var.private_subnets
 
   # length(var.cloudwatch_schedule_expressions) > 1 means that it is cron task and desired_count should be 0
   cloudwatch_schedule_expressions = var.cloudwatch_schedule_expressions
@@ -104,17 +44,19 @@ module "service" {
   autoscaling_min_size          = var.autoscaling_min_size
   autoscaling_max_size          = var.autoscaling_max_size
 
-  docker_container_entrypoint                = var.docker_container_entrypoint
-  docker_container_command                   = var.docker_container_command
-  docker_image_name                          = var.docker_image_name != "" ? var.docker_image_name : "${var.docker_registry}/${var.namespace}-${var.name}"
-  docker_image_tag                           = var.docker_image_tag
-  iam_role_policy_statement                  = var.iam_role_policy_statement
+  docker_container_entrypoint = var.docker_container_entrypoint
+  docker_container_command    = var.docker_container_command
+  docker_image_name           = var.docker_image_name != "" ? var.docker_image_name : "${var.docker_registry}/${var.namespace}-${var.name}"
+  docker_image_tag            = var.docker_image_tag
+  iam_role_policy_statement   = var.iam_role_policy_statement
+
   additional_container_definition_parameters = var.additional_container_definition_parameters
 
   app_secrets    = var.app_secrets
   global_secrets = var.global_secrets
 
-  ecs_service_deployed                        = (var.cloudwatch_schedule_expressions == [] || !var.ecs_service_deployed) ? false : true
+  ecs_service_deployed = (var.cloudwatch_schedule_expressions == [] || !var.ecs_service_deployed) ? false : true
+
   deployment_minimum_healthy_percent          = var.deployment_minimum_healthy_percent
   aws_service_discovery_private_dns_namespace = var.aws_service_discovery_private_dns_namespace
   firelens_ecs_log_enabled                    = var.firelens_ecs_log_enabled
@@ -122,7 +64,7 @@ module "service" {
   tmpfs_size                                  = var.tmpfs_size
   tmpfs_container_path                        = var.tmpfs_container_path
   tmpfs_mount_options                         = var.tmpfs_mount_options
-  shared_memory_size                          = var.shared_memory_size
+  shared_memory_size = var.shared_memory_size
   # TODO: This should be expanded to read some standard labels from datadog module to configure JMX, http and other checks. per https://docs.datadoghq.com/agent/docker/integrations/?tab=docker#configuration
   docker_labels                               = var.docker_labels
 
@@ -133,26 +75,25 @@ module "service" {
     }
   ] : []
 
-
   sidecar_container_definitions = concat(
     var.sidecar_container_definitions,
-    var.web_proxy_enabled ? [
+      var.web_proxy_enabled ? [
       module.nginx.container_definition
     ] : [],
-    var.datadog_enabled ? [
+      var.datadog_enabled ? [
       module.datadog.container_definition
     ] : [],
-    var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
+      var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
   )
 
   docker_container_links = concat(
-    var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
+      var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
       "datadog-agent:datadog-agent"
     ] : [])
 
   docker_container_depends_on = concat(
     # TODO: This needs to be pulled from datadog agent module output
-    var.datadog_enabled ? [
+      var.datadog_enabled ? [
       {
         containerName = "datadog-agent",
         condition     = "START"
@@ -162,16 +103,16 @@ module "service" {
 
 
   # TODO: instead of hardcoding the index, better use dynamic lookup by a canonical name
-  target_group_arn = var.app_type == "web" && length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : null
+  target_group_arn = var.app_type == "web" && length(module.alb[*].target_groups) >= 1 ? module.alb[0].target_groups[0] : null
 
   port_mappings = jsondecode(var.app_type == "web" ? jsonencode([
     {
       container_name   = var.web_proxy_enabled ? "nginx" : var.name
       container_port   = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
       host_port        = var.ecs_network_mode == "awsvpc" ? (var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port) : var.docker_host_port
-      target_group_arn = length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : ""
+      target_group_arn = length(module.alb[*].target_groups) >= 1 ? module.alb[0].target_groups[0] : ""
     }
-  ]) : ( var.app_type == "tcp-app" ? jsonencode(local.ecs_service_tcp_port_mappings) : jsonencode(var.port_mappings)))
+  ]) : (var.app_type == "tcp-app" ? jsonencode(local.ecs_service_tcp_port_mappings) : jsonencode(var.port_mappings)))
 
   environment = merge(var.environment, local.datadog_env_vars, local.ecs_exec_env_vars, {
     APP_NAME      = var.name
@@ -181,6 +122,7 @@ module "service" {
   )
 }
 
+# Route53 record for ALB
 resource "aws_route53_record" "alb" {
   count   = var.app_type == "web" || var.app_type == "tcp-app" ? length(local.domain_names) : 0
   zone_id = var.zone_id
@@ -188,12 +130,13 @@ resource "aws_route53_record" "alb" {
   type    = "A"
 
   alias {
-    name                   = module.alb[0].lb_dns_name
-    zone_id                = module.alb[0].lb_zone_id
+    name                   = module.alb[0].dns_name
+    zone_id                = module.alb[0].zone_id
     evaluate_target_health = true
   }
 }
 
+# Route53 records for EC2 instance when EIP is enabled
 resource "aws_route53_record" "ec2" {
   count   = (var.ecs_launch_type == "EC2" && var.ec2_eip_enabled && var.ec2_eip_dns_enabled) ? length(local.domain_names) : 0
   zone_id = var.zone_id
