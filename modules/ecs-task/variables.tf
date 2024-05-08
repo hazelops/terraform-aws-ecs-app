@@ -5,7 +5,7 @@ variable "env" {
 
 variable "name" {
   type        = string
-  description = "ECS app name"
+  description = "ECS app name including namespace (if applies)"
 }
 
 variable "memory_reservation" {
@@ -17,19 +17,19 @@ variable "memory_reservation" {
 # The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs
 variable "cpu" {
   type        = number
-  default     = 256
   description = "Fargate CPU value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
+  default     = 256
 
   validation {
-    condition     =  can(regex("256|512|1024|2048|4096", var.cpu))
+    condition     = can(regex("256|512|1024|2048|4096", var.cpu))
     error_message = "The cpu value must be a valid CPU value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html."
   }
 }
 
 variable "memory" {
   type        = number
-  default     = 512
   description = "Fargate Memory value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
+  default     = 512
 
   validation {
     condition     = can(regex("512|1024|2048|3072|4096|5120|6144|7168|8192|9216|10240|11264|12288|13312|14336|15360|16384|17408|18432|19456|20480|21504|22528|23552|24576|25600|26624|27648|28672|29696|30720", var.memory))
@@ -87,8 +87,8 @@ variable "docker_image_tag" {
 }
 
 variable "docker_container_port" {
-  description = "Docker container port"
   type        = number
+  description = "Docker container port"
   default     = 3000
 }
 
@@ -135,13 +135,13 @@ variable "sidecar_container_definitions" {
 variable "additional_container_definition_parameters" {
   type        = any
   description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
-  default     = {}
+  default = {}
 }
 
 
 variable "task_group" {
-  description = "ECS Task group name, e.g. app, service name etc."
   type        = string
+  description = "ECS Task group name, e.g. app, service name etc."
   default     = "app"
 }
 
@@ -174,9 +174,9 @@ variable "ecs_network_mode" {
 }
 
 variable "ecs_network_configuration" {
-  description = "ECS Network Configuration"
-  default     = {}
   type        = map(any)
+  description = "ECS Network Configuration"
+  default = {}
 }
 
 variable "ecs_task_family_name" {
@@ -208,16 +208,15 @@ variable "volumes" {
   default     = []
 }
 
-# https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
 variable "cloudwatch_schedule_expressions" {
-  description = "List of Cron-like Cloudwatch Event Rule schedule expressions"
   type        = list(any)
+  description = "List of Cron-like Cloudwatch Event Rule schedule expressions (https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html)"
   default     = []
 }
 
 variable "cloudwatch_retention_in_days" {
-  description = "Default AWS Cloudwatch retention in days"
   type        = number
+  description = "Default AWS Cloudwatch retention in days"
   default     = 90
 }
 
@@ -228,40 +227,40 @@ variable "firelens_ecs_log_enabled" {
 }
 
 variable "tmpfs_enabled" {
-  type = bool
+  type        = bool
   description = "TMPFS support for non-Fargate deployments"
-  default = false
+  default     = false
 }
 
 variable "tmpfs_size" {
-  type = number
+  type        = number
   description = "Size of the tmpfs in MB"
-  default = 1024
+  default     = 1024
 }
 
 variable "tmpfs_container_path" {
-  type = string
+  type        = string
   description = "Path where tmpfs tmpfs would be mounted"
-  default = "/tmp/"
+  default     = "/tmp/"
 }
 
 
 variable "tmpfs_mount_options" {
-  type = list(string)
+  type        = list(string)
   description = "Options for the mount of the ram disk. noatime by default to speed up access"
-  default = ["noatime"]
+  default     = ["noatime"]
 }
 
 variable "shared_memory_size" {
-  type = number
+  type        = number
   description = "Size of the /dev/shm shared memory in MB"
-  default = 0
+  default     = 0
 }
 
 variable "docker_labels" {
-  type = map(any)
+  type        = map(any)
   description = "Labels to be added to the docker. Used for auto-configuration, for instance of JMX discovery"
-  default = null
+  default     = null
 }
 
 variable "operating_system_family" {}

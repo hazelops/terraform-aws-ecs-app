@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func CopyFileWorkerAutoScheduled(src, dst string) (err error) {
+func CopyFileCompleteWeb(src, dst string) (err error) {
 	sfi, err := os.Stat(src)
 	if err != nil {
 		return
@@ -38,11 +38,11 @@ func CopyFileWorkerAutoScheduled(src, dst string) (err error) {
 	if err = os.Link(src, dst); err == nil {
 		return
 	}
-	err = copyFileContentsWorkerAutoScheduled(src, dst)
+	err = copyFileContentsCompleteWeb(src, dst)
 	return
 }
 
-func copyFileContentsWorkerAutoScheduled(src, dst string) (err error) {
+func copyFileContentsCompleteWeb(src, dst string) (err error) {
 	in, err := os.Open(src)
 	if err != nil {
 		return
@@ -65,26 +65,26 @@ func copyFileContentsWorkerAutoScheduled(src, dst string) (err error) {
 	return
 }
 
-func cleanupExamplesWorkerAutoScheduled(t *testing.T, terraformOptions *terraform.Options, tempTestFolder string) {
+func cleanupExamplesCompleteWeb(t *testing.T, terraformOptions *terraform.Options, tempTestFolder string) {
 	terraform.Destroy(t, terraformOptions)
 	os.RemoveAll(tempTestFolder)
 }
 
 // Test the Terraform module in examples/complete using Terratest.
-func TestExamplesWorkerAutoScheduled(t *testing.T) {
+func TestExamplesCompleteWeb(t *testing.T) {
 	t.Parallel()
 	// randID := strings.ToLower(random.UniqueId())
 	// attributes := []string{randID}
 
-	rootFolder := "../../"
-	terraformFolderRelativeToRoot := "examples/worker-scheduled-autoscale"
+	rootFolder := "../"
+	terraformFolderRelativeToRoot := "examples/complete-web"
 
 	tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, rootFolder, terraformFolderRelativeToRoot)
 	fullRootPath := rootFolder + terraformFolderRelativeToRoot
 
 	// Copy terraform.tfvars
 	fmt.Printf("Copying %s to %s\n", fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
-	err := CopyFileWorkerAutoScheduled(fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
+	err := CopyFileCompleteWeb(fullRootPath+"/terraform.tfvars", tempTestFolder+"/terraform.tfvars")
 	if err != nil {
 		fmt.Printf("CopyFile failed %q\n", err)
 	} else {
@@ -104,13 +104,13 @@ func TestExamplesWorkerAutoScheduled(t *testing.T) {
 		// Variables to pass to our Terraform code using -var-file options
 		VarFiles: varFiles,
 		/*Vars: map[string]interface{}{
-			"attributes": attributes,
-		},
+		  	"attributes": attributes,
+		  },
 		*/
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
-	defer cleanupExamplesWorkerAutoScheduled(t, terraformOptions, tempTestFolder)
+	defer cleanupExamplesCompleteWeb(t, terraformOptions, tempTestFolder)
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
@@ -118,23 +118,27 @@ func TestExamplesWorkerAutoScheduled(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	vpcCidr := terraform.Output(t, terraformOptions, "vpc_cidr")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "10.5.0.0/16", vpcCidr)
+	assert.Equal(t, "10.1.0.0/16", vpcCidr)
 
 	// Run `terraform output` to get the value of an output variable
 	privateSubnetCidrs := terraform.OutputList(t, terraformOptions, "private_subnet_cidrs")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, []string{"10.5.20.0/23"}, privateSubnetCidrs)
+	assert.Equal(t, []string{"10.1.20.0/23"}, privateSubnetCidrs)
 
 	// Run `terraform output` to get the value of an output variable
 	cloudWatchLogGroup := terraform.Output(t, terraformOptions, "cloudwatch_log_group")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples4-worker-scheduled-auto", cloudWatchLogGroup)
+	assert.Equal(t, "examples3-app", cloudWatchLogGroup)
 
 	// Run `terraform output` to get the value of an output variable
 	ecsClusterName := terraform.Output(t, terraformOptions, "ecs_cluster_name")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples4-tftest-worker-scheduled-auto", ecsClusterName)
+	assert.Equal(t, "examples3-tftest-app", ecsClusterName)
 
+	// Run `terraform output` to get the value of an output variable
+	r53AppDnsName := terraform.Output(t, terraformOptions, "r53_lb_dns_name")
+	// Verify we're getting back the outputs we expect
+	assert.Equal(t, "app.examples3.nutcorp.net", r53AppDnsName)
 	/*
 		// Run `terraform output` to get the value of an output variable
 		proxyEndpoint := terraform.Output(t, terraformOptions, "proxy_endpoint")

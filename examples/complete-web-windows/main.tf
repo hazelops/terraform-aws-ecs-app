@@ -1,13 +1,3 @@
-# Versions
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-    }
-  }
-  required_version = ">= 1.0"
-}
-
 # Data
 data "aws_route53_zone" "root" {
   name         = "${var.root_domain_name}."
@@ -17,7 +7,7 @@ data "aws_route53_zone" "root" {
 # Main
 module "vpc" {
   source  = "registry.terraform.io/terraform-aws-modules/vpc/aws"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   name = "${var.env}-vpc"
   cidr = "10.0.0.0/16"
@@ -34,12 +24,12 @@ module "vpc" {
   private_subnets = [
     "10.0.20.0/23"
   ]
-  manage_default_network_acl          = true
-  default_network_acl_name            = "${var.env}-${var.namespace}"
+  manage_default_network_acl = true
+  default_network_acl_name   = "${var.env}-${var.namespace}"
 }
 resource "aws_security_group" "default_permissive" {
-  name        = "${var.env}-default-permissive"
-  vpc_id      = module.vpc.vpc_id
+  name   = "${var.env}-default-permissive"
+  vpc_id = module.vpc.vpc_id
 
   ingress {
     protocol    = -1
@@ -74,45 +64,44 @@ resource "aws_route53_zone" "env_domain" {
 }
 
 module "ecs" {
-  source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
-  version            = "~> 4.0"
-  cluster_name       = "${var.env}-${var.namespace}"
+  source       = "registry.terraform.io/terraform-aws-modules/ecs/aws"
+  version      = "~> 4.0"
+  cluster_name = "${var.env}-${var.namespace}"
 }
 
 module "web_complete" {
   source = "../.."
 
-  name                  = "app"
-  app_type              = "web"
-  env                   = var.env
-  namespace             = var.namespace
-  
+  name     = "app"
+  app_type = "web"
+  env = var.env
+
   # Containers
   cpu                     = 1024
   memory                  = 2048
   operating_system_family = "WINDOWS_SERVER_2019_CORE"
   ecs_cluster_name        = module.ecs.cluster_name
   docker_registry         = var.docker_registry
-  docker_image_tag        = var.docker_image_tag
+  docker_image_tag = var.docker_image_tag
 
   # Load Balancer
   public                = true
   https_enabled         = false
   alb_health_check_path = "/"
-  alb_security_groups   = [aws_security_group.default_permissive.id]
+  alb_security_groups = [aws_security_group.default_permissive.id]
 
   # EFS settings
-  efs_enabled           = false
-  efs_mount_point       = "/mnt/efs"
-  efs_root_directory    = "/"
+  efs_enabled     = false
+  efs_mount_point = "/mnt/efs"
+  efs_root_directory = "/"
 
   # Network
-  vpc_id                        = module.vpc.vpc_id
-  public_subnets                = module.vpc.public_subnets
-  private_subnets               = module.vpc.private_subnets
-  security_groups               = [aws_security_group.default_permissive.id]
-  root_domain_name              = var.root_domain_name
-  zone_id                       = aws_route53_zone.env_domain.id
+  vpc_id           = module.vpc.vpc_id
+  public_subnets   = module.vpc.public_subnets
+  private_subnets  = module.vpc.private_subnets
+  security_groups  = [aws_security_group.default_permissive.id]
+  root_domain_name = var.root_domain_name
+  zone_id = aws_route53_zone.env_domain.id
 
   # Environment variables
   app_secrets = [

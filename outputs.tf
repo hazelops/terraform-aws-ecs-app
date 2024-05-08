@@ -26,8 +26,8 @@ output "alb_arn" {
   value = length(module.alb[*].lb_arn) >= 1 ? module.alb[0].lb_arn : ""
 }
 
-output "efs" {
-  value = var.efs_enabled ? module.efs.mount_target_dns_names[*] : ""
+output "efs_mount_target" {
+  value = var.efs_enabled && var.efs_share_create ? module.efs.mount_target_dns_names[0] : ""
 }
 
 output "eips" {

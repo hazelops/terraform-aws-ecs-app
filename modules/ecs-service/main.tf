@@ -19,7 +19,7 @@ module "task" {
 
   docker_container_links = var.docker_container_links
 
-  environment    = var.environment
+  environment = var.environment
   # Non-secret Environment variables
   app_secrets    = local.app_secrets
   global_secrets = local.global_secrets
@@ -106,13 +106,13 @@ resource "aws_ecs_service" "this" {
 
   dynamic "load_balancer" {
     for_each = var.app_type == "web" || var.app_type == "tcp-app" ? [
-    for port_mapping in var.port_mappings : {
-      container_name   = port_mapping.container_name
-      target_group_arn = port_mapping.target_group_arn
-      container_port   = port_mapping.container_port
+      for port_mapping in var.port_mappings : {
+        container_name   = port_mapping.container_name
+        target_group_arn = port_mapping.target_group_arn
+        container_port   = port_mapping.container_port
 
-    }
-    ]: []
+      }
+    ] : []
 
     content {
       target_group_arn = load_balancer.value.target_group_arn
@@ -180,11 +180,11 @@ resource "aws_ecs_service" "this_deployed" {
 
   dynamic "load_balancer" {
     for_each = var.app_type == "web" || var.app_type == "tcp-app" ? [
-    for p in var.port_mappings : {
-      container_name   = p.container_name
-      container_port   = p.container_port
-      target_group_arn = p.target_group_arn
-    }
+      for p in var.port_mappings : {
+        container_name   = p.container_name
+        container_port   = p.container_port
+        target_group_arn = p.target_group_arn
+      }
     ] : []
 
 

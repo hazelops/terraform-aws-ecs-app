@@ -76,7 +76,7 @@ func TestExamplesWorkerSchedule(t *testing.T) {
 	// randID := strings.ToLower(random.UniqueId())
 	// attributes := []string{randID}
 
-	rootFolder := "../../"
+	rootFolder := "../"
 	terraformFolderRelativeToRoot := "examples/worker-scheduled"
 
 	tempTestFolder := test_structure.CopyTerraformFolderToTemp(t, rootFolder, terraformFolderRelativeToRoot)
@@ -104,8 +104,8 @@ func TestExamplesWorkerSchedule(t *testing.T) {
 		// Variables to pass to our Terraform code using -var-file options
 		VarFiles: varFiles,
 		/*Vars: map[string]interface{}{
-			"attributes": attributes,
-		},
+		  	"attributes": attributes,
+		  },
 		*/
 	}
 

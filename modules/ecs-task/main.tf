@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "this" {
   requires_compatibilities = [
     var.ecs_launch_type
   ]
-  container_definitions    = jsonencode(local.container_definitions)
+  container_definitions = jsonencode(local.container_definitions)
 
   runtime_platform {
     operating_system_family = var.operating_system_family

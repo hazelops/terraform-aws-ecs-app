@@ -3,14 +3,9 @@ variable "env" {
   description = "Target environment name of the infrastructure"
 }
 
-variable "namespace" {
-  type        = string
-  description = "Namespace name within the infrastructure"
-}
-
 variable "name" {
   type        = string
-  description = "ECS app name"
+  description = "ECS app name including all required namespaces"
 }
 
 variable "app_type" {
@@ -25,21 +20,21 @@ variable "app_type" {
 }
 
 variable "ecs_service_name" {
-  default     = ""
   type        = string
   description = "The ECS service name"
+  default     = ""
 }
 
 variable "ecs_platform_version" {
+  type        = string
   description = "The platform version on which to run your service. Only applicable when using Fargate launch type"
   default     = "LATEST"
-  type        = string
 }
 
 
 variable "ec2_service_group" {
-  description = "Service group name, e.g. app, service name etc."
   type        = string
+  description = "Service group name, e.g. app, service name etc."
   default     = "app"
 }
 
@@ -51,12 +46,12 @@ variable "instance_type" {
 
 variable "environment" {
   type        = map(string)
-  description = "Set of environment variables"
+  description = "Map of parameters to be set in SSM and then exposed into a Task Definition as environment variables."
 }
 
 variable "public" {
-  description = "It's publicity accessible application"
   type        = bool
+  description = "It's publicity accessible application"
   default     = true
 }
 
@@ -67,8 +62,8 @@ variable "app_secrets" {
 }
 
 variable "public_ecs_service" {
-  description = "It's publicity accessible service"
   type        = bool
+  description = "It's publicity accessible service"
   default     = false
 }
 
@@ -135,7 +130,7 @@ variable "image_id" {
 variable "root_domain_name" {
   type        = string
   description = "Domain name of AWS Route53 Zone"
-  default     = "example.com"
+  default     = ""
 }
 
 variable "domain_names" {
@@ -147,7 +142,7 @@ variable "domain_names" {
 variable "zone_id" {
   type        = string
   description = "AWS Route53 Zone ID"
-  default     = "AWS123456789"
+  default     = ""
 }
 
 variable "vpc_id" {
@@ -187,21 +182,21 @@ variable "docker_image_tag" {
 }
 
 variable "docker_container_port" {
-  description = "Docker container port"
   type        = number
+  description = "Docker container port"
   default     = 3000
 }
 
 variable "docker_host_port" {
-  description = "Docker host port. 0 means Auto-assign."
   type        = number
+  description = "Docker host port. 0 means Auto-assign."
   default     = 0
 }
 
 variable "port_mappings" {
+  type        = any
   description = "List of ports to open from a service"
-  type = any
-  default = []
+  default     = []
 }
 
 variable "docker_container_entrypoint" {
@@ -223,8 +218,8 @@ variable "sidecar_container_definitions" {
 }
 
 variable "alb_idle_timeout" {
-  description = "The time in seconds that the connection is allowed to be idle."
   type        = number
+  description = "The time in seconds that the connection is allowed to be idle."
   default     = 60
 }
 
@@ -251,6 +246,7 @@ variable "web_proxy_docker_image_tag" {
   default     = "1.19.2-alpine"
 }
 variable "proxy_docker_image_name" {
+  type        = string
   description = "Nginx proxy docker image name"
   default     = "nginx"
 }
@@ -262,30 +258,33 @@ variable "web_proxy_docker_container_port" {
 }
 
 variable "proxy_docker_container_command" {
-  description = "Proxy docker container CMD"
   type        = list(string)
+  description = "Proxy docker container CMD"
   default     = ["nginx", "-g", "daemon off;"]
 }
 
 variable "proxy_docker_entrypoint" {
+  type        = list(string)
   description = "Proxy docker container entrypoint"
   default     = ["/docker-entrypoint.sh"]
 }
 
 variable "autoscale_scheduled_up" {
+  type        = list(string)
   description = "List of Cron-like expressions for scheduled ecs autoscale UP"
   default     = []
 }
 
 variable "autoscale_scheduled_down" {
+  type        = list(string)
   description = "List of Cron-like expressions for scheduled ecs autoscale DOWN"
   default     = []
 }
 
 variable "autoscale_scheduled_timezone" {
-  type = string
+  type        = string
   description = "Time Zone for the scheduled event"
-  default = "UTC"
+  default     = "UTC"
 }
 
 variable "ec2_eip_enabled" {
@@ -310,13 +309,12 @@ variable "ec2_eip_dns_enabled" {
 variable "ecs_cluster_name" {
   type        = string
   description = "ECS cluster name"
-  default     = ""
 }
 
 variable "ecs_cluster_arn" {
   type        = string
   description = "ECS cluster arn. Should be specified to avoid data query by cluster name"
-  default = ""
+  default     = ""
 }
 
 variable "autoscaling_health_check_type" {
@@ -386,9 +384,9 @@ variable "autoscale_target_value_memory" {
 }
 
 variable "deployment_minimum_healthy_percent" {
+  type        = number
   description = "Lower limit on the number of running tasks"
   default     = 100
-  type        = number
 }
 
 
@@ -399,9 +397,9 @@ variable "datadog_enabled" {
 }
 
 variable "datadog_jmx_enabled" {
-  type = bool
+  type        = bool
   description = "Enables / Disables jmx monitor via the datadog agent"
-  default = false
+  default     = false
 }
 
 variable "route53_health_check_enabled" {
@@ -425,8 +423,8 @@ variable "sns_service_subscription_endpoint_protocol" {
 # The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs
 variable "cpu" {
   type        = number
-  default     = 256
   description = "Fargate CPU value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
+  default     = 256
 
   validation {
     condition     = can(regex("256|512|1024|2048|4096", var.cpu))
@@ -436,8 +434,8 @@ variable "cpu" {
 
 variable "memory" {
   type        = number
-  default     = 512
   description = "Fargate Memory value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
+  default     = 512
 
   validation {
     condition     = can(regex("512|1024|2048|3072|4096|5120|6144|7168|8192|9216|10240|11264|12288|13312|14336|15360|16384|17408|18432|19456|20480|21504|22528|23552|24576|25600|26624|27648|28672|29696|30720", var.memory))
@@ -517,49 +515,62 @@ variable "resource_requirements" {
 }
 
 variable "root_block_device_size" {
-  type    = number
-  default = "50"
+  type        = number
+  description = "EBS root block device size in GB"
+  default     = "50"
 }
 
 variable "http_port" {
   type        = number
-  default     = 80
   description = "Port that is used for HTTP protocol"
+  default     = 80
 }
 
 variable "root_block_device_type" {
-  type    = string
-  default = "gp2"
+  type        = string
+  description = "EBS root block device type"
+  default     = "gp2"
+
+  validation {
+    condition     = can(regex("io1|io2|gp2|gp3", var.root_block_device_type))
+    error_message = "The root_block_device_type value must be a valid type: io1, io2, gp2, gp3 (https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html)."
+  }
 }
 
 variable "alb_health_check_valid_response_codes" {
-  type    = string
-  default = "200-399"
+  type        = string
+  description = "The HTTP codes to use when checking for a successful response from a target. You can specify multiple values (for example, \"200,202\") or a range of values (for example, \"200-299\")."
+  default     = "200-399"
 }
 
 variable "alb_deregistration_delay" {
-  type    = number
-  default = 5
+  type        = number
+  description = "The amount of time, in seconds, for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused"
+  default     = 5
 }
 
 variable "alb_health_check_interval" {
-  type    = number
-  default = 30
+  type        = number
+  description = "The approximate amount of time, in seconds, between health checks of an individual target"
+  default     = 30
 }
 
 variable "alb_health_check_healthy_threshold" {
-  type    = number
-  default = 3
+  type        = number
+  description = "The number of consecutive health checks successes required before considering an unhealthy target healthy"
+  default     = 3
 }
 
 variable "alb_health_check_unhealthy_threshold" {
-  type    = number
-  default = 3
+  type        = number
+  description = "The number of consecutive health check failures required before considering the target unhealthy"
+  default     = 3
 }
 
 variable "alb_health_check_timeout" {
-  type    = number
-  default = 6
+  type        = number
+  description = "The amount of time, in seconds, during which no response means a failed health check"
+  default     = 6
 }
 
 variable "volumes" {
@@ -570,13 +581,25 @@ variable "volumes" {
 
 variable "efs_enabled" {
   type        = bool
-  description = "EFS Enabled"
+  description = "Whether to enable EFS mount for ECS task"
   default     = false
+}
+
+variable "efs_share_create" {
+  type        = bool
+  description = "Whether to create EFS share or not"
+  default     = false
+}
+
+variable "efs_file_system_id" {
+  type        = string
+  description = "EFS file system ID"
+  default     = ""
 }
 
 variable "efs_mount_point" {
   type        = string
-  description = "EFS mount point"
+  description = "EFS mount point in the container"
   default     = "/mnt/efs"
 }
 
@@ -588,7 +611,7 @@ variable "efs_root_directory" {
 
 variable "ecs_service_deployed" {
   type        = bool
-  description = "This service resource doesn't have task definition lifecycle policy, so terraform is used to deploy it (instead of ecs cli)"
+  description = "This service resource doesn't have task definition lifecycle policy, so terraform is used to deploy it (instead of ecs cli or ize)"
   default     = false
 }
 
@@ -607,7 +630,7 @@ variable "cloudwatch_schedule_expressions" {
 
 variable "firelens_ecs_log_enabled" {
   type        = bool
-  description = "AWSFirelens ECS logs enabled"
+  description = "AWS Firelens ECS logs enabled (used by FluentBit, Datadog, etc)"
   default     = false
 }
 
@@ -633,7 +656,7 @@ variable "ecs_exec_prompt_string" {
 variable "additional_container_definition_parameters" {
   type        = any
   description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
-  default     = {}
+  default = {}
 }
 
 
@@ -668,21 +691,21 @@ variable "shared_memory_size" {
 }
 
 variable "create_schedule" {
-  description = "Determines whether to create autoscaling group schedule or not"
   type        = bool
+  description = "Determines whether to create autoscaling group schedule or not"
   default     = false
 }
 
 variable "schedules" {
-  description = "Map of autoscaling group schedule to create"
   type        = map(any)
-  default     = {}
+  description = "Map of autoscaling group schedule to create"
+  default = {}
 }
 
 variable "docker_labels" {
-  type = map(any)
+  type        = map(any)
   description = "Labels to be added to the docker. Used for auto-configuration, for instance of JMX discovery"
-  default = null
+  default     = null
 }
 
 variable "operating_system_family" {
@@ -698,13 +721,15 @@ variable "cpu_architecture" {
 }
 
 variable "ecr_force_delete" {
-  default = false
-  description = "If true, will delete the ECR repository even if it contains images."
+  type        = bool
+  description = "If true, will delete the ECR repository even if it contains images on destroy"
+  default     = false
 }
 
 variable "alb_access_logs_enabled" {
-  default = false
-  description = "If true, ALB access logs will be writing to S3"
+  type        = bool
+  description = "If true, ALB access logs will be written to S3"
+  default     = false
 }
 
 variable "alb_access_logs_s3bucket_name" {
