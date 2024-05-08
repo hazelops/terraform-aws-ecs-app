@@ -44,11 +44,11 @@ module "service" {
   autoscaling_max_size          = var.autoscaling_max_size
 
   docker_container_entrypoint = var.docker_container_entrypoint
-  docker_container_command    = var.docker_container_command
+  docker_container_command = var.docker_container_command
 
   # If docker_image_name is set then use it, otherwise check if we are managing ECR repo on this module and use it's repository_url. Otherwise use docker_registry/name
-  docker_image_name           = var.docker_image_name != "" ? var.docker_image_name : var.ecr_repo_create ? module.ecr.repository_url : "${var.docker_registry}/${var.name}"
-  docker_image_tag            = var.docker_image_tag
+  docker_image_name = var.docker_image_name != "" ? var.docker_image_name : var.ecr_repo_create ? module.ecr.repository_url : "${var.docker_registry}/${var.name}"
+  docker_image_tag  = var.docker_image_tag
 
   iam_role_policy_statement                  = var.iam_role_policy_statement
   additional_container_definition_parameters = var.additional_container_definition_parameters

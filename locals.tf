@@ -34,12 +34,12 @@ locals {
 
   fluentbit_container_definition = [
     {
-      essential             = true
-      image                 = "public.ecr.aws/aws-observability/aws-for-fluent-bit:latest"
-      name                  = "log_router"
-      memoryReservation     = 75
+      essential         = true
+      image             = "public.ecr.aws/aws-observability/aws-for-fluent-bit:latest"
+      name              = "log_router"
+      memoryReservation = 75
       firelensConfiguration = {
-        "type"    = "fluentbit"
+        "type" = "fluentbit"
         "options" = {
           "enable-ecs-log-metadata" = "true"
         }
@@ -49,7 +49,7 @@ locals {
 
   volumes = concat(var.web_proxy_enabled ? [
     {
-      name        = "nginx-templates",
+      name = "nginx-templates",
       mount_point = {
         "sourceVolume"  = "nginx-templates"
         "containerPath" = "/etc/nginx/templates/"
@@ -67,7 +67,7 @@ locals {
       ]
     },
     {
-      name        = "nginx-app",
+      name = "nginx-app",
       mount_point = {
         "sourceVolume"  = "nginx-app"
         "containerPath" = "/etc/nginx/app/"
@@ -85,9 +85,9 @@ locals {
       ]
     },
   ] : [],
-    var.efs_enabled ? [
+      var.efs_enabled ? [
       {
-        name        = "efs",
+        name = "efs",
         mount_point = {
           "sourceVolume"  = "efs"
           "containerPath" = var.efs_mount_point,
@@ -105,7 +105,7 @@ locals {
         ]
       }
     ] : [],
-    (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
+      (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
   )
 
   alb_http_tcp_listeners = var.app_type == "tcp-app" ? [
@@ -114,13 +114,13 @@ locals {
       port               = port_mapping["host_port"]
       protocol           = "TCP"
       target_group_index = index
-    } if ! lookup(port_mapping, "tls", false)
-    ] : [
-      {
-        port               = var.http_port
-        protocol           = "HTTP"
-        target_group_index = 0
-      }
+    } if !lookup(port_mapping, "tls", false)
+  ] : [
+    {
+      port               = var.http_port
+      protocol           = "HTTP"
+      target_group_index = 0
+    }
   ]
 
   # In case app type is "tcp-app" and port_mapping has "tls" config and is true we use tcp over tls.
@@ -158,7 +158,7 @@ locals {
       backend_port         = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
       target_type          = var.ecs_launch_type == "EC2" ? "instance" : "ip"
       deregistration_delay = var.alb_deregistration_delay
-      preserve_client_ip   = null
+      preserve_client_ip = null
       # This is specified for compatibility with the tcp target groups. It's not actually used in a lookup.
 
       health_check = {

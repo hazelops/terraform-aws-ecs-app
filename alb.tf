@@ -14,8 +14,8 @@ module "alb" {
 
 
 
-  http_tcp_listeners  = local.alb_http_tcp_listeners
-  https_listeners = var.https_enabled ? concat(local.alb_https_listeners) : []
+  http_tcp_listeners = local.alb_http_tcp_listeners
+  https_listeners    = var.https_enabled ? concat(local.alb_https_listeners) : []
 
   target_groups = concat(var.app_type == "web" ? local.target_groups_web : local.target_groups_tcp)
 
