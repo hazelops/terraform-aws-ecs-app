@@ -21,7 +21,7 @@ variable "cpu" {
   default     = 256
 
   validation {
-    condition     =  can(regex("256|512|1024|2048|4096", var.cpu))
+    condition     = can(regex("256|512|1024|2048|4096", var.cpu))
     error_message = "The cpu value must be a valid CPU value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html."
   }
 }
@@ -135,7 +135,7 @@ variable "sidecar_container_definitions" {
 variable "additional_container_definition_parameters" {
   type        = any
   description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
-  default     = {}
+  default = {}
 }
 
 
@@ -176,7 +176,7 @@ variable "ecs_network_mode" {
 variable "ecs_network_configuration" {
   type        = map(any)
   description = "ECS Network Configuration"
-  default     = {}
+  default = {}
 }
 
 variable "ecs_task_family_name" {
@@ -227,40 +227,40 @@ variable "firelens_ecs_log_enabled" {
 }
 
 variable "tmpfs_enabled" {
-  type = bool
+  type        = bool
   description = "TMPFS support for non-Fargate deployments"
-  default = false
+  default     = false
 }
 
 variable "tmpfs_size" {
-  type = number
+  type        = number
   description = "Size of the tmpfs in MB"
-  default = 1024
+  default     = 1024
 }
 
 variable "tmpfs_container_path" {
-  type = string
+  type        = string
   description = "Path where tmpfs tmpfs would be mounted"
-  default = "/tmp/"
+  default     = "/tmp/"
 }
 
 
 variable "tmpfs_mount_options" {
-  type = list(string)
+  type        = list(string)
   description = "Options for the mount of the ram disk. noatime by default to speed up access"
-  default = ["noatime"]
+  default     = ["noatime"]
 }
 
 variable "shared_memory_size" {
-  type = number
+  type        = number
   description = "Size of the /dev/shm shared memory in MB"
-  default = 0
+  default     = 0
 }
 
 variable "docker_labels" {
-  type = map(any)
+  type        = map(any)
   description = "Labels to be added to the docker. Used for auto-configuration, for instance of JMX discovery"
-  default = null
+  default     = null
 }
 
 variable "operating_system_family" {}

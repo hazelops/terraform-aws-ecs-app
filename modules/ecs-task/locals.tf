@@ -3,7 +3,7 @@ locals {
   docker_container_command    = (var.docker_container_command == [] ? [] : var.docker_container_command)
   docker_container_entrypoint = (var.docker_container_entrypoint == [] ? [] : var.docker_container_entrypoint)
 
-  ssm_secret_path        = var.ssm_secret_path != null ? var.ssm_secret_path : "/${var.env}/${var.name}"
+  ssm_secret_path = var.ssm_secret_path != null ? var.ssm_secret_path : "/${var.env}/${var.name}"
   ssm_global_secret_path = var.ssm_global_secret_path != null ? var.ssm_global_secret_path : "/${var.env}/global"
 
   # ECS Task Container definition file is filled with content here
@@ -15,7 +15,7 @@ locals {
       image                = "${var.docker_image_name}:${var.docker_image_tag}"
       resourceRequirements = var.resource_requirements
 
-      dockerLabels: var.docker_labels
+      dockerLabels : var.docker_labels
 
 
       cpu               = var.ecs_launch_type == "FARGATE" ? var.cpu : null
@@ -34,39 +34,43 @@ locals {
 
       linuxParameters = var.operating_system_family == "LINUX" ? {
         sharedMemorySize = (var.shared_memory_size > 0 && var.ecs_launch_type != "FARGATE") ? var.shared_memory_size : null
-        tmpfs = (var.tmpfs_enabled && var.ecs_launch_type != "FARGATE") ? [
+        tmpfs            = (var.tmpfs_enabled && var.ecs_launch_type != "FARGATE") ? [
           {
             ContainerPath = var.tmpfs_container_path
-            MountOptions = var.tmpfs_mount_options
-            Size = var.tmpfs_size
-          }] : null,
+            MountOptions  = var.tmpfs_mount_options
+            Size          = var.tmpfs_size
+          }
+        ] : null,
         initProcessEnabled = var.ecs_exec_enabled ? true : null
       } : null
 
       mountPoints = [
-      # This way we ensure that we only mount main app volumes to the main app container.
-      for volume in var.volumes : lookup(volume, "mount_point", {}) if(contains(keys(volume), "mount_point"))
+        # This way we ensure that we only mount main app volumes to the main app container.
+        for volume in var.volumes : lookup(volume, "mount_point", {}) if(contains(keys(volume), "mount_point"))
       ]
 
       environment = [for k, v in local.environment : { name = k, value = v }]
 
-      secrets = concat([for param_name in var.app_secrets :
-      {
-        name      = param_name
-        valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_secret_path}/${param_name}"
-      }
-      ], [for param_name in var.global_secrets :
-      {
-        name      = replace(param_name, "/", "") != param_name ? element(split("/", param_name), 1) : param_name
-        valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_global_secret_path}/${param_name}"
-      }
+      secrets = concat([
+        for param_name in var.app_secrets :
+        {
+          name      = param_name
+          valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_secret_path}/${param_name}"
+        }
+      ], [
+        for param_name in var.global_secrets :
+        {
+          name      = replace(param_name, "/", "") != param_name ? element(split("/", param_name), 1) : param_name
+          valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_global_secret_path}/${param_name}"
+        }
       ])
 
-      portMappings = [for p in var.port_mappings :
-      {
-        containerPort = p.container_port
-        hostPort      = p.host_port
-      }
+      portMappings = [
+        for p in var.port_mappings :
+        {
+          containerPort = p.container_port
+          hostPort      = p.host_port
+        }
       ]
 
       links = var.docker_container_links
@@ -106,7 +110,7 @@ locals {
 
 
   iam_ecs_execution_role_policy = {
-    "Version" = "2012-10-17",
+    "Version"   = "2012-10-17",
     "Statement" = concat(var.iam_role_policy_statement, [
       {
         "Effect" = "Allow",
@@ -150,11 +154,11 @@ locals {
         ]
       },
       {
-          "Action" = [
-            "kms:Decrypt"
-          ],
-          "Effect" = "Allow",
-          "Resource" = "*"
+        "Action" = [
+          "kms:Decrypt"
+        ],
+        "Effect"   = "Allow",
+        "Resource" = "*"
       }
     ])
   }
