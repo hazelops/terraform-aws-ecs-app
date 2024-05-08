@@ -1,5 +1,5 @@
 module "service" {
-  source = "modules/ecs-service"
+  source = "./modules/ecs-service"
 
   env              = var.env
   name             = var.name
