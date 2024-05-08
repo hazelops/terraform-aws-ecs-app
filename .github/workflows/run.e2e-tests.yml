@@ -62,7 +62,7 @@ jobs:
 
       - name: Go TF Test
         run: |
-          cd test/src
+          cd test
           go mod tidy
           go test -v -timeout 60m -run TestExamplesCompleteWorker
 
@@ -114,7 +114,7 @@ jobs:
 
       - name: Go TF Test
         run: |
-          cd test/src
+          cd test
           go mod tidy
           go test -v -timeout 60m -run TestExamplesWorkerSchedule
 
@@ -167,7 +167,7 @@ jobs:
 
       - name: Go TF Test
         run: |
-          cd test/src
+          cd test
           go mod tidy
           go test -v -timeout 60m -run TestExamplesCompleteWeb
 
@@ -217,7 +217,7 @@ jobs:
 
       - name: Go TF Test
         run: |
-          cd test/src
+          cd test
           go mod tidy
           go test -v -timeout 60m -run TestExamplesWebProxy
 
@@ -268,6 +268,6 @@ jobs:
 
       - name: Go TF Test
         run: |
-          cd test/src
+          cd test
           go mod tidy
           go test -v -timeout 60m -run TestExamplesWorkerAutoScheduled
