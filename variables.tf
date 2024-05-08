@@ -264,7 +264,7 @@ variable "proxy_docker_container_command" {
 }
 
 variable "proxy_docker_entrypoint" {
-  type        = string
+  type        = list(string)
   description = "Proxy docker container entrypoint"
   default     = ["/docker-entrypoint.sh"]
 }
