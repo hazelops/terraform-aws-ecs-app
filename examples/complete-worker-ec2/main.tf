@@ -34,12 +34,12 @@ module "vpc" {
     "10.0.20.0/23"
   ]
 
-  manage_default_network_acl          = true
-  default_network_acl_name            = "${var.env}-${var.namespace}"
+  manage_default_network_acl = true
+  default_network_acl_name   = "${var.env}-${var.namespace}"
 }
 resource "aws_security_group" "default_permissive" {
-  name        = "${var.env}-default-permissive"
-  vpc_id      = module.vpc.vpc_id
+  name   = "${var.env}-default-permissive"
+  vpc_id = module.vpc.vpc_id
 
   ingress {
     protocol    = -1
@@ -73,17 +73,17 @@ resource "aws_key_pair" "root" {
 }
 
 module "ecs" {
-  source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
-  version            = "~> 4.0"
-  cluster_name       = "${var.env}-${var.namespace}"
+  source       = "registry.terraform.io/terraform-aws-modules/ecs/aws"
+  version      = "~> 4.0"
+  cluster_name = "${var.env}-${var.namespace}"
 }
 
 module "worker_complete" {
   source = "../.."
 
-  name             = "worker"
-  app_type         = "worker"
-  env              = var.env
+  name     = "worker"
+  app_type = "worker"
+  env      = var.env
 
   public           = false
   ecs_launch_type  = "EC2"
@@ -94,21 +94,21 @@ module "worker_complete" {
 
 
   # Containers
-  ecs_cluster_arn       = module.ecs.cluster_arn
-  ecs_cluster_name      = module.ecs.cluster_name
-  docker_registry       = var.docker_registry
-  docker_image_tag      = var.docker_image_tag
+  ecs_cluster_arn  = module.ecs.cluster_arn
+  ecs_cluster_name = module.ecs.cluster_name
+  docker_registry  = var.docker_registry
+  docker_image_tag = var.docker_image_tag
 
-  docker_container_command           = ["echo", "command-output"]
+  docker_container_command = ["echo", "command-output"]
   deployment_minimum_healthy_percent = 0
 
   # Network
-  vpc_id                        = module.vpc.vpc_id
-  private_subnets               = module.vpc.private_subnets
-  security_groups               = [aws_security_group.default_permissive.id]
-  key_name                      = var.ec2_key_pair_name
-  create_iam_instance_profile   = true
-  image_id                      = data.aws_ami.amazon_linux_ecs_generic.id
+  vpc_id                      = module.vpc.vpc_id
+  private_subnets             = module.vpc.private_subnets
+  security_groups             = [aws_security_group.default_permissive.id]
+  key_name                    = var.ec2_key_pair_name
+  create_iam_instance_profile = true
+  image_id = data.aws_ami.amazon_linux_ecs_generic.id
 
   # Environment variables
   app_secrets = [

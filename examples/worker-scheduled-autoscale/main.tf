@@ -17,12 +17,12 @@ module "vpc" {
     "10.5.20.0/23"
   ]
 
-  manage_default_network_acl          = true
-  default_network_acl_name            = "${var.env}-${var.namespace}"
+  manage_default_network_acl = true
+  default_network_acl_name   = "${var.env}-${var.namespace}"
 }
 resource "aws_security_group" "default_permissive" {
-  name        = "${var.env}-default-permissive"
-  vpc_id      = module.vpc.vpc_id
+  name   = "${var.env}-default-permissive"
+  vpc_id = module.vpc.vpc_id
 
   ingress {
     protocol    = -1
@@ -45,35 +45,35 @@ resource "aws_security_group" "default_permissive" {
 }
 
 module "ecs" {
-  source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
-  version            = "~> 4.0"
-  cluster_name       = "${var.env}-${var.namespace}-worker-scheduled-auto"
+  source       = "registry.terraform.io/terraform-aws-modules/ecs/aws"
+  version      = "~> 4.0"
+  cluster_name = "${var.env}-${var.namespace}-worker-scheduled-auto"
 }
 
 module "worker_scheduled" {
   source = "../.."
 
-  name             = "worker-scheduled-auto"
-  app_type         = "worker"
-  env              = var.env
+  name     = "worker-scheduled-auto"
+  app_type = "worker"
+  env      = var.env
 
-  public           = false
-  ecs_launch_type  = "FARGATE"
+  public = false
+  ecs_launch_type = "FARGATE"
 
   # Containers
-  ecs_cluster_arn       = module.ecs.cluster_arn
-  ecs_cluster_name      = module.ecs.cluster_name
-  docker_registry       = var.docker_registry
-  docker_image_tag      = var.docker_image_tag
+  ecs_cluster_arn  = module.ecs.cluster_arn
+  ecs_cluster_name = module.ecs.cluster_name
+  docker_registry  = var.docker_registry
+  docker_image_tag = var.docker_image_tag
 
-  docker_container_command           = ["echo", "command-output"]
+  docker_container_command = ["echo", "command-output"]
   deployment_minimum_healthy_percent = 0
 
   # Autoscaling
   autoscale_enabled = true
   min_size          = 1
   max_size          = 1
-  desired_capacity  = 1
+  desired_capacity = 1
 
   # Scheduled ECS scaling up/down
   autoscaling_min_size         = 1
@@ -94,9 +94,9 @@ module "worker_scheduled" {
   ]
 
   # Network
-  vpc_id                        = module.vpc.vpc_id
-  private_subnets               = module.vpc.private_subnets
-  security_groups               = [aws_security_group.default_permissive.id]
+  vpc_id          = module.vpc.vpc_id
+  private_subnets = module.vpc.private_subnets
+  security_groups = [aws_security_group.default_permissive.id]
 
   # Environment variables
   app_secrets = [

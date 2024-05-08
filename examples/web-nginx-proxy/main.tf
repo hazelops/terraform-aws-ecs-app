@@ -25,14 +25,14 @@ module "vpc" {
     "10.2.20.0/23"
   ]
 
-  enable_nat_gateway                  = true
-  single_nat_gateway                  = true
-  manage_default_network_acl          = true
-  default_network_acl_name            = "${var.env}-${var.namespace}"
+  enable_nat_gateway         = true
+  single_nat_gateway         = true
+  manage_default_network_acl = true
+  default_network_acl_name   = "${var.env}-${var.namespace}"
 }
 resource "aws_security_group" "default_permissive" {
-  name        = "${var.env}-default-permissive"
-  vpc_id      = module.vpc.vpc_id
+  name   = "${var.env}-default-permissive"
+  vpc_id = module.vpc.vpc_id
 
   ingress {
     protocol    = -1
@@ -67,40 +67,40 @@ resource "aws_route53_zone" "env_domain" {
 }
 
 module "ecs" {
-  source             = "registry.terraform.io/terraform-aws-modules/ecs/aws"
-  version            = "~> 4.0"
-  cluster_name       = "${var.env}-${var.namespace}-proxy"
+  source       = "registry.terraform.io/terraform-aws-modules/ecs/aws"
+  version      = "~> 4.0"
+  cluster_name = "${var.env}-${var.namespace}-proxy"
 }
 
 module "web_proxy" {
   source = "../.."
 
-  name                  = "proxy"
-  app_type              = "web"
-  env                   = var.env
+  name     = "proxy"
+  app_type = "web"
+  env = var.env
 
   # Nginx Proxy enabling
-  web_proxy_enabled     = true
+  web_proxy_enabled = true
   # We mount a shared volume to /etc/nginx dir in our container. In order to the web proxy to work - your app must copy(create) Nginx config template to /etc/nginx/templates/default.conf.template. See proxied-prj/entrypoint.sh.
 
   # Containers
-  ecs_cluster_name      = module.ecs.cluster_name
-  docker_registry       = var.docker_registry
-  docker_image_tag      = var.docker_image_tag
+  ecs_cluster_name = module.ecs.cluster_name
+  docker_registry  = var.docker_registry
+  docker_image_tag = var.docker_image_tag
 
   # Load Balancer
   public                = true
   https_enabled         = false
   alb_health_check_path = "/"
-  alb_security_groups   = [aws_security_group.default_permissive.id]
+  alb_security_groups = [aws_security_group.default_permissive.id]
 
   # Network
-  vpc_id                        = module.vpc.vpc_id
-  public_subnets                = module.vpc.public_subnets
-  private_subnets               = module.vpc.private_subnets
-  security_groups               = [aws_security_group.default_permissive.id]
-  root_domain_name              = var.root_domain_name
-  zone_id                       = aws_route53_zone.env_domain.id
+  vpc_id           = module.vpc.vpc_id
+  public_subnets   = module.vpc.public_subnets
+  private_subnets  = module.vpc.private_subnets
+  security_groups  = [aws_security_group.default_permissive.id]
+  root_domain_name = var.root_domain_name
+  zone_id = aws_route53_zone.env_domain.id
 
   # Environment variables
   app_secrets = [
