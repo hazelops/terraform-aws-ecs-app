@@ -1,4 +1,4 @@
-name: "Tests: TF Examples"
+name: "Tests: E2E"
 defaults:
   run:
     shell: bash
@@ -53,9 +53,9 @@ jobs:
       - name: IZE create AWS Profile
         run: ize gen aws-profile
 
-      - name: IZE gen tfenv 
+      - name: IZE gen tfenv
         run: ize gen tfenv
-      
+
       - name: Copy generated files
         run: |
           cp -R .ize/env/${{ env.ENV }}/*.* examples/${{ github.job }}/
@@ -105,9 +105,9 @@ jobs:
       - name: IZE create AWS Profile
         run: ize gen aws-profile
 
-      - name: IZE gen tfenv 
+      - name: IZE gen tfenv
         run: ize gen tfenv
-      
+
       - name: Copy generated files
         run: |
           cp -R .ize/env/${{ env.ENV }}/*.* examples/${{ github.job }}/
@@ -158,9 +158,9 @@ jobs:
       - name: IZE create AWS Profile
         run: ize gen aws-profile
 
-      - name: IZE gen tfenv 
+      - name: IZE gen tfenv
         run: ize gen tfenv
-      
+
       - name: Copy generated files
         run: |
           cp -R .ize/env/${{ env.ENV }}/*.* examples/${{ github.job }}/
@@ -208,9 +208,9 @@ jobs:
       - name: IZE create AWS Profile
         run: ize gen aws-profile
 
-      - name: IZE gen tfenv 
+      - name: IZE gen tfenv
         run: ize gen tfenv
-      
+
       - name: Copy generated files
         run: |
           cp -R .ize/env/${{ env.ENV }}/*.* examples/${{ github.job }}/
@@ -259,9 +259,9 @@ jobs:
       - name: IZE create AWS Profile
         run: ize gen aws-profile
 
-      - name: IZE gen tfenv 
+      - name: IZE gen tfenv
         run: ize gen tfenv
-      
+
       - name: Copy generated files
         run: |
           cp -R .ize/env/${{ env.ENV }}/*.* examples/${{ github.job }}/

@@ -7,7 +7,7 @@ data "aws_route53_zone" "root" {
 # Main
 module "vpc" {
   source  = "registry.terraform.io/terraform-aws-modules/vpc/aws"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   name = "${var.env}-vpc"
   cidr = "10.0.0.0/16"
