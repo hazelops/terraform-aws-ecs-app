@@ -5,7 +5,7 @@ variable "env" {
 
 variable "name" {
   type        = string
-  description = "ECS app name"
+  description = "ECS app name including namespace (if applies)"
 }
 
 variable "memory_reservation" {
@@ -17,8 +17,8 @@ variable "memory_reservation" {
 # The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs
 variable "cpu" {
   type        = number
-  default     = 256
   description = "Fargate CPU value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
+  default     = 256
 
   validation {
     condition     =  can(regex("256|512|1024|2048|4096", var.cpu))
@@ -28,8 +28,8 @@ variable "cpu" {
 
 variable "memory" {
   type        = number
-  default     = 512
   description = "Fargate Memory value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
+  default     = 512
 
   validation {
     condition     = can(regex("512|1024|2048|3072|4096|5120|6144|7168|8192|9216|10240|11264|12288|13312|14336|15360|16384|17408|18432|19456|20480|21504|22528|23552|24576|25600|26624|27648|28672|29696|30720", var.memory))
@@ -87,8 +87,8 @@ variable "docker_image_tag" {
 }
 
 variable "docker_container_port" {
-  description = "Docker container port"
   type        = number
+  description = "Docker container port"
   default     = 3000
 }
 
@@ -140,8 +140,8 @@ variable "additional_container_definition_parameters" {
 
 
 variable "task_group" {
-  description = "ECS Task group name, e.g. app, service name etc."
   type        = string
+  description = "ECS Task group name, e.g. app, service name etc."
   default     = "app"
 }
 
@@ -174,9 +174,9 @@ variable "ecs_network_mode" {
 }
 
 variable "ecs_network_configuration" {
+  type        = map(any)
   description = "ECS Network Configuration"
   default     = {}
-  type        = map(any)
 }
 
 variable "ecs_task_family_name" {
@@ -208,16 +208,15 @@ variable "volumes" {
   default     = []
 }
 
-# https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
 variable "cloudwatch_schedule_expressions" {
-  description = "List of Cron-like Cloudwatch Event Rule schedule expressions"
   type        = list(any)
+  description = "List of Cron-like Cloudwatch Event Rule schedule expressions (https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html)"
   default     = []
 }
 
 variable "cloudwatch_retention_in_days" {
-  description = "Default AWS Cloudwatch retention in days"
   type        = number
+  description = "Default AWS Cloudwatch retention in days"
   default     = 90
 }
 

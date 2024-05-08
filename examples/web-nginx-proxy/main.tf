@@ -88,11 +88,10 @@ module "web_proxy" {
   name                  = "proxy"
   app_type              = "web"
   env                   = var.env
-  namespace             = var.namespace
-  
+
   # Nginx Proxy enabling
   web_proxy_enabled     = true
-  # We mount a shared volume to /etc/nginx dir in our container. In order to the web proxy to work - your app must copy(create) Nginx config template to /etc/nginx/templates/default.conf.template. See proxied-prj/entrypoint.sh.  
+  # We mount a shared volume to /etc/nginx dir in our container. In order to the web proxy to work - your app must copy(create) Nginx config template to /etc/nginx/templates/default.conf.template. See proxied-prj/entrypoint.sh.
 
   # Containers
   ecs_cluster_name      = module.ecs.cluster_name

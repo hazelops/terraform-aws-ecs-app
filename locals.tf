@@ -1,13 +1,14 @@
 locals {
   name             = "${var.env}-${var.name}"
   ecs_service_name = var.ecs_service_name != "" ? var.ecs_service_name : "${var.env}-${var.name}"
-  ecs_cluster_name = var.ecs_cluster_name != "" ? var.ecs_cluster_name : "${var.env}-${var.namespace}"
+  ecs_cluster_name = var.ecs_cluster_name
   ecs_cluster_arn  = length(var.ecs_cluster_arn) != "" ? var.ecs_cluster_arn : "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${local.ecs_cluster_name}"
-  ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : "${var.namespace}-${var.name}"
+  ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : var.name
   name_prefix      = "${substr(var.name, 0, 5)}-"
-  domain_names     = var.root_domain_name != "example.com" ? concat([
+  domain_names     = var.root_domain_name != "" ? concat([
     "${var.name}.${var.env}.${var.root_domain_name}"
   ], var.domain_names) : []
+
 
   # Datadog Environment Variables: https://docs.datadoghq.com/agent/guide/environment-variables/
   #                                https://docs.datadoghq.com/agent/docker/apm/?tab=linux#docker-apm-agent-environment-variables
@@ -95,7 +96,7 @@ locals {
 
         efs_volume_configuration = [
           {
-            file_system_id : module.efs.id
+            file_system_id : var.efs_share_create ? module.efs.id : var.efs_file_system_id
             root_directory : var.efs_root_directory
             transit_encryption : "ENABLED"
             transit_encryption_port : 2999

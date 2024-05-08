@@ -102,8 +102,7 @@ module "web_complete" {
   name                  = "app"
   app_type              = "web"
   env                   = var.env
-  namespace             = var.namespace
-  
+
   # Containers
   ecs_cluster_name      = module.ecs.cluster_name
   docker_registry       = var.docker_registry

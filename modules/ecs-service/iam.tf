@@ -2,7 +2,7 @@
 resource "aws_iam_role" "ecs_events" {
   count = var.cloudwatch_schedule_expressions == [] ? 0 : 1
 
-  name               = var.ecs_service_name != "" ? "${var.ecs_service_name}_ECSEvents" : "${var.env}_${var.name}_ECSEvents"
+  name               = var.ecs_service_name != "" ? "${var.ecs_service_name}-ECSEvents" : "${var.env}-${var.name}-ECSEvents"
   assume_role_policy = data.aws_iam_policy_document.ecs_events_assume_role[0].json
   path               = "/"
   description        = "CloudWatch Events IAM Role"

@@ -5,7 +5,7 @@ variable "env" {
 
 variable "name" {
   type        = string
-  description = "ECS app name"
+  description = "ECS app name including the namespace (if applies)"
 }
 
 variable "app_type" {
@@ -19,25 +19,21 @@ variable "app_type" {
   }
 }
 
-variable "namespace" {
-  type        = string
-  description = "Namespace name within the infrastructure"
-}
-
 variable "memoryReservation" {
   type        = number
-  default     = 1024
   description = "The soft limit (in MiB) of memory to reserve for the container"
+  default     = 1024
 }
+
 variable "environment" {
   type        = map(string)
   description = "Set of environment variables"
 }
 
 variable "ecs_platform_version" {
+  type        = string
   description = "The platform version on which to run your service. Only applicable when using Fargate launch type"
   default     = "LATEST"
-  type        = string
 }
 
 variable "app_secrets" {
@@ -127,27 +123,27 @@ variable "docker_container_links" {
 }
 
 variable "ec2_service_group" {
-  description = "Service group name, e.g. app, service name etc."
   type        = string
+  description = "Service group name, e.g. app, service name etc. Mainly used in scheduling tasks on different instances."
   default     = "app"
 }
 
 variable "service_desired_count" {
+  type        = number
   description = "The number of instances of a task definition"
   default     = 1
-  type        = number
 }
 
 variable "ecs_target_task_count" {
+  type        = number
   description = "The target task count of 'worker' ecs app type, see $var.app_type of the root module"
   default     = 1
-  type        = number
 }
 
 variable "deployment_minimum_healthy_percent" {
+  type        = number
   description = "Lower limit on the number of running tasks."
   default     = 100
-  type        = number
 }
 
 variable "target_group_arn" {
@@ -189,8 +185,8 @@ variable "ecs_launch_type" {
 # The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs
 variable "cpu" {
   type        = number
-  default     = 256
   description = "Fargate CPU value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
+  default     = 256
 
   validation {
     condition     =  can(regex("256|512|1024|2048|4096", var.cpu))
@@ -200,8 +196,8 @@ variable "cpu" {
 
 variable "memory" {
   type        = number
-  default     = 512
   description = "Fargate Memory value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
+  default     = 512
 
   validation {
     condition     = can(regex("512|1024|2048|3072|4096|5120|6144|7168|8192|9216|10240|11264|12288|13312|14336|15360|16384|17408|18432|19456|20480|21504|22528|23552|24576|25600|26624|27648|28672|29696|30720", var.memory))
@@ -348,8 +344,8 @@ variable "web_proxy_enabled" {
 
 # https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
 variable "cloudwatch_schedule_expressions" {
-  description = "List of Cron-like Cloudwatch Event Rule schedule expressions"
   type        = list(any)
+  description = "List of Cron-like Cloudwatch Event Rule schedule expressions"
   default     = []
 }
 

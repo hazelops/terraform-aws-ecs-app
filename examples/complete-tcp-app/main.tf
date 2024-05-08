@@ -102,8 +102,7 @@ module "tcp_app" {
   name                  = "tcpapp"
   app_type              = "tcp-app"
   env                   = var.env
-  namespace             = var.namespace
-  
+
   # Containers
   ecs_cluster_name      = module.ecs.cluster_name
   docker_registry       = var.docker_registry

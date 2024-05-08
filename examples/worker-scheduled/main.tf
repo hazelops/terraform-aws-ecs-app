@@ -66,7 +66,6 @@ module "worker_scheduled" {
   name             = "worker-scheduled"
   app_type         = "worker"
   env              = var.env
-  namespace        = var.namespace
 
   public           = false
   ecs_launch_type  = "FARGATE"

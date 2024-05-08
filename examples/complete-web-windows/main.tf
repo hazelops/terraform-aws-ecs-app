@@ -85,8 +85,7 @@ module "web_complete" {
   name                  = "app"
   app_type              = "web"
   env                   = var.env
-  namespace             = var.namespace
-  
+
   # Containers
   cpu                     = 1024
   memory                  = 2048

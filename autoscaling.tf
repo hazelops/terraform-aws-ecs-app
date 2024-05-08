@@ -17,7 +17,7 @@ module "autoscaling" {
 
   create                  = var.ecs_launch_type == "EC2" ? true : false
   create_launch_template  = var.ecs_launch_type == "EC2" ? true : false
-  
+
   name                  = local.name
   launch_template_name  = local.name
 
@@ -29,13 +29,13 @@ module "autoscaling" {
 
   # EC2 Instance Profile
   create_iam_instance_profile   = var.ecs_launch_type == "EC2" ? var.create_iam_instance_profile : false
-  iam_instance_profile_name     = "${var.env}-${var.namespace}"
-  iam_role_name                 = "${var.env}-${var.namespace}-ec2-profile-role"
+  iam_instance_profile_name     = "${var.env}-${var.name}"
+  iam_role_name                 = "${var.env}-${var.name}-ec2-profile-role"
   iam_role_path                 = "/ec2/"
   iam_role_policies = {
     AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   }
-  
+
   block_device_mappings = [
     {
       # Root volume
