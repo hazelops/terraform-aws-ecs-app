@@ -533,7 +533,7 @@ variable "root_block_device_type" {
 
   validation {
     condition     = can(regex("io1|io2|gp2|gp3", var.root_block_device_type))
-    error_message = "The root_block_device_type value must be a valid type: io1, io2, gp2, gp3 (https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html)"
+    error_message = "The root_block_device_type value must be a valid type: io1, io2, gp2, gp3 (https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html)."
   }
 }
 
