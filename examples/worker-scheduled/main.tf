@@ -1,13 +1,3 @@
-# Versions
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-    }
-  }
-  required_version = ">= 1.0"
-}
-
 # Main
 module "vpc" {
   source  = "registry.terraform.io/terraform-aws-modules/vpc/aws"

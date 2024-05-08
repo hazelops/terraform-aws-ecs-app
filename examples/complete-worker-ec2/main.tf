@@ -1,13 +1,3 @@
-# Versions
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-    }
-  }
-  required_version = ">= 1.0"
-}
-
 # Data
 data "aws_ami" "amazon_linux_ecs_generic" {
   most_recent = true
