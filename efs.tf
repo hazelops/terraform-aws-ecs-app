@@ -1,6 +1,6 @@
 module "efs" {
   source  = "registry.terraform.io/cloudposse/efs/aws"
-  version = "~> 0.31"
+  version = "~> 0.36"
 
   enabled         = var.efs_enabled && var.efs_share_create ? true : false
   stage           = var.env
