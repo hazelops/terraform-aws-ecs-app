@@ -6,7 +6,7 @@ Create and manage AWS ECS application in a clean abstracted way.
 This module is actively maintained and is covered by multiple end-to-end [tests](./test/examples_complete-web_test.go) to prevent regressions.
 
 ## Features
-_This module is feature-rich, with sane [defaults](./variables.tf). _Some of the features are:_
+_This module is feature-rich, with sane [defaults](./variables.tf). Some of the features are:_
 - [Web application](./examples/complete-web/main.tf) (ALB + ACM + R53) 
 - [Worker application to Fargate](./examples/complete-worker/main.tf) and [Worker application to EC2](./examples/complete-worker-ec2/main.tf) (no ALB)
 - [TCP application](./examples/complete-tcp-app/main.tf) (no ALB)
