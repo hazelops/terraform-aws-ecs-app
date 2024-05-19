@@ -1,5 +1,5 @@
 # Terraform AWS ECS App Module
-[![e2e tests](https://github.com/hazelops/terraform-aws-ecs-app/actions/workflows/run.e2e-tests.yml/badge.svg)](/actions/workflows/run.e2e-tests.yml)
+[![e2e tests](https://github.com/hazelops/terraform-aws-ecs-app/actions/workflows/run.e2e-tests.yml/badge.svg)](https://github.com/hazelops/terraform-aws-ecs-app/actions/workflows/run.e2e-tests.yml)
 
 Create and manage AWS ECS application in a clean abstracted way.
 
