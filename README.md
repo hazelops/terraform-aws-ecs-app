@@ -1,7 +1,35 @@
 # Terraform AWS ECS App Module
-Terraform module to create and manage AWS ECS application.
+![e2e tests](https://github.com/hazelops/terraform-aws-ecs-app/actions/workflows/run.e2e-tests.yml/badge.svg)
+
+Create and manage AWS ECS application in a clean abstracted way.
+
+This module is actively maintained and is covered by multiple end-to-end [tests](./test/examples_complete-web_test.go) to prevent regressions.
+
+## Features
+_This module is feature-rich, with sane [defaults](./variables.tf). _Some of the features are:_
+- [Web application](./examples/complete-web/main.tf) (ALB + ACM + R53) 
+- [Worker application to Fargate](./examples/complete-worker/main.tf) and [Worker application to EC2](./examples/complete-worker-ec2/main.tf) (no ALB)
+- [TCP application](./examples/complete-tcp-app/main.tf) (no ALB)
+- [Environment variables](#input_environment) (SSM parameters)
+- [ECR repo Management](#input_ecr_repo_create) 
+- [Standardized naming convention for all resources](#input_name)
+- [Deployment via Terraform & via external tool](#input_ecs_service_deployed) (ecs-deploy or ize)
+- [Datadog integration](#input_datadog_enabled)
+- [Autoscale](#input_autoscale_enabled) ([scheduled](#input_autoscale_scheduled_up) or [target-based](#input_autoscale_target_value_cpu))
+- [ECS Launch Type (EC2 or Fargate)](#input_ecs_launch_type)
+- [EIP assignment](#input_ec2_eip_enabled)
+- Resource configuration ([CPU](#input_cpu)/[MEM](#input_mem))
+- EFS ([mount](#input_efs_mount_point) and/or [share management](#input_efs_share_create))
+- [GPU-based instance](#input_gpu)
+- [Multiple ECS network modes](#input_ecs_network_mode)
+- Root block device configuration ([size](#input_root_block_device_size), [type](#input_root_block_device_type))
+- [Automatic Nginx Proxy for Web Applications](#inputs_web_proxy_enabled)
+- [Firelens / Datadog log driver](#input_firelens_ecs_log_enabled)
+- [ECS Exec](#input_ecs_exec_enabled) (console into the container)
+- [tmpfs configuration](#input_tmpfs_enabled)
 
 ## Usage
+This is a minimal example which demostrates simplicity of the module:
 ```hcl
 module "api" {
   source     = "registry.terraform.io/hazelops/ecs-app/aws"
@@ -32,7 +60,7 @@ See [examples](./examples) for more usage options.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1 |
 
 ## Providers
 
@@ -49,10 +77,10 @@ See [examples](./examples) for more usage options.
 | <a name="module_autoscaling"></a> [autoscaling](#module\_autoscaling) | terraform-aws-modules/autoscaling/aws | ~> 6.0 |
 | <a name="module_datadog"></a> [datadog](#module\_datadog) | registry.terraform.io/hazelops/ecs-datadog-agent/aws | ~> 3.3 |
 | <a name="module_ecr"></a> [ecr](#module\_ecr) | registry.terraform.io/hazelops/ecr/aws | ~> 1.1 |
-| <a name="module_efs"></a> [efs](#module\_efs) | registry.terraform.io/cloudposse/efs/aws | ~> 0.31 |
+| <a name="module_efs"></a> [efs](#module\_efs) | registry.terraform.io/cloudposse/efs/aws | ~> 0.36 |
 | <a name="module_nginx"></a> [nginx](#module\_nginx) | registry.terraform.io/hazelops/ecs-nginx-proxy/aws | ~> 1.0 |
 | <a name="module_route_53_health_check"></a> [route\_53\_health\_check](#module\_route\_53\_health\_check) | registry.terraform.io/hazelops/route53-healthcheck/aws | ~> 1.0 |
-| <a name="module_service"></a> [service](#module\_service) | ./ecs-modules/ecs-service | n/a |
+| <a name="module_service"></a> [service](#module\_service) | ./modules/ecs-service | n/a |
 
 ## Resources
 
@@ -160,7 +188,7 @@ See [examples](./examples) for more usage options.
 | <a name="input_port_mappings"></a> [port\_mappings](#input\_port\_mappings) | List of ports to open from a service | `any` | `[]` | no |
 | <a name="input_private_subnets"></a> [private\_subnets](#input\_private\_subnets) | VPC Private subnets to place ECS resources | `list(any)` | `[]` | no |
 | <a name="input_proxy_docker_container_command"></a> [proxy\_docker\_container\_command](#input\_proxy\_docker\_container\_command) | Proxy docker container CMD | `list(string)` | <pre>[<br>  "nginx",<br>  "-g",<br>  "daemon off;"<br>]</pre> | no |
-| <a name="input_proxy_docker_entrypoint"></a> [proxy\_docker\_entrypoint](#input\_proxy\_docker\_entrypoint) | Proxy docker container entrypoint | `string` | <pre>[<br>  "/docker-entrypoint.sh"<br>]</pre> | no |
+| <a name="input_proxy_docker_entrypoint"></a> [proxy\_docker\_entrypoint](#input\_proxy\_docker\_entrypoint) | Proxy docker container entrypoint | `list(string)` | <pre>[<br>  "/docker-entrypoint.sh"<br>]</pre> | no |
 | <a name="input_proxy_docker_image_name"></a> [proxy\_docker\_image\_name](#input\_proxy\_docker\_image\_name) | Nginx proxy docker image name | `string` | `"nginx"` | no |
 | <a name="input_public"></a> [public](#input\_public) | It's publicity accessible application | `bool` | `true` | no |
 | <a name="input_public_ecs_service"></a> [public\_ecs\_service](#input\_public\_ecs\_service) | It's publicity accessible service | `bool` | `false` | no |
@@ -194,16 +222,16 @@ See [examples](./examples) for more usage options.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_alb_arn"></a> [alb\_arn](#output\_alb\_arn) | n/a |
-| <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | n/a |
-| <a name="output_alb_dns_zone"></a> [alb\_dns\_zone](#output\_alb\_dns\_zone) | n/a |
-| <a name="output_cloudwatch_event_rule_id"></a> [cloudwatch\_event\_rule\_id](#output\_cloudwatch\_event\_rule\_id) | n/a |
+| <a name="output_alb_arn"></a> [alb\_arn](#output\_alb\_arn) | ARN of the ALB (if ALB is created) |
+| <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | Name of the ALB DNS record (if ALB is created) |
+| <a name="output_alb_dns_zone"></a> [alb\_dns\_zone](#output\_alb\_dns\_zone) | Zone ID of the ALB DNS record (if ALB is created) |
+| <a name="output_cloudwatch_event_rule_id"></a> [cloudwatch\_event\_rule\_id](#output\_cloudwatch\_event\_rule\_id) | ID of the Cloudwatch event rule for ECS Scheduled Task |
 | <a name="output_cloudwatch_log_group"></a> [cloudwatch\_log\_group](#output\_cloudwatch\_log\_group) | n/a |
-| <a name="output_ec2_dns_name"></a> [ec2\_dns\_name](#output\_ec2\_dns\_name) | n/a |
-| <a name="output_efs_mount_target"></a> [efs\_mount\_target](#output\_efs\_mount\_target) | n/a |
-| <a name="output_eips"></a> [eips](#output\_eips) | n/a |
-| <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | n/a |
-| <a name="output_r53_lb_dns_name"></a> [r53\_lb\_dns\_name](#output\_r53\_lb\_dns\_name) | n/a |
+| <a name="output_ec2_dns_name"></a> [ec2\_dns\_name](#output\_ec2\_dns\_name) | Public DNS name of the EC2 instance (if EC2 is used) |
+| <a name="output_efs_mount_target"></a> [efs\_mount\_target](#output\_efs\_mount\_target) | DNS name of the EFS mount target (if EFS is created) |
+| <a name="output_eips"></a> [eips](#output\_eips) | List of EIPs associated with the EC2 instances (if EC2 is used) |
+| <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | Public IP of the EC2 instance (if EC2 is used) |
+| <a name="output_r53_lb_dns_name"></a> [r53\_lb\_dns\_name](#output\_r53\_lb\_dns\_name) | DNS name of the record that is attached to the ALB (if app type is web or tcp-ap) |
 | <a name="output_this_target_group_arn"></a> [this\_target\_group\_arn](#output\_this\_target\_group\_arn) | n/a |
 | <a name="output_this_task_definition_arn"></a> [this\_task\_definition\_arn](#output\_this\_task\_definition\_arn) | n/a |
 <!-- END_TF_DOCS -->
