@@ -16,7 +16,7 @@ module "route_53_health_check" {
   count = var.route53_health_check_enabled ? 1 : 0
 
   source  = "registry.terraform.io/hazelops/route53-healthcheck/aws"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   enabled                        = var.route53_health_check_enabled
   env                            = var.env
