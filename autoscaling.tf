@@ -50,7 +50,7 @@ module "autoscaling" {
   ]
 
   target_group_arns = var.app_type == "web" || var.app_type == "tcp-app" ? module.alb[0].target_group_arns : []
-  user_data         = var.ecs_launch_type == "EC2" ? base64encode(data.template_file.asg_ecs_ec2_user_data.rendered) : null
+  user_data         = var.ecs_launch_type == "EC2" ? base64encode(local.asg_ecs_ec2_user_data) : null
 
   vpc_zone_identifier       = var.public_ecs_service ? var.public_subnets : var.private_subnets
   health_check_type         = var.autoscaling_health_check_type

@@ -198,4 +198,14 @@ locals {
       }
     }
   ]
+
+  asg_ecs_ec2_user_data = templatefile(
+    "${path.module}/templates/ecs_ec2_user_data.sh.tpl",
+    {
+      ecs_cluster_name  = local.ecs_cluster_name
+      service           = local.name
+      env               = var.env
+      ec2_service_group = var.ec2_service_group
+      ec2_eip_enabled   = tostring(var.ec2_eip_enabled)
+    }, )
 }
