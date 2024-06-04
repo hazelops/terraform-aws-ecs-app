@@ -65,13 +65,13 @@ func copyFileContentsCompleteWorkerEc2(src, dst string) (err error) {
 	return
 }
 
-func cleanupExamplesCompleteWorkerEc2(t *testing.T, terraformOptions *terraform.Options, tempTestFolder string) {
+func cleanupExamplesWorkerEc2(t *testing.T, terraformOptions *terraform.Options, tempTestFolder string) {
 	terraform.Destroy(t, terraformOptions)
 	os.RemoveAll(tempTestFolder)
 }
 
 // Test the Terraform module in examples/complete using Terratest.
-func TestExamplesCompleteWorkerEc2(t *testing.T) {
+func TestExamplesWorkerEc2(t *testing.T) {
 	t.Parallel()
 	// randID := strings.ToLower(random.UniqueId())
 	// attributes := []string{randID}
@@ -110,7 +110,7 @@ func TestExamplesCompleteWorkerEc2(t *testing.T) {
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
-	defer cleanupExamplesCompleteWorkerEc2(t, terraformOptions, tempTestFolder)
+	defer cleanupExamplesWorkerEc2(t, terraformOptions, tempTestFolder)
 
 	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
 	terraform.InitAndApply(t, terraformOptions)
