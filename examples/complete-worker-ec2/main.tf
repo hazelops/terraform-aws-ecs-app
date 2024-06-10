@@ -75,13 +75,13 @@ resource "aws_key_pair" "root" {
 module "ecs" {
   source       = "registry.terraform.io/terraform-aws-modules/ecs/aws"
   version      = "~> 4.0"
-  cluster_name = "${var.env}-${var.namespace}"
+  cluster_name = "${var.env}-${var.namespace}-worker-ec2"
 }
 
 module "worker_complete" {
   source = "../.."
 
-  name     = "worker"
+  name     = "worker-ec2"
   app_type = "worker"
   env      = var.env
 

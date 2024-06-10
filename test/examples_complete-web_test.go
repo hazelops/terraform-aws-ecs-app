@@ -128,17 +128,17 @@ func TestExamplesCompleteWeb(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	cloudWatchLogGroup := terraform.Output(t, terraformOptions, "cloudwatch_log_group")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples3-app", cloudWatchLogGroup)
+	assert.Equal(t, "e2e03-app", cloudWatchLogGroup)
 
 	// Run `terraform output` to get the value of an output variable
 	ecsClusterName := terraform.Output(t, terraformOptions, "ecs_cluster_name")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples3-tftest-app", ecsClusterName)
+	assert.Equal(t, "e2e03-tftest-app", ecsClusterName)
 
 	// Run `terraform output` to get the value of an output variable
 	r53AppDnsName := terraform.Output(t, terraformOptions, "r53_lb_dns_name")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "app.examples3.nutcorp.net", r53AppDnsName)
+	assert.Equal(t, "app.e2e03.nutcorp.net", r53AppDnsName)
 	/*
 		// Run `terraform output` to get the value of an output variable
 		proxyEndpoint := terraform.Output(t, terraformOptions, "proxy_endpoint")
