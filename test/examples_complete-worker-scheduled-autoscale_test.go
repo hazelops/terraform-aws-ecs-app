@@ -128,12 +128,12 @@ func TestExamplesWorkerAutoScheduled(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	cloudWatchLogGroup := terraform.Output(t, terraformOptions, "cloudwatch_log_group")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples4-worker-scheduled-auto", cloudWatchLogGroup)
+	assert.Equal(t, "e2e05-worker-scheduled-auto", cloudWatchLogGroup)
 
 	// Run `terraform output` to get the value of an output variable
 	ecsClusterName := terraform.Output(t, terraformOptions, "ecs_cluster_name")
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, "examples4-tftest-worker-scheduled-auto", ecsClusterName)
+	assert.Equal(t, "e2e05-tftest-worker-scheduled-auto", ecsClusterName)
 
 	/*
 		// Run `terraform output` to get the value of an output variable
