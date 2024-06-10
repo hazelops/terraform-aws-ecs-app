@@ -8,7 +8,7 @@ module "alb" {
   load_balancer_type = var.app_type == "web" ? "application" : "network"
   internal           = var.public ? false : true
   vpc_id             = var.vpc_id
-  security_groups    = var.alb_security_groups
+  security_groups    = len(var.alb_security_groups) > 0 ? var.alb_security_groups : var.security_groups
   subnets            = var.public ? var.public_subnets : var.private_subnets
   idle_timeout       = var.alb_idle_timeout
 

@@ -158,7 +158,7 @@ variable "assign_public_ip" {
 
 variable "alb_security_groups" {
   type        = list(any)
-  description = "Security groups to assign to ALB"
+  description = "Security groups to assign to ALB. If not specified then a value from security_groups will be used here."
   default     = []
 }
 
