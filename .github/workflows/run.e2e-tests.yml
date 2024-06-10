@@ -69,7 +69,7 @@ jobs:
         run: ssh-keygen -q -f ~/.ssh/id_rsa
 
       - name: IZE setup
-        uses: hazelops/action-setup-ize@0.0.1
+        uses: hazelops/action-setup-ize@1.0.1
         with:
           version: ${{ env.IZE_VERSION }}
 
