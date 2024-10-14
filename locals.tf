@@ -94,13 +94,14 @@ locals {
           "readOnly"      = null
         }
 
+        # We are passing the config only if we are not creating the share via the module.
         efs_volume_configuration = [
           {
             file_system_id : var.efs_share_create ? module.efs.id : var.efs_file_system_id
             root_directory : var.efs_root_directory
             transit_encryption : "ENABLED"
             transit_encryption_port : 2999
-            authorization_config = {}
+            authorization_config : var.efs_share_create ? {} : var.efs_authorization_config # TODO: Upgrade CloudPosse module and build the config here.
           }
         ]
       }
