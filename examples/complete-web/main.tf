@@ -106,9 +106,10 @@ module "web_complete" {
   tls_cert_arn = local.tls_cert_arn
 
   # EFS settings
-  efs_enabled     = false
+  efs_enabled     = true
   efs_mount_point = "/mnt/efs"
   efs_root_directory = "/"
+  efs_share_create = true
 
   # Network
   vpc_id           = module.vpc.vpc_id

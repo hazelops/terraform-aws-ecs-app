@@ -609,6 +609,31 @@ variable "efs_root_directory" {
   default     = "/"
 }
 
+variable "efs_authorization_config" {
+  type = object({})
+  description = "EFS authorization config"
+  default = {}
+}
+
+variable "efs_access_points" {
+  type = object({})
+  description = "EFS access points"
+  default = {
+    "data" = {
+      posix_user = {
+        gid            = "1001"
+        uid            = "5000"
+        secondary_gids = "1002,1003"
+      }
+      creation_info = {
+        gid         = "1001"
+        uid         = "5000"
+        permissions = "0755"
+      }
+    }
+  }
+}
+
 variable "ecs_service_deployed" {
   type        = bool
   description = "This service resource doesn't have task definition lifecycle policy, so terraform is used to deploy it (instead of ecs cli or ize)"

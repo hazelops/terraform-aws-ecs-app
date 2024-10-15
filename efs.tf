@@ -8,6 +8,7 @@ module "efs" {
   region  = data.aws_region.current.name
   vpc_id  = var.vpc_id
   security_groups = var.security_groups
+  access_points = var.efs_access_points
 
   # This is a workaround for 2-zone legacy setups
   subnets = length(regexall("legacy", var.env)) > 0 ? [
