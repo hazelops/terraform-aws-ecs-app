@@ -610,9 +610,15 @@ variable "efs_root_directory" {
 }
 
 variable "efs_authorization_config" {
-  type = object({})
+  type = object({
+    access_point_id = string
+    iam             = string
+  })
   description = "EFS authorization config"
-  default = {}
+  default = {
+    access_point_id = null
+    iam             = "ENABLED"
+  }
 }
 
 variable "efs_access_points" {
