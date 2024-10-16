@@ -73,6 +73,16 @@ module "worker_complete" {
   docker_container_command = ["echo", "command-output"]
   deployment_minimum_healthy_percent = 0
 
+  # EFS settings (external)
+  efs_enabled     = true
+  efs_file_system_id = module.efs_data.id
+  efs_mount_point = "/mnt/efs"
+  efs_root_directory = "/"
+  efs_authorization_config = {
+    access_point_id = module.efs_data.access_points.posix_example.id
+    iam             = "ENABLED"
+  }
+
   # Network
   vpc_id          = module.vpc.vpc_id
   private_subnets = module.vpc.private_subnets
