@@ -2,7 +2,7 @@ resource "aws_eip" "autoscaling" {
   # If ec2_eip_count is set, use that number for number of EIPs, otherwise use var.max_size + 1 (but that might not be the best during downscaling and deletion of EIPs
   count            = var.ec2_eip_enabled ? (var.ec2_eip_count > 0 ? var.ec2_eip_count : var.max_size + 1) : 0
   public_ipv4_pool = "amazon"
-
+  domain           = "vpc"
   tags = {
     Name    = "${local.name}-${count.index + 1}"
     env     = var.env
