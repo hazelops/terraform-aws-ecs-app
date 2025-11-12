@@ -1,6 +1,19 @@
 # Terraform AWS ECS App Module
 [![e2e tests](https://github.com/hazelops/terraform-aws-ecs-app/actions/workflows/run.e2e-tests.yml/badge.svg)](https://github.com/hazelops/terraform-aws-ecs-app/actions/workflows/run.e2e-tests.yml)
 
+## Version 3.0 - Breaking Changes
+
+**This version requires AWS Provider v6.0+**
+
+Key changes:
+- Minimum Terraform version: `>= 1.5.7`
+- Minimum AWS Provider version: `>= 6.0`
+- Updated external modules: ALB v10.x, Autoscaling v9.x
+
+See [Migration Guide](./docs/MIGRATION-v3.md) for upgrade instructions.
+
+---
+
 Create and manage AWS ECS application in a clean abstracted way.
 
 This module is actively maintained and is covered by multiple end-to-end [tests](./test/examples_complete-web_test.go) to prevent regressions.
@@ -60,26 +73,27 @@ See [examples](./examples) for more usage options.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.47.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.0 |
 | <a name="provider_template"></a> [template](#provider\_template) | 2.2.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_alb"></a> [alb](#module\_alb) | registry.terraform.io/terraform-aws-modules/alb/aws | ~> 7.0 |
-| <a name="module_autoscaling"></a> [autoscaling](#module\_autoscaling) | terraform-aws-modules/autoscaling/aws | ~> 6.0 |
+| <a name="module_alb"></a> [alb](#module\_alb) | registry.terraform.io/terraform-aws-modules/alb/aws | ~> 10.2 |
+| <a name="module_autoscaling"></a> [autoscaling](#module\_autoscaling) | terraform-aws-modules/autoscaling/aws | ~> 9.0 |
 | <a name="module_datadog"></a> [datadog](#module\_datadog) | registry.terraform.io/hazelops/ecs-datadog-agent/aws | ~> 3.3 |
-| <a name="module_ecr"></a> [ecr](#module\_ecr) | registry.terraform.io/hazelops/ecr/aws | ~> 1.1 |
+| <a name="module_ecr"></a> [ecr](#module\_ecr) | registry.terraform.io/hazelops/ecr/aws | ~> 2.0 |
 | <a name="module_efs"></a> [efs](#module\_efs) | registry.terraform.io/cloudposse/efs/aws | ~> 0.36 |
 | <a name="module_nginx"></a> [nginx](#module\_nginx) | registry.terraform.io/hazelops/ecs-nginx-proxy/aws | ~> 1.0 |
-| <a name="module_route_53_health_check"></a> [route\_53\_health\_check](#module\_route\_53\_health\_check) | registry.terraform.io/hazelops/route53-healthcheck/aws | ~> 1.0 |
+| <a name="module_route_53_health_check"></a> [route\_53\_health\_check](#module\_route\_53\_health\_check) | registry.terraform.io/hazelops/route53-healthcheck/aws | ~> 2.0 |
 | <a name="module_service"></a> [service](#module\_service) | ./modules/ecs-service | n/a |
 
 ## Resources

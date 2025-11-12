@@ -103,15 +103,16 @@ module "service" {
   )
 
 
-  # TODO: instead of hardcoding the index, better use dynamic lookup by a canonical name
-  target_group_arn = var.app_type == "web" && length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : null
+  # ALB v10+ target_groups is a map, not an array
+  target_group_arn = var.app_type == "web" && length(module.alb) >= 1 ? module.alb[0].target_groups["tg-0"].arn : null
 
   port_mappings = jsondecode(var.app_type == "web" ? jsonencode([
     {
       container_name   = var.web_proxy_enabled ? "nginx" : var.name
       container_port   = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
       host_port        = var.ecs_network_mode == "awsvpc" ? (var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port) : var.docker_host_port
-      target_group_arn = length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : ""
+      # ALB v10+ target_groups is a map, not an array
+      target_group_arn = length(module.alb) >= 1 ? module.alb[0].target_groups["tg-0"].arn : ""
     }
   ]) : (var.app_type == "tcp-app" ? jsonencode(local.ecs_service_tcp_port_mappings) : jsonencode(var.port_mappings)))
 
@@ -130,8 +131,9 @@ resource "aws_route53_record" "alb" {
   type    = "A"
 
   alias {
-    name                   = module.alb[0].lb_dns_name
-    zone_id                = module.alb[0].lb_zone_id
+    # ALB v10+ changed output names from lb_* to just the attribute names
+    name                   = module.alb[0].dns_name
+    zone_id                = module.alb[0].zone_id
     evaluate_target_health = true
   }
 }

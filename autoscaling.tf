@@ -12,19 +12,19 @@ resource "aws_eip" "autoscaling" {
 
 module "autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
-  version = "~> 6.0"
+  version = "~> 9.0"
 
   create                 = var.ecs_launch_type == "EC2" ? true : false
   create_launch_template = var.ecs_launch_type == "EC2" ? true : false
 
-  name = local.name
+  name                 = local.name
   launch_template_name = local.name
 
   # Auto scaling group
   image_id        = var.image_id
   instance_type   = var.instance_type
   security_groups = var.security_groups
-  key_name = var.key_name
+  key_name        = var.key_name
 
   # EC2 Instance Profile
   create_iam_instance_profile = var.ecs_launch_type == "EC2" ? var.create_iam_instance_profile : false
@@ -49,8 +49,16 @@ module "autoscaling" {
     }
   ]
 
-  target_group_arns = var.app_type == "web" || var.app_type == "tcp-app" ? module.alb[0].target_group_arns : []
-  user_data         = var.ecs_launch_type == "EC2" ? base64encode(local.asg_ecs_ec2_user_data) : null
+  # Autoscaling v9+ uses traffic_source_attachments instead of target_group_arns
+  traffic_source_attachments = var.app_type == "web" || var.app_type == "tcp-app" ? {
+    for idx, arn in values(module.alb[0].target_groups) :
+    "tg-${idx}" => {
+      traffic_source_identifier = arn.arn
+      traffic_source_type       = "elbv2"
+    }
+  } : null
+
+  user_data = var.ecs_launch_type == "EC2" ? base64encode(local.asg_ecs_ec2_user_data) : null
 
   vpc_zone_identifier       = var.public_ecs_service ? var.public_subnets : var.private_subnets
   health_check_type         = var.autoscaling_health_check_type
@@ -59,8 +67,8 @@ module "autoscaling" {
   desired_capacity          = var.desired_capacity
   wait_for_capacity_timeout = 0
 
-  create_schedule = var.create_schedule
-  schedules       = var.schedules
+  # Autoscaling v9+ removed create_schedule variable, schedules are created if the map is not empty
+  schedules = var.schedules
 
   tags = {
     env            = var.env
@@ -78,7 +86,7 @@ resource "aws_iam_role_policy" "ec2_auto_eip" {
 
 
   policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
         Action = [

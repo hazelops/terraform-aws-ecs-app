@@ -2,7 +2,7 @@ locals {
   name             = "${var.env}-${var.name}"
   ecs_service_name = var.ecs_service_name != "" ? var.ecs_service_name : "${var.env}-${var.name}"
   ecs_cluster_name = var.ecs_cluster_name
-  ecs_cluster_arn  = length(var.ecs_cluster_arn) != "" ? var.ecs_cluster_arn : "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${local.ecs_cluster_name}"
+  ecs_cluster_arn  = length(var.ecs_cluster_arn) != "" ? var.ecs_cluster_arn : "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${local.ecs_cluster_name}"
   ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : var.name
   name_prefix      = "${substr(var.name, 0, 5)}-"
   domain_names     = var.root_domain_name != "" ? concat([
@@ -109,38 +109,56 @@ locals {
       (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
   )
 
-  alb_http_tcp_listeners = var.app_type == "tcp-app" ? [
-    for index, port_mapping in var.port_mappings :
-    {
-      port               = port_mapping["host_port"]
-      protocol           = "TCP"
-      target_group_index = index
-    } if !lookup(port_mapping, "tls", false)
-  ] : [
-    {
-      port               = var.http_port
-      protocol           = "HTTP"
-      target_group_index = 0
+  # ALB v10+ uses a listeners map instead of separate http_tcp_listeners and https_listeners arrays
+  # Use locals to avoid conditional type inconsistency
+  _http_listener = {
+    http = {
+      port     = var.http_port
+      protocol = "HTTP"
+      forward = {
+        target_group_key = "tg-0"
+      }
     }
-  ]
+  }
 
-  # In case app type is "tcp-app" and port_mapping has "tls" config and is true we use tcp over tls.
-  alb_https_listeners = var.app_type == "tcp-app" ? [
-    for index, port_mapping in var.port_mappings :
-    {
-      port               = port_mapping["host_port"]
-      protocol           = "TLS"
-      certificate_arn    = var.tls_cert_arn
-      target_group_index = index
-    } if lookup(port_mapping, "tls", false)
-  ] : [
-    {
-      port               = 443
-      protocol           = "HTTPS"
-      certificate_arn    = var.tls_cert_arn
-      target_group_index = 0
+  _https_listener = var.https_enabled ? {
+    https = {
+      port            = 443
+      protocol        = "HTTPS"
+      certificate_arn = var.tls_cert_arn
+      forward = {
+        target_group_key = "tg-0"
+      }
     }
-  ]
+  } : {}
+
+  _tcp_listeners = {
+    for index, port_mapping in var.port_mappings :
+    "tcp-${port_mapping["host_port"]}" => {
+      port     = port_mapping["host_port"]
+      protocol = "TCP"
+      forward = {
+        target_group_key = "tg-${index}"
+      }
+    } if !lookup(port_mapping, "tls", false)
+  }
+
+  _tls_listeners = var.https_enabled ? {
+    for index, port_mapping in var.port_mappings :
+    "tls-${port_mapping["host_port"]}" => {
+      port            = port_mapping["host_port"]
+      protocol        = "TLS"
+      certificate_arn = var.tls_cert_arn
+      forward = {
+        target_group_key = "tg-${index}"
+      }
+    } if lookup(port_mapping, "tls", false)
+  } : {}
+
+  alb_listeners = merge(
+    var.app_type == "tcp-app" ? local._tcp_listeners : local._http_listener,
+    var.app_type == "tcp-app" ? local._tls_listeners : local._https_listener
+  )
 
   ecs_service_tcp_port_mappings = [
     for index, port_mapping in var.port_mappings :
@@ -148,19 +166,21 @@ locals {
       container_name   = var.name
       container_port   = port_mapping["container_port"]
       host_port        = port_mapping["host_port"]
-      target_group_arn = length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[index] : ""
+      # ALB v10+ target_groups is a map, not an array
+      target_group_arn = length(module.alb) >= 1 ? module.alb[0].target_groups["tg-${index}"].arn : ""
     }
   ]
 
-  target_groups_web = [
-    {
+  # ALB v10+ uses a target_groups map with named keys instead of arrays
+  target_groups_web = {
+    "tg-0" = {
       name_prefix          = local.name_prefix
       backend_protocol     = "HTTP"
       backend_port         = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
       target_type          = var.ecs_launch_type == "EC2" ? "instance" : "ip"
       deregistration_delay = var.alb_deregistration_delay
-      preserve_client_ip = null
-      # This is specified for compatibility with the tcp target groups. It's not actually used in a lookup.
+      preserve_client_ip   = null
+      create_attachment    = false  # ECS service handles target registration automatically
 
       health_check = {
         enabled             = true
@@ -174,17 +194,18 @@ locals {
         protocol            = "HTTP"
       }
     }
-  ]
+  }
 
-  target_groups_tcp = [
-    for port_mapping in var.port_mappings :
-    {
+  target_groups_tcp = {
+    for index, port_mapping in var.port_mappings :
+    "tg-${index}" => {
       name_prefix          = local.name_prefix
       backend_protocol     = "TCP"
       backend_port         = port_mapping["container_port"]
       target_type          = var.ecs_launch_type == "EC2" ? "instance" : "ip"
       deregistration_delay = var.alb_deregistration_delay
       preserve_client_ip   = true
+      create_attachment    = false  # ECS service handles target registration automatically
 
       health_check = {
         enabled             = true
@@ -198,7 +219,7 @@ locals {
         protocol            = "TCP"
       }
     }
-  ]
+  }
 
   asg_ecs_ec2_user_data = templatefile(
     "${path.module}/templates/ecs_ec2_user_data.sh.tpl",

@@ -66,7 +66,7 @@ resource "aws_service_discovery_service" "this" {
     }
   }
   health_check_custom_config {
-    failure_threshold = 5
+    # failure_threshold removed - AWS no longer supports this parameter (always set to 1)
   }
 }
 

@@ -1,5 +1,6 @@
 output "this_target_group_arn" {
-  value = length(module.alb[*].target_group_arns) >= 1 ? module.alb[0].target_group_arns[0] : ""
+  # ALB v10+ target_groups is a map, not an array
+  value = length(module.alb) >= 1 ? module.alb[0].target_groups["tg-0"].arn : ""
 }
 
 output "this_task_definition_arn" {
@@ -17,17 +18,20 @@ output "cloudwatch_event_rule_id" {
 
 output "alb_dns_name" {
   description = "Name of the ALB DNS record (if ALB is created)"
-  value = length(module.alb[*].lb_dns_name) >= 1 ? module.alb[0].lb_dns_name : ""
+  # ALB v10+ changed output names from lb_* to just the attribute names
+  value = length(module.alb) >= 1 ? module.alb[0].dns_name : ""
 }
 
 output "alb_dns_zone" {
   description = "Zone ID of the ALB DNS record (if ALB is created)"
-  value = length(module.alb[*].lb_zone_id) >= 1 ? module.alb[0].lb_zone_id : ""
+  # ALB v10+ changed output names from lb_* to just the attribute names
+  value = length(module.alb) >= 1 ? module.alb[0].zone_id : ""
 }
 
 output "alb_arn" {
   description = "ARN of the ALB (if ALB is created)"
-  value = length(module.alb[*].lb_arn) >= 1 ? module.alb[0].lb_arn : ""
+  # ALB v10+ changed output names from lb_* to just the attribute names
+  value = length(module.alb) >= 1 ? module.alb[0].arn : ""
 }
 
 output "efs_mount_target" {
