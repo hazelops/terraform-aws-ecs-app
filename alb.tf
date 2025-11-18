@@ -12,6 +12,8 @@ module "alb" {
   subnets            = var.public ? var.public_subnets : var.private_subnets
   idle_timeout       = var.alb_idle_timeout
 
+  enable_deletion_protection = var.alb_enable_deletion_protection
+
 
 
   # ALB v10+ uses listeners map and target_groups map
