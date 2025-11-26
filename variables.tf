@@ -622,7 +622,7 @@ variable "efs_authorization_config" {
 }
 
 variable "efs_access_points" {
-  type = object({})
+  type        = object({})
   description = "EFS access points"
   default = {
     "data" = {
@@ -687,7 +687,7 @@ variable "ecs_exec_prompt_string" {
 variable "additional_container_definition_parameters" {
   type        = any
   description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
-  default = {}
+  default     = {}
 }
 
 
@@ -730,7 +730,7 @@ variable "create_schedule" {
 variable "schedules" {
   type        = map(any)
   description = "Map of autoscaling group schedule to create"
-  default = {}
+  default     = {}
 }
 
 variable "docker_labels" {
@@ -775,7 +775,7 @@ variable "alb_access_logs_s3prefix" {
   default     = ""
 }
 
-variable "alb_enable_deletion_protection" {
+variable "alb_deletion_protection_enabled" {
   type        = bool
   description = "If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer"
   default     = true

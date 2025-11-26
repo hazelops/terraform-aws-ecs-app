@@ -5,7 +5,7 @@ locals {
   ecs_cluster_arn  = length(var.ecs_cluster_arn) != "" ? var.ecs_cluster_arn : "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${local.ecs_cluster_name}"
   ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : var.name
   name_prefix      = "${substr(var.name, 0, 5)}-"
-  domain_names     = var.root_domain_name != "" ? concat([
+  domain_names = var.root_domain_name != "" ? concat([
     "${var.name}.${var.env}.${var.root_domain_name}"
   ], var.domain_names) : []
 
@@ -84,8 +84,8 @@ locals {
         }
       ]
     },
-  ] : [],
-      var.efs_enabled ? [
+    ] : [],
+    var.efs_enabled ? [
       {
         name = "efs",
         mount_point = {
@@ -106,7 +106,7 @@ locals {
         ]
       }
     ] : [],
-      (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
+    (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
   )
 
   # ALB v10+ uses a listeners map instead of separate http_tcp_listeners and https_listeners arrays
@@ -163,9 +163,9 @@ locals {
   ecs_service_tcp_port_mappings = [
     for index, port_mapping in var.port_mappings :
     {
-      container_name   = var.name
-      container_port   = port_mapping["container_port"]
-      host_port        = port_mapping["host_port"]
+      container_name = var.name
+      container_port = port_mapping["container_port"]
+      host_port      = port_mapping["host_port"]
       # ALB v10+ target_groups is a map, not an array
       target_group_arn = length(module.alb) >= 1 ? module.alb[0].target_groups["tg-${index}"].arn : ""
     }
@@ -175,12 +175,12 @@ locals {
   target_groups_web = {
     "tg-0" = {
       name_prefix          = local.name_prefix
-      backend_protocol     = "HTTP"
-      backend_port         = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
+      protocol             = "HTTP"
+      port                 = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
       target_type          = var.ecs_launch_type == "EC2" ? "instance" : "ip"
       deregistration_delay = var.alb_deregistration_delay
       preserve_client_ip   = null
-      create_attachment    = false  # ECS service handles target registration automatically
+      create_attachment    = false # ECS service handles target registration automatically
 
       health_check = {
         enabled             = true
@@ -200,23 +200,20 @@ locals {
     for index, port_mapping in var.port_mappings :
     "tg-${index}" => {
       name_prefix          = local.name_prefix
-      backend_protocol     = "TCP"
-      backend_port         = port_mapping["container_port"]
+      protocol             = "TCP"
+      port                 = port_mapping["container_port"]
       target_type          = var.ecs_launch_type == "EC2" ? "instance" : "ip"
       deregistration_delay = var.alb_deregistration_delay
       preserve_client_ip   = true
-      create_attachment    = false  # ECS service handles target registration automatically
+      create_attachment    = false # ECS service handles target registration automatically
 
       health_check = {
         enabled             = true
+        protocol            = "TCP"
+        port                = port_mapping["host_port"]
         interval            = var.alb_health_check_interval
-        path                = null
         healthy_threshold   = var.alb_health_check_healthy_threshold
         unhealthy_threshold = var.alb_health_check_unhealthy_threshold
-        timeout             = null
-        matcher             = null
-        port                = port_mapping["host_port"]
-        protocol            = "TCP"
       }
     }
   }
@@ -229,5 +226,5 @@ locals {
       env               = var.env
       ec2_service_group = var.ec2_service_group
       ec2_eip_enabled   = tostring(var.ec2_eip_enabled)
-    }, )
+  }, )
 }

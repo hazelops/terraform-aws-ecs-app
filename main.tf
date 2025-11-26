@@ -26,7 +26,7 @@ module "service" {
 
   web_proxy_enabled = var.web_proxy_enabled
   ecs_exec_enabled  = var.ecs_exec_enabled
-  subnets = var.public_ecs_service ? var.public_subnets : var.private_subnets
+  subnets           = var.public_ecs_service ? var.public_subnets : var.private_subnets
 
   # length(var.cloudwatch_schedule_expressions) > 1 means that it is cron task and desired_count should be 0
   cloudwatch_schedule_expressions = var.cloudwatch_schedule_expressions
@@ -44,7 +44,7 @@ module "service" {
   autoscaling_max_size          = var.autoscaling_max_size
 
   docker_container_entrypoint = var.docker_container_entrypoint
-  docker_container_command = var.docker_container_command
+  docker_container_command    = var.docker_container_command
 
   # If docker_image_name is set then use it, otherwise check if we are managing ECR repo on this module and use it's repository_url. Otherwise use docker_registry/name
   docker_image_name = var.docker_image_name != "" ? var.docker_image_name : var.ecr_repo_create ? module.ecr.repository_url : "${var.docker_registry}/${var.name}"
@@ -64,9 +64,9 @@ module "service" {
   tmpfs_size                                  = var.tmpfs_size
   tmpfs_container_path                        = var.tmpfs_container_path
   tmpfs_mount_options                         = var.tmpfs_mount_options
-  shared_memory_size = var.shared_memory_size
+  shared_memory_size                          = var.shared_memory_size
   # TODO: This should be expanded to read some standard labels from datadog module to configure JMX, http and other checks. per https://docs.datadoghq.com/agent/docker/integrations/?tab=docker#configuration
-  docker_labels                               = var.docker_labels
+  docker_labels = var.docker_labels
 
   resource_requirements = var.gpu > 0 ? [
     {
@@ -78,23 +78,23 @@ module "service" {
 
   sidecar_container_definitions = concat(
     var.sidecar_container_definitions,
-      var.web_proxy_enabled ? [
+    var.web_proxy_enabled ? [
       module.nginx.container_definition
     ] : [],
-      var.datadog_enabled ? [
+    var.datadog_enabled ? [
       module.datadog.container_definition
     ] : [],
-      var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
+    var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
   )
 
   docker_container_links = concat(
-      var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
+    var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
       "datadog-agent:datadog-agent"
-    ] : [])
+  ] : [])
 
   docker_container_depends_on = concat(
     # TODO: This needs to be pulled from datadog agent module output
-      var.datadog_enabled ? [
+    var.datadog_enabled ? [
       {
         containerName = "datadog-agent",
         condition     = "START"
@@ -108,9 +108,9 @@ module "service" {
 
   port_mappings = jsondecode(var.app_type == "web" ? jsonencode([
     {
-      container_name   = var.web_proxy_enabled ? "nginx" : var.name
-      container_port   = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
-      host_port        = var.ecs_network_mode == "awsvpc" ? (var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port) : var.docker_host_port
+      container_name = var.web_proxy_enabled ? "nginx" : var.name
+      container_port = var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port
+      host_port      = var.ecs_network_mode == "awsvpc" ? (var.web_proxy_enabled ? var.web_proxy_docker_container_port : var.docker_container_port) : var.docker_host_port
       # ALB v10+ target_groups is a map, not an array
       target_group_arn = length(module.alb) >= 1 ? module.alb[0].target_groups["tg-0"].arn : ""
     }
@@ -120,7 +120,7 @@ module "service" {
     APP_NAME      = var.name
     ENV           = var.env
     PROXY_ENABLED = var.web_proxy_enabled ? "true" : "false"
-  }
+    }
   )
 }
 
