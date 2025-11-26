@@ -55,13 +55,13 @@ locals {
         for param_name in var.app_secrets :
         {
           name      = param_name
-          valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_secret_path}/${param_name}"
+          valueFrom = "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_secret_path}/${param_name}"
         }
       ], [
         for param_name in var.global_secrets :
         {
           name      = replace(param_name, "/", "") != param_name ? element(split("/", param_name), 1) : param_name
-          valueFrom = "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_global_secret_path}/${param_name}"
+          valueFrom = "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_global_secret_path}/${param_name}"
         }
       ])
 
@@ -99,7 +99,7 @@ locals {
         "logDriver" = "awslogs",
         options = {
           "awslogs-group"         = aws_cloudwatch_log_group.this.name
-          "awslogs-region"        = data.aws_region.current.name
+          "awslogs-region"        = data.aws_region.current.region
           "awslogs-stream-prefix" = "main"
         }
       }
@@ -149,8 +149,8 @@ locals {
           "ssm:GetParameter*"
         ],
         "Resource" = [
-          "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_secret_path}/*",
-          "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_global_secret_path}/*"
+          "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_secret_path}/*",
+          "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_global_secret_path}/*"
         ]
       },
       {

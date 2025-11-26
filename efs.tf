@@ -5,7 +5,7 @@ module "efs" {
   enabled = var.efs_enabled && var.efs_share_create ? true : false
   stage   = var.env
   name    = var.name
-  region  = data.aws_region.current.name
+  region  = data.aws_region.current.region
   vpc_id  = var.vpc_id
   security_groups = var.security_groups
   access_points = var.efs_access_points
