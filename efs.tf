@@ -1,19 +1,34 @@
 module "efs" {
-  source  = "registry.terraform.io/cloudposse/efs/aws"
-  version = "~> 0.36"
+  source  = "registry.terraform.io/terraform-aws-modules/efs/aws"
+  version = "~> 2.0"
 
-  enabled = var.efs_enabled && var.efs_share_create ? true : false
-  stage   = var.env
-  name    = var.name
-  region  = data.aws_region.current.name
-  vpc_id  = var.vpc_id
-  security_groups = var.security_groups
-  access_points = var.efs_access_points
+  create = var.efs_enabled && var.efs_share_create ? true : false
 
-  # This is a workaround for 2-zone legacy setups
-  subnets = length(regexall("legacy", var.env)) > 0 ? [
-    var.private_subnets[0],
-    var.private_subnets[1]
-  ] : var.private_subnets
+  name = var.name
 
+  create_security_group = true
+  security_group_vpc_id = var.vpc_id
+
+  security_group_ingress_rules = {
+    for idx, sg_id in var.security_groups :
+    "from_sg_${idx}" => {
+      referenced_security_group_id = sg_id
+      description                  = "NFS from application security group"
+    }
+  }
+
+  # Mount targets
+  mount_targets = {
+    for idx, subnet_id in (
+      length(regexall("legacy", var.env)) > 0 ? [
+      var.private_subnets[0],
+      var.private_subnets[1]
+    ] : var.private_subnets
+    ) : "mount-${idx}" => {
+      subnet_id = subnet_id
+    }
+  }
+
+  # Access points
+  access_points = local.efs_access_points
 }

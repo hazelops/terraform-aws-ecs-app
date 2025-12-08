@@ -9,6 +9,29 @@ locals {
     "${var.name}.${var.env}.${var.root_domain_name}"
   ], var.domain_names) : []
 
+  # EFS access points - default configuration in terraform-aws-modules/efs format
+  efs_access_points_default = {
+    "data" = {
+      name = "data"
+      posix_user = {
+        gid            = 1001
+        uid            = 5000
+        secondary_gids = [1002, 1003]
+      }
+      root_directory = {
+        path = "/"
+        creation_info = {
+          owner_gid   = 1001
+          owner_uid   = 5000
+          permissions = "0755"
+        }
+      }
+    }
+  }
+
+  # Use provided var.efs_access_points or fall back to default
+  efs_access_points = length(var.efs_access_points) > 0 ? var.efs_access_points : local.efs_access_points_default
+
 
   # Datadog Environment Variables: https://docs.datadoghq.com/agent/guide/environment-variables/
   #                                https://docs.datadoghq.com/agent/docker/apm/?tab=linux#docker-apm-agent-environment-variables
@@ -101,7 +124,10 @@ locals {
             root_directory : var.efs_root_directory
             transit_encryption : "ENABLED"
             transit_encryption_port : 2999
-            authorization_config : var.efs_share_create ? {} : var.efs_authorization_config # TODO: Upgrade CloudPosse module and build the config here.
+            authorization_config : var.efs_share_create && length(module.efs.access_points) > 0 ? {
+              access_point_id = try(values(module.efs.access_points)[0].id, null)
+              iam             = "ENABLED"
+            } : (var.efs_share_create ? {} : var.efs_authorization_config)
           }
         ]
       }

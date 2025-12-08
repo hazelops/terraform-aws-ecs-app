@@ -622,22 +622,9 @@ variable "efs_authorization_config" {
 }
 
 variable "efs_access_points" {
-  type = object({})
-  description = "EFS access points"
-  default = {
-    "data" = {
-      posix_user = {
-        gid            = "1001"
-        uid            = "5000"
-        secondary_gids = "1002,1003"
-      }
-      creation_info = {
-        gid         = "1001"
-        uid         = "5000"
-        permissions = "0755"
-      }
-    }
-  }
+  type        = any
+  description = "EFS access points - map of access point definitions. See terraform-aws-modules/efs/aws documentation for format."
+  default     = {}
 }
 
 variable "ecs_service_deployed" {
