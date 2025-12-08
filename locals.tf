@@ -32,7 +32,6 @@ locals {
   # Use provided var.efs_access_points or fall back to default
   efs_access_points = length(var.efs_access_points) > 0 ? var.efs_access_points : local.efs_access_points_default
 
-
   # Datadog Environment Variables: https://docs.datadoghq.com/agent/guide/environment-variables/
   #                                https://docs.datadoghq.com/agent/docker/apm/?tab=linux#docker-apm-agent-environment-variables
   datadog_env_vars = var.datadog_enabled ? {
