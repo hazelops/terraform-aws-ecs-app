@@ -764,6 +764,6 @@ variable "alb_access_logs_s3prefix" {
 
 variable "alb_deletion_protection_enabled" {
   type        = bool
-  description = "If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer"
+  description = "If true, deletion protection of the load balancer will be enabled."
   default     = true
 }
