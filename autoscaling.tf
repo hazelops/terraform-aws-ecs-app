@@ -21,7 +21,7 @@ module "autoscaling" {
   launch_template_name = local.name
 
   # Auto scaling group
-  image_id        = var.image_id
+  image_id        = var.image_id != null ? var.image_id : try(data.aws_ami.this[0].id, null)
   instance_type   = var.instance_type
   security_groups = var.security_groups
   key_name = var.key_name
