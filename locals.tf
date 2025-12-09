@@ -111,7 +111,7 @@ locals {
 
   # ALB v10+ uses a listeners map instead of separate http_tcp_listeners and https_listeners arrays
   # Use locals to avoid conditional type inconsistency
-  _http_listener = {
+  http_listener = {
     http = {
       port     = var.http_port
       protocol = "HTTP"
@@ -121,7 +121,7 @@ locals {
     }
   }
 
-  _https_listener = var.https_enabled ? {
+  https_listener = var.https_enabled ? {
     https = {
       port            = 443
       protocol        = "HTTPS"
@@ -132,7 +132,7 @@ locals {
     }
   } : {}
 
-  _tcp_listeners = {
+  tcp_listeners = {
     for index, port_mapping in var.port_mappings :
     "tcp-${port_mapping["host_port"]}" => {
       port     = port_mapping["host_port"]
@@ -143,7 +143,7 @@ locals {
     } if !lookup(port_mapping, "tls", false)
   }
 
-  _tls_listeners = var.https_enabled ? {
+  tls_listeners = var.https_enabled ? {
     for index, port_mapping in var.port_mappings :
     "tls-${port_mapping["host_port"]}" => {
       port            = port_mapping["host_port"]
@@ -156,8 +156,8 @@ locals {
   } : {}
 
   alb_listeners = merge(
-    var.app_type == "tcp-app" ? local._tcp_listeners : local._http_listener,
-    var.app_type == "tcp-app" ? local._tls_listeners : local._https_listener
+    var.app_type == "tcp-app" ? local.tcp_listeners : local.http_listener,
+    var.app_type == "tcp-app" ? local.tls_listeners : local.https_listener
   )
 
   ecs_service_tcp_port_mappings = [
