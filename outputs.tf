@@ -36,7 +36,7 @@ output "alb_arn" {
 
 output "efs_mount_target" {
   description = "DNS name of the EFS mount target (if EFS is created)"
-  value       = var.efs_enabled && var.efs_share_create ? module.efs.mount_target_dns_names[0] : ""
+  value = var.efs_enabled && var.efs_share_create ? module.efs.dns_name : ""
 }
 
 output "eips" {
