@@ -5,7 +5,7 @@ locals {
   ecs_cluster_arn  = length(var.ecs_cluster_arn) != "" ? var.ecs_cluster_arn : "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${local.ecs_cluster_name}"
   ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : var.name
   name_prefix      = "${substr(var.name, 0, 5)}-"
-  domain_names     = var.root_domain_name != "" ? concat([
+  domain_names = var.root_domain_name != "" ? concat([
     "${var.name}.${var.env}.${var.root_domain_name}"
   ], var.domain_names) : []
 
@@ -106,8 +106,8 @@ locals {
         }
       ]
     },
-  ] : [],
-      var.efs_enabled ? [
+    ] : [],
+    var.efs_enabled ? [
       {
         name = "efs",
         mount_point = {
@@ -131,7 +131,7 @@ locals {
         ]
       }
     ] : [],
-      (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
+    (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
   )
 
   # ALB v10+ now uses a listeners map instead of separate http_tcp_listeners and https_listeners arrays
@@ -181,8 +181,8 @@ locals {
   } : {}
 
   alb_listeners = merge(
-      var.app_type == "tcp-app" ? local._tcp_listeners : local._http_listener,
-      var.app_type == "tcp-app" ? local._tls_listeners : local._https_listener
+    var.app_type == "tcp-app" ? local._tcp_listeners : local._http_listener,
+    var.app_type == "tcp-app" ? local._tls_listeners : local._https_listener
   )
 
   ecs_service_tcp_port_mappings = [
@@ -251,5 +251,5 @@ locals {
       env               = var.env
       ec2_service_group = var.ec2_service_group
       ec2_eip_enabled   = tostring(var.ec2_eip_enabled)
-    }, )
+  }, )
 }
