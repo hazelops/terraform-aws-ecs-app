@@ -8,7 +8,7 @@ resource "aws_iam_role" "ecs_execution" {
   name = "${var.env}-${var.name}-ecs-execution-role"
 
   assume_role_policy = jsonencode({
-    "Version"   = "2012-10-17",
+    "Version" = "2012-10-17",
     "Statement" = [
       {
         "Sid"    = "",
@@ -32,7 +32,7 @@ resource "aws_iam_role" "ecs_task_role" {
   name = "${var.env}-${var.name}-ecs-task-role"
 
   assume_role_policy = jsonencode({
-    "Version"   = "2012-10-17",
+    "Version" = "2012-10-17",
     "Statement" = [
       {
         "Sid"    = "",

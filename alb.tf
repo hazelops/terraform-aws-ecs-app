@@ -2,7 +2,7 @@ module "alb" {
   count = var.app_type == "web" || var.app_type == "tcp-app" ? 1 : 0
 
   source  = "registry.terraform.io/terraform-aws-modules/alb/aws"
-  version = "~> 10.2"
+  version = "~> 10.4"
 
   name               = var.public ? local.name : "${local.name}-private"
   load_balancer_type = var.app_type == "web" ? "application" : "network"
@@ -12,7 +12,7 @@ module "alb" {
   subnets            = var.public ? var.public_subnets : var.private_subnets
   idle_timeout       = var.alb_idle_timeout
 
-  enable_deletion_protection = var.alb_enable_deletion_protection
+  enable_deletion_protection = var.alb_deletion_protection_enabled
 
 
 
