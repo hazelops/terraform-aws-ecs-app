@@ -2,13 +2,35 @@ locals {
   name             = "${var.env}-${var.name}"
   ecs_service_name = var.ecs_service_name != "" ? var.ecs_service_name : "${var.env}-${var.name}"
   ecs_cluster_name = var.ecs_cluster_name
-  ecs_cluster_arn  = length(var.ecs_cluster_arn) != "" ? var.ecs_cluster_arn : "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:cluster/${local.ecs_cluster_name}"
+  ecs_cluster_arn  = length(var.ecs_cluster_arn) != "" ? var.ecs_cluster_arn : "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${local.ecs_cluster_name}"
   ecr_repo_name    = var.ecr_repo_name != "" ? var.ecr_repo_name : var.name
   name_prefix      = "${substr(var.name, 0, 5)}-"
   domain_names = var.root_domain_name != "" ? concat([
     "${var.name}.${var.env}.${var.root_domain_name}"
   ], var.domain_names) : []
 
+  # EFS access points - default configuration in terraform-aws-modules/efs format
+  efs_access_points_default = {
+    "data" = {
+      name = "data"
+      posix_user = {
+        gid            = 1001
+        uid            = 5000
+        secondary_gids = [1002, 1003]
+      }
+      root_directory = {
+        path = "/"
+        creation_info = {
+          owner_gid   = 1001
+          owner_uid   = 5000
+          permissions = "0755"
+        }
+      }
+    }
+  }
+
+  # Use provided var.efs_access_points or fall back to default
+  efs_access_points = length(var.efs_access_points) > 0 ? var.efs_access_points : local.efs_access_points_default
 
   # Datadog Environment Variables: https://docs.datadoghq.com/agent/guide/environment-variables/
   #                                https://docs.datadoghq.com/agent/docker/apm/?tab=linux#docker-apm-agent-environment-variables
@@ -101,7 +123,10 @@ locals {
             root_directory : var.efs_root_directory
             transit_encryption : "ENABLED"
             transit_encryption_port : 2999
-            authorization_config : var.efs_share_create ? {} : var.efs_authorization_config # TODO: Upgrade CloudPosse module and build the config here.
+            authorization_config : var.efs_share_create && length(module.efs.access_points) > 0 ? {
+              access_point_id = try(values(module.efs.access_points)[0].id, null)
+              iam             = "ENABLED"
+            } : (var.efs_share_create ? {} : var.efs_authorization_config)
           }
         ]
       }
@@ -109,8 +134,8 @@ locals {
     (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
   )
 
-  # ALB v10+ uses a listeners map instead of separate http_tcp_listeners and https_listeners arrays
-  # Use locals to avoid conditional type inconsistency
+  # ALB v10+ now uses a listeners map instead of separate http_tcp_listeners and https_listeners arrays
+  # Locals used to avoid conditional type inconsistency
   http_listener = {
     http = {
       port     = var.http_port
