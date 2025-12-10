@@ -1,6 +1,6 @@
 module "efs" {
   source  = "registry.terraform.io/terraform-aws-modules/efs/aws"
-  version = "~> 2.0"
+  version = "~> 1.0"
 
   create = var.efs_enabled && var.efs_share_create ? true : false
 

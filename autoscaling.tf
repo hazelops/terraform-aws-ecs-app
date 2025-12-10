@@ -12,7 +12,7 @@ resource "aws_eip" "autoscaling" {
 
 module "autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
-  version = "~> 9.0"
+  version = "~> 8"
 
   create                 = var.ecs_launch_type == "EC2" ? true : false
   create_launch_template = var.ecs_launch_type == "EC2" ? true : false
