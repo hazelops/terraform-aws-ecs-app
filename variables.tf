@@ -761,3 +761,9 @@ variable "alb_access_logs_s3prefix" {
   description = "S3 prefix for ALB access logs"
   default     = ""
 }
+
+variable "alb_deletion_protection_enabled" {
+  type        = bool
+  description = "If true, deletion protection of the load balancer will be enabled."
+  default     = true
+}
