@@ -23,4 +23,3 @@ data "aws_ami" "this" {
 
   owners = ["amazon"]
 }
-
