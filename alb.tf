@@ -2,7 +2,7 @@ module "alb" {
   count = var.app_type == "web" || var.app_type == "tcp-app" ? 1 : 0
 
   source  = "registry.terraform.io/terraform-aws-modules/alb/aws"
-  version = "~> 9"
+  version = "~> 10.4"
 
   name               = var.public ? local.name : "${local.name}-private"
   load_balancer_type = var.app_type == "web" ? "application" : "network"
