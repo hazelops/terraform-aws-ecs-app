@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        terraform_version: [1.5.6, 1.10.1] # Actual and latest versions used
+        terraform_version: [1.5.7, 1.14.2] # Actual and latest versions used
       fail-fast: false
     steps:
       - name: Checkout Code
@@ -45,7 +45,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        terraform_version: [1.5.6, 1.10.1] # Actual and latest versions used
+        terraform_version: [1.5.7, 1.14.2] # Actual and latest versions used
       fail-fast: false
     steps:
       - name: Checkout Code
