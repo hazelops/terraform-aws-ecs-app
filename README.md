@@ -66,20 +66,19 @@ See [examples](./examples) for more usage options.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.47.0 |
-| <a name="provider_template"></a> [template](#provider\_template) | 2.2.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.25.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_alb"></a> [alb](#module\_alb) | registry.terraform.io/terraform-aws-modules/alb/aws | ~> 7.0 |
+| <a name="module_alb"></a> [alb](#module\_alb) | registry.terraform.io/terraform-aws-modules/alb/aws | ~> 10.4 |
 | <a name="module_autoscaling"></a> [autoscaling](#module\_autoscaling) | terraform-aws-modules/autoscaling/aws | ~> 6.0 |
 | <a name="module_datadog"></a> [datadog](#module\_datadog) | registry.terraform.io/hazelops/ecs-datadog-agent/aws | ~> 3.3 |
-| <a name="module_ecr"></a> [ecr](#module\_ecr) | registry.terraform.io/hazelops/ecr/aws | ~> 1.1 |
-| <a name="module_efs"></a> [efs](#module\_efs) | registry.terraform.io/cloudposse/efs/aws | ~> 0.36 |
-| <a name="module_nginx"></a> [nginx](#module\_nginx) | registry.terraform.io/hazelops/ecs-nginx-proxy/aws | ~> 1.0 |
-| <a name="module_route_53_health_check"></a> [route\_53\_health\_check](#module\_route\_53\_health\_check) | registry.terraform.io/hazelops/route53-healthcheck/aws | ~> 1.0 |
+| <a name="module_ecr"></a> [ecr](#module\_ecr) | registry.terraform.io/hazelops/ecr/aws | ~> 2.0 |
+| <a name="module_efs"></a> [efs](#module\_efs) | registry.terraform.io/terraform-aws-modules/efs/aws | ~> 2.0 |
+| <a name="module_nginx"></a> [nginx](#module\_nginx) | registry.terraform.io/hazelops/ecs-nginx-proxy/aws | ~> 2.0 |
+| <a name="module_route_53_health_check"></a> [route\_53\_health\_check](#module\_route\_53\_health\_check) | registry.terraform.io/hazelops/route53-healthcheck/aws | ~> 3.0 |
 | <a name="module_service"></a> [service](#module\_service) | ./modules/ecs-service | n/a |
 
 ## Resources
@@ -90,10 +89,10 @@ See [examples](./examples) for more usage options.
 | [aws_iam_role_policy.ec2_auto_eip](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_route53_record.alb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.ec2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_ami.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_iam_instance_profile.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_instance_profile) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
-| [template_file.asg_ecs_ec2_user_data](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
 
 ## Inputs
 
@@ -102,6 +101,8 @@ See [examples](./examples) for more usage options.
 | <a name="input_additional_container_definition_parameters"></a> [additional\_container\_definition\_parameters](#input\_additional\_container\_definition\_parameters) | Additional parameters passed straight to the container definition, eg. tmpfs config | `any` | `{}` | no |
 | <a name="input_alb_access_logs_enabled"></a> [alb\_access\_logs\_enabled](#input\_alb\_access\_logs\_enabled) | If true, ALB access logs will be written to S3 | `bool` | `false` | no |
 | <a name="input_alb_access_logs_s3bucket_name"></a> [alb\_access\_logs\_s3bucket\_name](#input\_alb\_access\_logs\_s3bucket\_name) | S3 bucket name for ALB access logs | `string` | `""` | no |
+| <a name="input_alb_access_logs_s3prefix"></a> [alb\_access\_logs\_s3prefix](#input\_alb\_access\_logs\_s3prefix) | S3 prefix for ALB access logs | `string` | `""` | no |
+| <a name="input_alb_deletion_protection_enabled"></a> [alb\_deletion\_protection\_enabled](#input\_alb\_deletion\_protection\_enabled) | If true, deletion protection of the load balancer will be enabled. | `bool` | `true` | no |
 | <a name="input_alb_deregistration_delay"></a> [alb\_deregistration\_delay](#input\_alb\_deregistration\_delay) | The amount of time, in seconds, for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused | `number` | `5` | no |
 | <a name="input_alb_health_check_healthy_threshold"></a> [alb\_health\_check\_healthy\_threshold](#input\_alb\_health\_check\_healthy\_threshold) | The number of consecutive health checks successes required before considering an unhealthy target healthy | `number` | `3` | no |
 | <a name="input_alb_health_check_interval"></a> [alb\_health\_check\_interval](#input\_alb\_health\_check\_interval) | The approximate amount of time, in seconds, between health checks of an individual target | `number` | `30` | no |
@@ -162,6 +163,8 @@ See [examples](./examples) for more usage options.
 | <a name="input_ecs_service_name"></a> [ecs\_service\_name](#input\_ecs\_service\_name) | The ECS service name | `string` | `""` | no |
 | <a name="input_ecs_task_health_check_command"></a> [ecs\_task\_health\_check\_command](#input\_ecs\_task\_health\_check\_command) | Command to check for the health of the container | `string` | `""` | no |
 | <a name="input_ecs_volumes_from"></a> [ecs\_volumes\_from](#input\_ecs\_volumes\_from) | The VolumeFrom property specifies details on a data volume from another container in the same task definition | `list(any)` | `[]` | no |
+| <a name="input_efs_access_points"></a> [efs\_access\_points](#input\_efs\_access\_points) | EFS access points - map of access point definitions. See terraform-aws-modules/efs/aws documentation for format. | `any` | `{}` | no |
+| <a name="input_efs_authorization_config"></a> [efs\_authorization\_config](#input\_efs\_authorization\_config) | EFS authorization config | <pre>object({<br>    access_point_id = string<br>    iam             = string<br>  })</pre> | <pre>{<br>  "access_point_id": null,<br>  "iam": "ENABLED"<br>}</pre> | no |
 | <a name="input_efs_enabled"></a> [efs\_enabled](#input\_efs\_enabled) | Whether to enable EFS mount for ECS task | `bool` | `false` | no |
 | <a name="input_efs_file_system_id"></a> [efs\_file\_system\_id](#input\_efs\_file\_system\_id) | EFS file system ID | `string` | `""` | no |
 | <a name="input_efs_mount_point"></a> [efs\_mount\_point](#input\_efs\_mount\_point) | EFS mount point in the container | `string` | `"/mnt/efs"` | no |
@@ -214,7 +217,7 @@ See [examples](./examples) for more usage options.
 | <a name="input_volumes"></a> [volumes](#input\_volumes) | Amazon data volumes for ECS Task (efs/FSx/Docker volume/Bind mounts) | `list(any)` | `[]` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | AWS VPC ID | `string` | n/a | yes |
 | <a name="input_web_proxy_docker_container_port"></a> [web\_proxy\_docker\_container\_port](#input\_web\_proxy\_docker\_container\_port) | Proxy docker container port | `number` | `80` | no |
-| <a name="input_web_proxy_docker_image_tag"></a> [web\_proxy\_docker\_image\_tag](#input\_web\_proxy\_docker\_image\_tag) | Nginx proxy docker image tag | `string` | `"1.19.2-alpine"` | no |
+| <a name="input_web_proxy_docker_image_tag"></a> [web\_proxy\_docker\_image\_tag](#input\_web\_proxy\_docker\_image\_tag) | Nginx proxy docker image tag | `string` | `"1.28.0-alpine"` | no |
 | <a name="input_web_proxy_enabled"></a> [web\_proxy\_enabled](#input\_web\_proxy\_enabled) | Nginx proxy enabled | `bool` | `false` | no |
 | <a name="input_zone_id"></a> [zone\_id](#input\_zone\_id) | AWS Route53 Zone ID | `string` | `""` | no |
 
@@ -232,6 +235,6 @@ See [examples](./examples) for more usage options.
 | <a name="output_eips"></a> [eips](#output\_eips) | List of EIPs associated with the EC2 instances (if EC2 is used) |
 | <a name="output_public_ip"></a> [public\_ip](#output\_public\_ip) | Public IP of the EC2 instance (if EC2 is used) |
 | <a name="output_r53_lb_dns_name"></a> [r53\_lb\_dns\_name](#output\_r53\_lb\_dns\_name) | DNS name of the record that is attached to the ALB (if app type is web or tcp-ap) |
-| <a name="output_this_target_group_arn"></a> [this\_target\_group\_arn](#output\_this\_target\_group\_arn) | n/a |
+| <a name="output_this_target_group_arn"></a> [this\_target\_group\_arn](#output\_this\_target\_group\_arn) | ALB v10+ target\_groups is a map, not an array |
 | <a name="output_this_task_definition_arn"></a> [this\_task\_definition\_arn](#output\_this\_task\_definition\_arn) | n/a |
 <!-- END_TF_DOCS -->
