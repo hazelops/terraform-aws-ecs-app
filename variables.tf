@@ -243,7 +243,7 @@ variable "web_proxy_enabled" {
 variable "web_proxy_docker_image_tag" {
   type        = string
   description = "Nginx proxy docker image tag"
-  default     = "1.19.2-alpine"
+  default     = "1.28.0-alpine"
 }
 variable "proxy_docker_image_name" {
   type        = string
