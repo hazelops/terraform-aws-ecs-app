@@ -8,7 +8,6 @@ data "aws_iam_instance_profile" "this" {
 
 # Get latest AMI info for Amazon Linux 2023 ECS optimized
 data "aws_ami" "this" {
-  count       = var.ecs_launch_type == "EC2" && var.image_id == null ? 1 : 0
   most_recent = true
 
   filter {
