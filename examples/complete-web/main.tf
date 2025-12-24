@@ -7,7 +7,7 @@ data "aws_route53_zone" "root" {
 # Main
 module "vpc" {
   source  = "registry.terraform.io/terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "~> 6.0"
 
   name = "${var.env}-vpc"
   cidr = "10.1.0.0/16"
@@ -65,7 +65,7 @@ resource "aws_route53_zone" "env_domain" {
 
 module "env_acm" {
   source  = "registry.terraform.io/terraform-aws-modules/acm/aws"
-  version = "~> 4.0"
+  version = "~> 6.0"
 
   domain_name = "${var.env}.${var.root_domain_name}"
 
@@ -75,6 +75,8 @@ module "env_acm" {
 
   zone_id = aws_route53_zone.env_domain.id
 
+  validation_method = "DNS"
+
   tags = {
     Name = "${var.env}.${var.root_domain_name}"
   }
@@ -82,7 +84,7 @@ module "env_acm" {
 
 module "ecs" {
   source       = "registry.terraform.io/terraform-aws-modules/ecs/aws"
-  version      = "~> 4.0"
+  version      = "~> 6.0"
   cluster_name = "${var.env}-${var.namespace}-app"
 }
 
@@ -104,6 +106,7 @@ module "web_complete" {
   alb_health_check_path = "/"
   alb_security_groups   = [aws_security_group.default_permissive.id]
   tls_cert_arn = local.tls_cert_arn
+  alb_deletion_protection_enabled = false
 
   # EFS settings
   efs_enabled     = true
