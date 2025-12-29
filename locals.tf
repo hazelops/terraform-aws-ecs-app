@@ -87,6 +87,9 @@ locals {
           }
         }
       ]
+
+      # Empty EFS config for type consistency
+      efs_volume_configuration = []
     },
     {
       name = "nginx-app",
@@ -105,6 +108,9 @@ locals {
           }
         }
       ]
+
+      # Empty EFS config for type consistency
+      efs_volume_configuration = []
     },
     ] : [],
     var.efs_enabled ? [
@@ -115,6 +121,9 @@ locals {
           "containerPath" = var.efs_mount_point,
           "readOnly"      = null
         }
+
+        # Empty Docker volume config for type consistency
+        docker_volume_configuration = []
 
         # We are passing the config only if we are not creating the share via the module.
         efs_volume_configuration = [
