@@ -1,7 +1,7 @@
 # Main
 module "vpc" {
   source  = "registry.terraform.io/terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "~> 6.0"
 
   name = "${var.env}-vpc"
   cidr = "10.0.0.0/16"
@@ -47,7 +47,7 @@ resource "aws_security_group" "default_permissive" {
 
 module "ecs" {
   source       = "registry.terraform.io/terraform-aws-modules/ecs/aws"
-  version      = "~> 4.0"
+  version      = "~> 6.0"
   cluster_name = "${var.env}-${var.namespace}-worker"
 }
 

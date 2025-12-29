@@ -243,7 +243,7 @@ variable "web_proxy_enabled" {
 variable "web_proxy_docker_image_tag" {
   type        = string
   description = "Nginx proxy docker image tag"
-  default     = "1.19.2-alpine"
+  default     = "1.28.0-alpine"
 }
 variable "proxy_docker_image_name" {
   type        = string
@@ -622,22 +622,9 @@ variable "efs_authorization_config" {
 }
 
 variable "efs_access_points" {
-  type        = object({})
-  description = "EFS access points"
-  default = {
-    "data" = {
-      posix_user = {
-        gid            = "1001"
-        uid            = "5000"
-        secondary_gids = "1002,1003"
-      }
-      creation_info = {
-        gid         = "1001"
-        uid         = "5000"
-        permissions = "0755"
-      }
-    }
-  }
+  type        = any
+  description = "EFS access points - map of access point definitions. See terraform-aws-modules/efs/aws documentation for format."
+  default     = {}
 }
 
 variable "ecs_service_deployed" {
@@ -687,7 +674,7 @@ variable "ecs_exec_prompt_string" {
 variable "additional_container_definition_parameters" {
   type        = any
   description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
-  default     = {}
+  default = {}
 }
 
 
@@ -730,7 +717,7 @@ variable "create_schedule" {
 variable "schedules" {
   type        = map(any)
   description = "Map of autoscaling group schedule to create"
-  default     = {}
+  default = {}
 }
 
 variable "docker_labels" {
@@ -777,6 +764,6 @@ variable "alb_access_logs_s3prefix" {
 
 variable "alb_deletion_protection_enabled" {
   type        = bool
-  description = "If true, deletion of the load balancer will be disabled via the AWS API. This will prevent Terraform from deleting the load balancer"
+  description = "If true, deletion protection of the load balancer will be enabled."
   default     = true
 }

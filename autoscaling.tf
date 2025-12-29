@@ -1,3 +1,4 @@
+
 resource "aws_eip" "autoscaling" {
   # If ec2_eip_count is set, use that number for number of EIPs, otherwise use var.max_size + 1 (but that might not be the best during downscaling and deletion of EIPs
   count            = var.ec2_eip_enabled ? (var.ec2_eip_count > 0 ? var.ec2_eip_count : var.max_size + 1) : 0
@@ -21,7 +22,7 @@ module "autoscaling" {
   launch_template_name = local.name
 
   # Auto scaling group
-  image_id        = var.image_id
+  image_id        = var.image_id != null ? var.image_id : data.aws_ami.this.id
   instance_type   = var.instance_type
   security_groups = var.security_groups
   key_name        = var.key_name
@@ -67,7 +68,7 @@ module "autoscaling" {
   desired_capacity          = var.desired_capacity
   wait_for_capacity_timeout = 0
 
-  # Autoscaling v9+ removed create_schedule variable, schedules are created if the map is not empty
+  # Autoscaling module v9+ removed create_schedule variable, schedules are created if the map is not empty
   schedules = var.schedules
 
   tags = {

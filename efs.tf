@@ -5,15 +5,10 @@ module "efs" {
   create = var.efs_enabled && var.efs_share_create ? true : false
 
   name = var.name
-#   tags = {
-#     Environment = var.env
-#   }
 
-  # Создаем security group для EFS
   create_security_group = true
   security_group_vpc_id = var.vpc_id
 
-  # Разрешаем доступ из существующих security groups
   security_group_ingress_rules = {
     for idx, sg_id in var.security_groups :
     "from_sg_${idx}" => {
@@ -35,5 +30,5 @@ module "efs" {
   }
 
   # Access points
-  access_points = var.efs_access_points
+  access_points = local.efs_access_points
 }

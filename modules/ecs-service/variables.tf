@@ -161,7 +161,7 @@ variable "sidecar_container_definitions" {
 variable "additional_container_definition_parameters" {
   type        = any
   description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
-  default     = {}
+  default = {}
 }
 
 

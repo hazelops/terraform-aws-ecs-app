@@ -78,23 +78,23 @@ module "service" {
 
   sidecar_container_definitions = concat(
     var.sidecar_container_definitions,
-    var.web_proxy_enabled ? [
+      var.web_proxy_enabled ? [
       module.nginx.container_definition
     ] : [],
-    var.datadog_enabled ? [
+      var.datadog_enabled ? [
       module.datadog.container_definition
     ] : [],
-    var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
+      var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
   )
 
   docker_container_links = concat(
-    var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
+      var.datadog_enabled && var.ecs_network_mode == "bridge" ? [
       "datadog-agent:datadog-agent"
-  ] : [])
+    ] : [])
 
   docker_container_depends_on = concat(
     # TODO: This needs to be pulled from datadog agent module output
-    var.datadog_enabled ? [
+      var.datadog_enabled ? [
       {
         containerName = "datadog-agent",
         condition     = "START"
@@ -120,7 +120,7 @@ module "service" {
     APP_NAME      = var.name
     ENV           = var.env
     PROXY_ENABLED = var.web_proxy_enabled ? "true" : "false"
-    }
+  }
   )
 }
 
@@ -146,4 +146,3 @@ resource "aws_route53_record" "ec2" {
 
   records = var.ec2_eip_enabled ? aws_eip.autoscaling.*.public_ip : []
 }
-

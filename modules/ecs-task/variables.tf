@@ -135,7 +135,7 @@ variable "sidecar_container_definitions" {
 variable "additional_container_definition_parameters" {
   type        = any
   description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
-  default     = {}
+  default = {}
 }
 
 
@@ -176,7 +176,7 @@ variable "ecs_network_mode" {
 variable "ecs_network_configuration" {
   type        = map(any)
   description = "ECS Network Configuration"
-  default     = {}
+  default = {}
 }
 
 variable "ecs_task_family_name" {
@@ -224,12 +224,6 @@ variable "firelens_ecs_log_enabled" {
   type        = bool
   description = "AWSFirelens ECS logs enabled"
   default     = false
-}
-
-variable "dd_api_key_ssm_path" {
-  type        = string
-  description = "SSM Parameter Store path for Datadog API key. Required when firelens_ecs_log_enabled is true."
-  default     = "/global/DD_API_KEY"
 }
 
 variable "tmpfs_enabled" {

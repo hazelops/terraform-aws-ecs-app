@@ -65,9 +65,7 @@ resource "aws_service_discovery_service" "this" {
       type = "SRV"
     }
   }
-  health_check_custom_config {
-    # failure_threshold removed - AWS no longer supports this parameter (always set to 1)
-  }
+  health_check_custom_config {}
 }
 
 # This service resource has task definition lifecycle policy, so terraform is NOT used to deploy it (ecs cli used instead)

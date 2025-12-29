@@ -43,7 +43,7 @@ resource "aws_ecs_task_definition" "this" {
       }
     }
   }
-  network_mode = var.ecs_network_mode
+  network_mode             = var.ecs_network_mode
   requires_compatibilities = [
     var.ecs_launch_type
   ]

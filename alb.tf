@@ -14,8 +14,6 @@ module "alb" {
 
   enable_deletion_protection = var.alb_deletion_protection_enabled
 
-
-
   # ALB v10+ uses listeners map and target_groups map
   listeners = local.alb_listeners
 
