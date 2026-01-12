@@ -1,11 +1,11 @@
 variable "env" {
   type        = string
-  description = "Target environment name of the infrastructure"
+  description = "Environment name (dev, prod)"
 }
 
 variable "name" {
   type        = string
-  description = "ECS app name including all required namespaces"
+  description = "Application name. Used as the primary identifier for all created resources (e.g., 'api', 'worker', 'web')"
 }
 
 variable "app_type" {
@@ -27,8 +27,13 @@ variable "ecs_service_name" {
 
 variable "ecs_platform_version" {
   type        = string
-  description = "The platform version on which to run your service. Only applicable when using Fargate launch type"
+  description = "The platform version on which to run your service. Only applicable when using Fargate launch type. Valid values are LATEST, or a specific version like 1.4.0"
   default     = "LATEST"
+
+  validation {
+    condition     = var.ecs_platform_version == "LATEST" || can(regex("^\\d+\\.\\d+\\.\\d+$", var.ecs_platform_version))
+    error_message = "The ecs_platform_version must be 'LATEST' or a semantic version like '1.4.0'."
+  }
 }
 
 
@@ -41,17 +46,17 @@ variable "ec2_service_group" {
 variable "instance_type" {
   type        = string
   description = "EC2 instance type for ECS"
-  default     = "t3.small"
+  default     = "t4g.nano"
 }
 
 variable "environment" {
   type        = map(string)
-  description = "Map of parameters to be set in SSM and then exposed into a Task Definition as environment variables."
+  description = "Map of environment variables to be stored in SSM Parameter Store and exposed to the ECS task. Example: { API_KEY = 'value', DATABASE_URL = 'value' }"
 }
 
 variable "public" {
   type        = bool
-  description = "It's publicity accessible application"
+  description = "It's publicly accessible application"
   default     = true
 }
 
@@ -63,7 +68,7 @@ variable "app_secrets" {
 
 variable "public_ecs_service" {
   type        = bool
-  description = "It's publicity accessible service"
+  description = "It's publicly accessible service"
   default     = false
 }
 
@@ -86,19 +91,19 @@ variable "ssm_global_secret_path" {
 }
 
 variable "public_subnets" {
-  type        = list(any)
+  type        = list(string)
   description = "VPC Public subnets to place ECS resources"
   default     = []
 }
 
 variable "private_subnets" {
-  type        = list(any)
+  type        = list(string)
   description = "VPC Private subnets to place ECS resources"
   default     = []
 }
 
 variable "security_groups" {
-  type        = list(any)
+  type        = list(string)
   description = "Security groups to assign to ECS Fargate task/ECS EC2"
   default     = []
 }
@@ -129,25 +134,25 @@ variable "image_id" {
 
 variable "root_domain_name" {
   type        = string
-  description = "Domain name of AWS Route53 Zone"
+  description = "Root domain name for Route53 DNS records (e.g., 'example.com'). Leave empty if not using custom domain"
   default     = ""
 }
 
 variable "domain_names" {
-  type        = list(any)
+  type        = list(string)
   description = "Domain names for AWS Route53 A records"
   default     = []
 }
 
 variable "zone_id" {
   type        = string
-  description = "AWS Route53 Zone ID"
+  description = "Route53 Hosted Zone ID for creating DNS records. Required if using custom domain"
   default     = ""
 }
 
 variable "vpc_id" {
   type        = string
-  description = "AWS VPC ID"
+  description = "ID of the VPC where ECS resources will be created. Required"
 }
 
 variable "assign_public_ip" {
@@ -157,7 +162,7 @@ variable "assign_public_ip" {
 }
 
 variable "alb_security_groups" {
-  type        = list(any)
+  type        = list(string)
   description = "Security groups to assign to ALB"
   default     = []
 }
@@ -171,7 +176,7 @@ variable "docker_registry" {
 # It should include registry, e.g. hashicorp/terraform
 variable "docker_image_name" {
   type        = string
-  description = "Docker image name"
+  description = "Docker image name without registry and tag (e.g., 'nginx', 'myapp/api'). Can include repository path"
   default     = ""
 }
 
@@ -183,7 +188,7 @@ variable "docker_image_tag" {
 
 variable "docker_container_port" {
   type        = number
-  description = "Docker container port"
+  description = "Port exposed by the Docker container. Default is 3000"
   default     = 3000
 }
 
@@ -194,9 +199,15 @@ variable "docker_host_port" {
 }
 
 variable "port_mappings" {
-  type        = any
-  description = "List of ports to open from a service"
-  default     = []
+  description = "List of additional port mappings for the container. Used for tcp-app type applications"
+  type = list(object({
+    container_port   = optional(number)
+    host_port        = optional(number)
+    protocol         = optional(string, "tcp")
+    container_name   = optional(string)
+    target_group_arn = optional(string)
+  }))
+  default = []
 }
 
 variable "docker_container_entrypoint" {
@@ -308,7 +319,7 @@ variable "ec2_eip_dns_enabled" {
 
 variable "ecs_cluster_name" {
   type        = string
-  description = "ECS cluster name"
+  description = "Name of the ECS cluster where the service will be deployed. Required"
 }
 
 variable "ecs_cluster_arn" {
@@ -321,6 +332,11 @@ variable "autoscaling_health_check_type" {
   type        = string
   description = "ECS 'EC2' or 'ELB' health check type"
   default     = "EC2"
+
+  validation {
+    condition     = contains(["EC2", "ELB"], var.autoscaling_health_check_type)
+    error_message = "The autoscaling_health_check_type must be either 'EC2' or 'ELB'."
+  }
 }
 
 variable "ecs_task_health_check_command" {
@@ -331,7 +347,7 @@ variable "ecs_task_health_check_command" {
 
 variable "alb_health_check_path" {
   type        = string
-  description = "ALB health check path"
+  description = "Path for ALB health check endpoint (e.g., '/health', '/api/health')"
   default     = "/health"
 }
 
@@ -361,7 +377,7 @@ variable "autoscaling_max_size" {
 
 variable "desired_capacity" {
   type        = number
-  description = "Desired number (capacity) of running ECS tasks"
+  description = "Desired number of running ECS tasks. Must be between min_size and max_size"
   default     = 1
 }
 
@@ -411,13 +427,18 @@ variable "route53_health_check_enabled" {
 variable "sns_service_subscription_endpoint" {
   type        = string
   description = "You can use different endpoints, such as email, Pagerduty, Slack, etc."
-  default     = "exmple@example.com"
+  default     = "example@example.com"
 }
 
 variable "sns_service_subscription_endpoint_protocol" {
   type        = string
-  description = "See valid protocols here: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_subscription#protocol-support"
+  description = "SNS subscription protocol. See valid protocols here: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_subscription#protocol-support"
   default     = "email"
+
+  validation {
+    condition     = contains(["email", "email-json", "http", "https", "sms", "sqs", "lambda", "firehose", "application"], var.sns_service_subscription_endpoint_protocol)
+    error_message = "The sns_service_subscription_endpoint_protocol must be a valid SNS protocol: email, email-json, http, https, sms, sqs, lambda, firehose, or application."
+  }
 }
 
 # The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs
@@ -428,7 +449,7 @@ variable "cpu" {
 
   validation {
     condition     = can(regex("256|512|1024|2048|4096", var.cpu))
-    error_message = "The cpu value must be a valid CPU value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html."
+    error_message = "The cpu value must be a valid CPU value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html"
   }
 }
 
@@ -439,7 +460,7 @@ variable "memory" {
 
   validation {
     condition     = can(regex("512|1024|2048|3072|4096|5120|6144|7168|8192|9216|10240|11264|12288|13312|14336|15360|16384|17408|18432|19456|20480|21504|22528|23552|24576|25600|26624|27648|28672|29696|30720", var.memory))
-    error_message = "The memory value must be a valid Memory value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html."
+    error_message = "The memory value must be a valid Memory value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html"
   }
 }
 
@@ -474,7 +495,7 @@ variable "ecs_network_mode" {
 
   validation {
     condition     = can(regex("awsvpc|host|bridge|none", var.ecs_network_mode))
-    error_message = "The ecs network mode value must be a valid ecs_network_mode value, see https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html."
+    error_message = "The ecs network mode value must be a valid ecs_network_mode value, please see https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html."
   }
 }
 
@@ -492,7 +513,7 @@ variable "https_enabled" {
 
 variable "ecr_repo_create" {
   type        = bool
-  description = "Creation of a ECR repo"
+  description = "Whether to create an ECR repository for this application. Set to true if you need a new registry"
   default     = false
 }
 
@@ -509,9 +530,19 @@ variable "ecr_repo_name" {
 }
 
 variable "resource_requirements" {
-  type        = list(any)
-  description = "The ResourceRequirement property specifies the type and amount of a resource to assign to a container. The only supported resource is a GPU"
-  default     = []
+  description = "Container resource requirements (GPU only). Specify GPU count for GPU-enabled tasks. Example: [{ type = 'GPU', value = '1' }]"
+  type = list(object({
+    type  = optional(string)
+    value = optional(string)
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for req in var.resource_requirements : req.type == "GPU"
+    ])
+    error_message = "Only GPU resource requirements are supported. Type must be 'GPU'."
+  }
 }
 
 variable "root_block_device_size" {
@@ -599,7 +630,7 @@ variable "efs_file_system_id" {
 
 variable "efs_mount_point" {
   type        = string
-  description = "EFS mount point in the container"
+  description = "Container path where EFS volume will be mounted (e.g., '/mnt/efs', '/data')"
   default     = "/mnt/efs"
 }
 
@@ -610,14 +641,19 @@ variable "efs_root_directory" {
 }
 
 variable "efs_authorization_config" {
+  description = "EFS authorization configuration. IAM can be ENABLED or DISABLED"
   type = object({
-    access_point_id = string
-    iam             = string
+    access_point_id = optional(string)
+    iam             = optional(string, "ENABLED")
   })
-  description = "EFS authorization config"
-  default = {
-    access_point_id = null
-    iam             = "ENABLED"
+  default = {}
+
+  validation {
+    condition = (
+      try(var.efs_authorization_config.iam, null) == null ||
+      contains(["ENABLED", "DISABLED"], var.efs_authorization_config.iam)
+    )
+    error_message = "efs_authorization_config.iam must be either 'ENABLED' or 'DISABLED'."
   }
 }
 
@@ -641,8 +677,8 @@ variable "ecs_volumes_from" {
 
 # https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
 variable "cloudwatch_schedule_expressions" {
-  description = "List of Cron-like Cloudwatch Event Rule schedule expressions (UTC time zone)"
-  type        = list(any)
+  description = "List of Cron-like Cloudwatch Event Rule schedule expressions (UTC time zone). Example: ['cron(0 10 * * ? *)', 'rate(5 minutes)']"
+  type        = list(string)
   default     = []
 }
 
@@ -654,7 +690,7 @@ variable "firelens_ecs_log_enabled" {
 
 variable "ecs_exec_enabled" {
   type        = bool
-  description = "Turns on the Amazon ECS Exec for the task"
+  description = "Enable Amazon ECS Exec for debugging. Allows you to execute commands in running containers using 'aws ecs execute-command'"
   default     = true
 }
 
@@ -674,7 +710,7 @@ variable "ecs_exec_prompt_string" {
 variable "additional_container_definition_parameters" {
   type        = any
   description = "Additional parameters passed straight to the container definition, eg. tmpfs config"
-  default = {}
+  default     = {}
 }
 
 
@@ -715,8 +751,16 @@ variable "create_schedule" {
 }
 
 variable "schedules" {
-  type        = map(any)
-  description = "Map of autoscaling group schedule to create"
+  description = "Map of autoscaling group schedules for EC2 Auto Scaling"
+  type = map(object({
+    desired_capacity = optional(number)
+    end_time         = optional(string)
+    max_size         = optional(number)
+    min_size         = optional(number)
+    recurrence       = optional(string)
+    start_time       = optional(string)
+    time_zone        = optional(string, "UTC")
+  }))
   default = {}
 }
 
@@ -730,17 +774,36 @@ variable "operating_system_family" {
   type        = string
   description = "Platform to be used with ECS. The valid values for Amazon ECS tasks hosted on Fargate are LINUX, WINDOWS_SERVER_2019_FULL, and WINDOWS_SERVER_2019_CORE. The valid values for Amazon ECS tasks hosted on EC2 are LINUX, WINDOWS_SERVER_2022_CORE, WINDOWS_SERVER_2022_FULL, WINDOWS_SERVER_2019_FULL, and WINDOWS_SERVER_2019_CORE, WINDOWS_SERVER_2016_FULL, WINDOWS_SERVER_2004_CORE, and WINDOWS_SERVER_20H2_CORE."
   default     = "LINUX"
+
+  validation {
+    condition = contains([
+      "LINUX",
+      "WINDOWS_SERVER_2019_FULL",
+      "WINDOWS_SERVER_2019_CORE",
+      "WINDOWS_SERVER_2022_CORE",
+      "WINDOWS_SERVER_2022_FULL",
+      "WINDOWS_SERVER_2016_FULL",
+      "WINDOWS_SERVER_2004_CORE",
+      "WINDOWS_SERVER_20H2_CORE"
+    ], var.operating_system_family)
+    error_message = "The operating_system_family must be a valid OS family. See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#runtime-platform"
+  }
 }
 
 variable "cpu_architecture" {
   type        = string
   description = "When you register a task definition, you specify the CPU architecture. The valid values are X86_64 and ARM64"
-  default     = "X86_64"
+  default     = "ARM64"
+
+  validation {
+    condition     = contains(["X86_64", "ARM64"], var.cpu_architecture)
+    error_message = "The cpu_architecture must be either 'X86_64' or 'ARM64'."
+  }
 }
 
 variable "ecr_force_delete" {
   type        = bool
-  description = "If true, will delete the ECR repository even if it contains images on destroy"
+  description = "If true, the ECR repository will be deleted even if it contains images on destroy"
   default     = false
 }
 
