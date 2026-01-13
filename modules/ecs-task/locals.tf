@@ -3,7 +3,7 @@ locals {
   docker_container_command    = (var.docker_container_command == [] ? [] : var.docker_container_command)
   docker_container_entrypoint = (var.docker_container_entrypoint == [] ? [] : var.docker_container_entrypoint)
 
-  ssm_secret_path = var.ssm_secret_path != null ? var.ssm_secret_path : "/${var.env}/${var.name}"
+  ssm_secret_path        = var.ssm_secret_path != null ? var.ssm_secret_path : "/${var.env}/${var.name}"
   ssm_global_secret_path = var.ssm_global_secret_path != null ? var.ssm_global_secret_path : "/${var.env}/global"
 
   # ECS Task Container definition file is filled with content here
@@ -21,12 +21,12 @@ locals {
       cpu               = var.ecs_launch_type == "FARGATE" ? var.cpu : null
       memoryReservation = var.memory_reservation
       essential         = true
-      healthCheck       = length(var.ecs_task_health_check_command) > 0 ? {
-        retries    = 3
-        timeout    = 5
-        interval   = 30
-        startPerid = null
-        command    = [
+      healthCheck = length(var.ecs_task_health_check_command) > 0 ? {
+        retries     = 3
+        timeout     = 5
+        interval    = 30
+        startPeriod = null
+        command = [
           "CMD-SHELL",
           var.ecs_task_health_check_command
         ]
@@ -34,7 +34,7 @@ locals {
 
       linuxParameters = var.operating_system_family == "LINUX" ? {
         sharedMemorySize = (var.shared_memory_size > 0 && var.ecs_launch_type != "FARGATE") ? var.shared_memory_size : null
-        tmpfs            = (var.tmpfs_enabled && var.ecs_launch_type != "FARGATE") ? [
+        tmpfs = (var.tmpfs_enabled && var.ecs_launch_type != "FARGATE") ? [
           {
             ContainerPath = var.tmpfs_container_path
             MountOptions  = var.tmpfs_mount_options
@@ -57,7 +57,7 @@ locals {
           name      = param_name
           valueFrom = "arn:aws:ssm:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:parameter${local.ssm_secret_path}/${param_name}"
         }
-      ], [
+        ], [
         for param_name in var.global_secrets :
         {
           name      = replace(param_name, "/", "") != param_name ? element(split("/", param_name), 1) : param_name
@@ -95,7 +95,7 @@ locals {
           "TLS"            = "on"
           "provider"       = "ecs"
         }
-      } : {
+        } : {
         "logDriver" = "awslogs",
         options = {
           "awslogs-group"         = aws_cloudwatch_log_group.this.name
@@ -110,7 +110,7 @@ locals {
 
 
   iam_ecs_execution_role_policy = {
-    "Version"   = "2012-10-17",
+    "Version" = "2012-10-17",
     "Statement" = concat(var.iam_role_policy_statement, [
       {
         "Effect" = "Allow",
