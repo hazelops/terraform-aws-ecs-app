@@ -3,6 +3,9 @@
 
 Create and manage AWS ECS application in a clean abstracted way.
 
+> [!WARNING]
+> This module requires AWS provider version 6.x or higher.
+
 This module is actively maintained and is covered by multiple end-to-end [tests](./test/examples_complete-web_test.go) to prevent regressions.
 
 ## Features
@@ -33,7 +36,7 @@ This is a minimal example which demostrates simplicity of the module:
 ```hcl
 module "api" {
   source     = "registry.terraform.io/hazelops/ecs-app/aws"
-  version    = "~>2.0.0"
+  version    = "~>3.0"
   name             = "api"
   
   env              = "prod"
