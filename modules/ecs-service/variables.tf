@@ -183,14 +183,14 @@ variable "ecs_launch_type" {
 }
 
 # The var.cpu & var.memory vars are valid only for FARGATE. EC2 instance type is used to set ECS EC2 specs
+# Please check: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-tasks-services.html#fargate-tasks-size
 variable "cpu" {
   type        = number
   description = "Fargate CPU value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
   default     = 256
-
   validation {
-    condition     = can(regex("256|512|1024|2048|4096", var.cpu))
-    error_message = "The cpu value must be a valid CPU value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html."
+    condition     = contains([256, 512, 1024, 2048, 4096, 8192, 16384], var.cpu)
+    error_message = "CPU must be one of: 256, 512, 1024, 2048, 4096, 8192, 16384. Please check: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html"
   }
 }
 
@@ -198,10 +198,15 @@ variable "memory" {
   type        = number
   description = "Fargate Memory value (https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html)"
   default     = 512
-
   validation {
-    condition     = can(regex("512|1024|2048|3072|4096|5120|6144|7168|8192|9216|10240|11264|12288|13312|14336|15360|16384|17408|18432|19456|20480|21504|22528|23552|24576|25600|26624|27648|28672|29696|30720", var.memory))
-    error_message = "The memory value must be a valid Memory value, https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html."
+    condition = contains([
+      512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 9216, 10240,
+      11264, 12288, 13312, 14336, 15360, 16384, 17408, 18432, 19456, 20480,
+      21504, 22528, 23552, 24576, 25600, 26624, 27648, 28672, 29696, 30720,
+      32768, 36864, 40960, 45056, 49152, 53248, 57344, 61440,
+      65536, 73728, 81920, 90112, 98304, 106496, 114688, 122880
+    ], var.memory)
+    error_message = "Memory must be a valid Fargate memory value. Please check: https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html"
   }
 }
 
