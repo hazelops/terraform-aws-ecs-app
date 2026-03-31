@@ -5,10 +5,12 @@ module "datadog_fargate" {
 
   create_task_definition = false
 
+  family            = "${var.env}-${var.name}"
   dd_api_key_secret = { arn = local.dd_api_key_secret_arn }
   dd_image_version  = var.datadog_jmx_enabled ? "latest-jmx" : "latest"
   dd_env            = var.env
   dd_service        = var.name
+  dd_environment    = []
 }
 
 # Datadog Monitoring Module - EC2 (can be enabled/disabled via datadog_enabled)
@@ -22,6 +24,7 @@ module "datadog_ec2" {
   family            = "${var.env}-${var.name}"
   dd_api_key_secret = { arn = local.dd_api_key_secret_arn }
   dd_image_version  = var.datadog_jmx_enabled ? "latest-jmx" : "latest"
+  dd_environment    = []
   network_mode      = var.ecs_network_mode
 }
 
