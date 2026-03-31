@@ -12,7 +12,7 @@ resource "aws_ecs_task_definition" "this" {
       host_path = lookup(volume.value, "host_path", null)
 
       dynamic "docker_volume_configuration" {
-        for_each = var.ecs_launch_type == "EC2" ? lookup(volume.value, "docker_volume_configuration", []) : []
+        for_each = var.ecs_launch_type == "EC2" ? coalesce(lookup(volume.value, "docker_volume_configuration", []), []) : []
         content {
           scope         = lookup(docker_volume_configuration.value, "scope", null)
           autoprovision = lookup(docker_volume_configuration.value, "autoprovision", null)
@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "this" {
       }
 
       dynamic "efs_volume_configuration" {
-        for_each = lookup(volume.value, "efs_volume_configuration", [])
+        for_each = coalesce(lookup(volume.value, "efs_volume_configuration", []), [])
         content {
           file_system_id          = lookup(efs_volume_configuration.value, "file_system_id", null)
           root_directory          = lookup(efs_volume_configuration.value, "root_directory", null)
