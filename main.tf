@@ -82,7 +82,7 @@ module "service" {
       module.nginx.container_definition
     ] : [],
       var.datadog_enabled ? [
-      module.datadog.container_definition
+      local.datadog_container_definition
     ] : [],
       var.firelens_ecs_log_enabled ? local.fluentbit_container_definition : []
   )

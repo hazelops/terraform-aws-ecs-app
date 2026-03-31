@@ -418,6 +418,12 @@ variable "datadog_jmx_enabled" {
   default     = false
 }
 
+variable "datadog_api_key_secret_arn" {
+  type        = string
+  description = "ARN of the Datadog API key secret (SSM Parameter or Secrets Manager). If not provided, the module will look up the SSM parameter at /<env>/global/DD_API_KEY"
+  default     = null
+}
+
 variable "route53_health_check_enabled" {
   type        = bool
   description = "AWS Route53 health check is enabled"

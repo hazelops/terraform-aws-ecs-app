@@ -32,6 +32,21 @@ locals {
   # Use provided var.efs_access_points or fall back to default
   efs_access_points = length(var.efs_access_points) > 0 ? var.efs_access_points : local.efs_access_points_default
 
+  # Datadog API key secret ARN - use provided ARN or look up from SSM
+  dd_api_key_secret_arn = var.datadog_api_key_secret_arn != null ? var.datadog_api_key_secret_arn : (
+    var.datadog_enabled ? data.aws_ssm_parameter.dd_api_key[0].arn : null
+  )
+
+  # Datadog container definition - pick from the right module based on launch type
+  datadog_container_definition = var.datadog_enabled ? (
+    var.ecs_launch_type == "FARGATE" ? module.datadog_fargate[0].container_definition : module.datadog_ec2[0].container_definition
+  ) : null
+
+  # Datadog volumes - pick from the right module based on launch type
+  datadog_volumes = var.datadog_enabled ? (
+    var.ecs_launch_type == "EC2" ? module.datadog_ec2[0].datadog_volumes : module.datadog_fargate[0].datadog_volumes
+  ) : []
+
   # Datadog Environment Variables: https://docs.datadoghq.com/agent/guide/environment-variables/
   #                                https://docs.datadoghq.com/agent/docker/apm/?tab=linux#docker-apm-agent-environment-variables
   datadog_env_vars = var.datadog_enabled ? {
@@ -140,7 +155,7 @@ locals {
         ]
       }
     ] : [],
-    (var.datadog_enabled && var.ecs_launch_type == "EC2") ? module.datadog.volumes : []
+    local.datadog_volumes
   )
 
   # ALB v10+ now uses a listeners map instead of separate http_tcp_listeners and https_listeners arrays
