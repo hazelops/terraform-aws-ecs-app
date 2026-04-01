@@ -4,6 +4,7 @@ module "datadog_fargate" {
   source = "github.com/hazelops/terraform-aws-ecs-datadog//modules/ecs_fargate?ref=feature/core-1560-datadog-module-created-based-on-theirs-and-our-modules"
 
   create_task_definition = false
+  create_task_role       = false
 
   family            = "${var.env}-${var.name}"
   dd_api_key_secret = { arn = local.dd_api_key_secret_arn }
@@ -19,6 +20,7 @@ module "datadog_ec2" {
   source = "github.com/hazelops/terraform-aws-ecs-datadog//modules/ecs_ec2?ref=feature/core-1560-datadog-module-created-based-on-theirs-and-our-modules"
 
   create_task_definition = false
+  create_task_role       = false
   create_service         = false
 
   family            = "${var.env}-${var.name}"
